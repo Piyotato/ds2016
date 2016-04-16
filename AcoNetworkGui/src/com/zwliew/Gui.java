@@ -1,7 +1,6 @@
 package com.zwliew;
 
 import javax.swing.*;
-import java.awt.*;
 
 /**
  * Created by zwliew on 25/3/16.
@@ -16,12 +15,7 @@ public class Gui extends JFrame {
 
     public static void main(String[] args) {
         // Initialize GUI in an Event-Dispatching thread for thread-safety
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new Gui().setVisible(true);
-            }
-        });
+        SwingUtilities.invokeLater(() -> new Gui().setVisible(true));
     }
 
     private void initComponents() {
@@ -60,15 +54,12 @@ public class Gui extends JFrame {
      * @return the newly initialized network panel
      */
     private JPanel initNetworkPanel() {
-        JPanel panel = new JPanel();
-
-        panel.setPreferredSize(new Dimension(538, 504));
 
         /*
          * TODO: Initialize the graph
          */
 
-        return panel;
+        return new JPanel();
     }
 
     /**
@@ -79,14 +70,58 @@ public class Gui extends JFrame {
      */
     private JPanel initConfigPanel() {
         JPanel panel = new JPanel();
-
-        panel.setPreferredSize(new Dimension(358, 504));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        /*
-         * TODO: Add in all the config options
-         */
+        JPanel graphConfigs = initGraphConfigs();
+        JPanel miscConfigs = initMiscConfigs();
+        panel.add(graphConfigs);
+        panel.add(miscConfigs);
 
         return panel;
+    }
+
+    /**
+     * Initializes a new graph configurations panel
+     * for displaying the graphs
+     *
+     * @return the newly initialized graph config panel
+     */
+    private JPanel initGraphConfigs() {
+        // TODO: Initialize the graphs
+        return new JPanel();
+    }
+
+    /**
+     * Initializes a new miscellaneous configuration panel
+     * for displaying the other config options
+     *
+     * @return the newly initialized misc config panel
+     */
+    private JPanel initMiscConfigs() {
+        JPanel configs = new JPanel();
+        configs.setLayout(new BoxLayout(configs, BoxLayout.Y_AXIS));
+
+        GuiPanel firstPanel = new GuiPanel();
+        firstPanel.addLabel("Packet : ants ratio");
+        firstPanel.addTextField(10);
+        firstPanel.addLabel("Size of tabu list");
+        firstPanel.addTextField(10);
+
+        GuiPanel secondPanel = new GuiPanel();
+        secondPanel.addLabel("Relative weightage");
+        secondPanel.addLabel("α");
+        secondPanel.addTextField(10);
+        secondPanel.addLabel("β");
+        secondPanel.addTextField(10);
+
+        GuiPanel thirdPanel = new GuiPanel();
+        thirdPanel.addLabel("Source / destination");
+        thirdPanel.addTextField(10);
+        thirdPanel.addTextField(10);
+
+        configs.add(firstPanel);
+        configs.add(secondPanel);
+        configs.add(thirdPanel);
+        return configs;
     }
 }
