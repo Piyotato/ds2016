@@ -31,9 +31,8 @@ class Ant extends Packet {
     void addNode(int node) {
         if (node == destination) {
             isBackwards = true;
-        } else {
-            path.add(node);
         }
+        path.add(node);
     }
 
     /**

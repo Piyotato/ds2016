@@ -6,33 +6,36 @@ import java.util.*;
  * Created by damian on 16/5/16.
  */
 class Node_EACO {
-
+    /* Todo: Resize pheromone table or add to object */
     boolean isOffline;
     UFDS DSU;
     private ArrayList<ArrayList<Double>> pheromone; // Node, Destination
     private ArrayList<Boolean> nodes; // Is offline
-    private ArrayList<SimpleEdge> edgeList;
+    private ArrayList<SimpleEdge> edgeList, neighbours;
     int numNodes;
     Queue<Ant> fastQ;
     Queue<Packet> slowQ;
-    int speed, ID;
+    int speed, NODEID;
 
     /**
      * Initialise a node
      *
-     * @param _ID Unique Identifier
+     * @param _NODEID Unique Identifier
      */
-    Node_EACO(int _ID) {
-        ID = _ID;
+    Node_EACO(int _NODEID) {
+        NODEID = _NODEID;
     }
 
     /**
      * Initialize the UFDS structure
      */
     private void initDSU() {
+        neighbours.clear();
         DSU = new UFDS(numNodes);
-        for (Edge_ACO edge: edgeList) {
-            if (edge.source == ID || edge.destination == ID) continue;
+        for (SimpleEdge edge: edgeList) {
+            if (edge.source == NODEID)
+                neighbours.add(edge);
+            if (edge.source == NODEID || edge.destination == NODEID) continue;
             if (edge.isOffline) continue;
             if (nodes.get(edge.source) || nodes.get(edge.destination)) continue;
             DSU.unionSet(edge.source, edge.destination);
@@ -48,12 +51,21 @@ class Node_EACO {
      * @param beta Weightage of cost
      * @return Neighbour for next hop
      */
-    int nextHop(int destination, int alpha, int beta) {
+    int nextHop(int destination, int alpha, int beta) throws IllegalStateException {
         double RNG = Math.random();
-        /* Stuff */
+        double totval = .0;
+        for (SimpleEdge edge: neighbours) {
+            totval += Math.pow(pheromone.get(edge.destination).get(destination), alpha) * Math.pow(edge.cost, beta);
+        }
+        for (SimpleEdge edge: neighbours) {
+            double val = Math.pow(pheromone.get(edge.destination).get(destination), alpha) * Math.pow(edge.cost, beta);
+            RNG -= val / totval;
+            if (RNG <= 0) return edge.destination;
+        }
+        throw new IllegalStateException();
     }
 
-    /* Todo: Implement actual updates */
+    /* Todo: Implement actual updates? */
 
     /* Todo: Update pheromone function */
 
@@ -72,7 +84,18 @@ class Node_EACO {
      */
     void toggleNode(int ID) {
         nodes.set(ID, !nodes.get(ID));
-        update();
+        if (nodes.get(ID)) {
+            update(true);
+        } else {
+            for (SimpleEdge edge: edgeList) {
+                if (edge.source != ID && edge.destination != ID) continue;
+                if (!edge.isOffline) {
+                    /* Todo: Add to neighbours if needed */
+                    DSU.unionSet(edge.source, edge.destination);
+                }
+            }
+            update(false);
+        }
     }
 
     /**
@@ -85,7 +108,9 @@ class Node_EACO {
     void addEdge(int node1, int node2, int cost) {
         edgeList.add(new SimpleEdge(node1, node2, cost));
         edgeList.add(new SimpleEdge(node2, node1, cost));
+        /* Todo: Add to neighbours if needed */
         DSU.unionSet(node1, node2);
+        update(false);
     }
 
     /**
@@ -97,17 +122,23 @@ class Node_EACO {
         SimpleEdge edge = edgeList.get(ID);
         edge.isOffline ^= true;
         if (edge.isOffline) {
-            update();
+            update(true);
         } else {
+            /* Todo: Add to neighbours if needed */
             DSU.unionSet(edge.source, edge.destination);
+            update(false);
         }
     }
 
     /**
      * Update DSU and heuristic
+     *
+     * @param full Whether a complete rebuild is needed
      */
-    private void update() {
-        initDSU();
+    private void update(boolean full) {
+        if (full) {
+            initDSU();
+        }
         /* Todo: efficiently update viability */
     }
 }

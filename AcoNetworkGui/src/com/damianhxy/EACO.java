@@ -36,8 +36,10 @@ public class EACO extends AlgoBase {
      *
      * @param ID Node ID
      */
-    void toggleNode(int ID) {
-        /* Todo: Perhaps ensure that source and destination are never offline */
+    void toggleNode(int ID) throws IllegalArgumentException {
+        if (ID == source || ID == destination) {
+            throw new IllegalArgumentException();
+        }
         /* Todo: Perhaps ensure that the graph is always complete */
         /* Propagated update */
         for (Node_EACO node: nodes) {
@@ -59,8 +61,10 @@ public class EACO extends AlgoBase {
      * @param node2 Second node
      * @param cost Time taken
      */
-    void addEdge(int node1, int node2, int cost) {
-        /* Todo: Perhaps ensure that the nodes exist */
+    void addEdge(int node1, int node2, int cost) throws IllegalArgumentException {
+        if (node1 >= numNodes || node2 >= numNodes) {
+            throw new IllegalArgumentException();
+        }
         /* Todo: Perhaps ensure that there are no multi-edges */
         /* Propagated update */
         for (Node_EACO node: nodes) {
@@ -90,7 +94,7 @@ public class EACO extends AlgoBase {
         }
 
     }
-    /* Todo: Find a more efficient way to find edges */
+    /* Todo: Find a more efficient way to access edges */
     /**
      * Simulate node
      *
@@ -110,7 +114,7 @@ public class EACO extends AlgoBase {
             ant.addNode(nxt);
             ant.totalTime += (double)node.slowQ.size() / node.speed;
             for (Edge_ACO edge: edgeList) {
-                if (edge.destination == nxt) {
+                if (edge.source == node.NODEID && edge.destination == nxt) {
                     edge.addAnt(ant, currentTime);
                     break;
                 }
@@ -121,7 +125,7 @@ public class EACO extends AlgoBase {
             int nxt = node.nextHop(packet.destination, alpha, beta);
             packet.nextHop = nxt;
             for (Edge_ACO edge: edgeList) {
-                if (edge.destination == nxt) {
+                if (edge.source == node.NODEID && edge.destination == nxt) {
                     edge.addPacket(packet, currentTime);
                     break;
                 }
@@ -139,8 +143,8 @@ public class EACO extends AlgoBase {
         int tot = 0;
         while (!edge.ants.isEmpty() && left > 0) {
             if (edge.ants.peek().timestamp > currentTime) break;
-            --left;
             Ant ant = edge.ants.poll();
+            --left;
             if (nodes.get(ant.nextHop).isOffline) continue; // Drop this Ant
             if (ant.nextHop == destination) ++tot;
             else if (ant.decrementTTL()) nodes.get(ant.nextHop).fastQ.add(ant);
