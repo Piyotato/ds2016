@@ -1,15 +1,18 @@
 package com.damianhxy;
 
 import java.util.*;
+import javafx.util.*;
 
 /**
  * Created by damian on 16/5/16.
  */
 public class EACO extends AlgoBase {
 
+    private int success, failure;
     private int alpha, beta, ratio, TTL;
     private ArrayList<Node_EACO> nodes;
     private ArrayList<Edge_ACO> edgeList;
+    private ArrayList<ArrayList<Edge_ACO>> adjList;
 
     /**
      * Initialize algorithm
@@ -28,6 +31,7 @@ public class EACO extends AlgoBase {
         }
         /* For simulation purposes */
         nodes.add(new Node_EACO(numNodes++));
+        adjList.add(new ArrayList<>());
     }
 
     /**
@@ -71,8 +75,12 @@ public class EACO extends AlgoBase {
             node.addEdge(node1, node2, cost);
         }
         /* For simulation purposes */
-        edgeList.add(new Edge_ACO(node1, node2, cost));
-        edgeList.add(new Edge_ACO(node2, node1, cost));
+        Edge_ACO forward = new Edge_ACO(node1, node2, cost);
+        Edge_ACO backward = new Edge_ACO(node2, node1, cost);
+        edgeList.add(forward);
+        edgeList.add(backward);
+        adjList.get(node1).add(forward);
+        adjList.get(node2).add(backward);
     }
 
     /**
@@ -89,12 +97,13 @@ public class EACO extends AlgoBase {
         Edge_ACO edge = edgeList.get(ID);
         edge.isOffline ^= true;
         if (edge.isOffline) {
+            failure += edge.packets.size() + edge.ants.size();
             edge.packets.clear();
             edge.ants.clear();
         }
 
     }
-    /* Todo: Find a more efficient way to access edges */
+
     /**
      * Simulate node
      *
@@ -105,18 +114,32 @@ public class EACO extends AlgoBase {
         while (!node.fastQ.isEmpty() && left-- > 0) {
             Ant ant = node.fastQ.poll();
             if (ant.isBackwards) {
-                /* Update Heuristics */
-                /* Travel backwards */
-                continue;
-            }
-            int nxt = node.nextHop(ant.destination, alpha, beta);
-            ant.nextHop = nxt;
-            ant.addNode(nxt);
-            ant.totalTime += (double)node.slowQ.size() / node.speed;
-            for (Edge_ACO edge: edgeList) {
-                if (edge.source == node.NODEID && edge.destination == nxt) {
-                    edge.addAnt(ant, currentTime);
-                    break;
+                Integer prev = ant.previousNode();
+                if (prev != null) {
+
+                }
+                if (ant.source == node.NODEID) continue; // Reached source
+                int nxt = ant.path.get(ant.path.size() - 2);
+                ant.nextHop = nxt;
+                if (nodes.get(nxt).isOffline) continue; // Drop Ant
+                for (Edge_ACO edge: adjList.get(node.NODEID)) {
+                    if (edge.destination == nxt) {
+                        edge.addAnt(ant, currentTime);
+                        break;
+                    }
+                }
+            } else { // Forward ant
+                int nxt = node.nextHop(ant.destination, alpha, beta);
+                ant.nextHop = nxt;
+                ant.addNode(nxt);
+                ant.totalTime += (double) node.slowQ.size() / node.speed;
+                if (ant.destination == node.NODEID) continue; // Reached destination
+                if (nodes.get(nxt).isOffline) continue; // Drop Ant
+                for (Edge_ACO edge : adjList.get(node.NODEID)) {
+                    if (edge.destination == nxt) {
+                        edge.addAnt(ant, currentTime);
+                        break;
+                    }
                 }
             }
         }
@@ -124,8 +147,16 @@ public class EACO extends AlgoBase {
             Packet packet = node.slowQ.poll();
             int nxt = node.nextHop(packet.destination, alpha, beta);
             packet.nextHop = nxt;
-            for (Edge_ACO edge: edgeList) {
-                if (edge.source == node.NODEID && edge.destination == nxt) {
+            if (packet.destination == node.NODEID) {
+                ++success;
+                continue;
+            }
+            if (nodes.get(nxt).isOffline) {
+                ++failure;
+                continue; // Drop Packet
+            }
+            for (Edge_ACO edge: adjList.get(node.NODEID)) {
+                if (edge.destination == nxt) {
                     edge.addPacket(packet, currentTime);
                     break;
                 }
@@ -138,26 +169,31 @@ public class EACO extends AlgoBase {
      *
      * @param edge Edge being processed
      */
-    private int processEdge(Edge_ACO edge) {
+    private void processEdge(Edge_ACO edge) {
         int left = edge.cost * SIM_SPEED;
-        int tot = 0;
         while (!edge.ants.isEmpty() && left > 0) {
             if (edge.ants.peek().timestamp > currentTime) break;
             Ant ant = edge.ants.poll();
             --left;
             if (nodes.get(ant.nextHop).isOffline) continue; // Drop this Ant
-            if (ant.nextHop == destination) ++tot;
-            else if (ant.decrementTTL()) nodes.get(ant.nextHop).fastQ.add(ant);
+            if (ant.nextHop == destination || ant.decrementTTL()) {
+                nodes.get(ant.nextHop).fastQ.add(ant);
+            }
         }
         while (!edge.packets.isEmpty() && left > 0) {
             if (edge.packets.peek().timestamp > currentTime) break;
             Packet packet = edge.packets.poll();
             --left;
-            if (nodes.get(packet.nextHop).isOffline) continue; // Drop this packet
-            if (packet.nextHop == destination) ++tot;
-            else if (packet.decrementTTL()) nodes.get(packet.nextHop).slowQ.add(packet);
+            if (nodes.get(packet.nextHop).isOffline) {
+                ++failure;
+                continue; // Drop this packet
+            }
+            if (packet.nextHop == destination || packet.decrementTTL()) {
+                nodes.get(packet.nextHop).slowQ.add(packet);
+            } else {
+                ++failure;
+            }
         }
-        return tot;
     }
 
     private void generatePackets() {
@@ -170,24 +206,25 @@ public class EACO extends AlgoBase {
         for (int a = 0; a < numAnts; ++a)
             src.fastQ.add(new Ant(source, destination, TTL));
     }
-    /* Todo: Calculate reliability */
+
     /**
      * One tick of the simulation
      *
-     * @return Throughput
+     * @return Success, Failure
      */
-    int tick() {
-        int tot = 0;
+    Pair<Integer, Integer> tick() {
         currentTime += SIM_SPEED;
         generatePackets();
         for (Edge_ACO edge: edgeList) {
             if (edge.isOffline) continue;
-            tot += processEdge(edge);
+            processEdge(edge);
         }
         for (Node_EACO node: nodes) {
             if (node.isOffline) continue;
             processNode(node);
         }
-        return tot;
+        Pair<Integer, Integer> ret = new Pair<>(success, failure);
+        success = failure = 0;
+        return ret;
     }
 }

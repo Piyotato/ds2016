@@ -8,7 +8,7 @@ import java.util.*;
 class Node_EACO {
     /* Todo: Resize pheromone table or add to object */
     boolean isOffline;
-    UFDS DSU;
+    private UFDS DSU;
     private ArrayList<ArrayList<Double>> pheromone; // Node, Destination
     private ArrayList<Boolean> nodes; // Is offline
     private ArrayList<SimpleEdge> edgeList, neighbours;
@@ -21,9 +21,12 @@ class Node_EACO {
      * Initialise a node
      *
      * @param _NODEID Unique Identifier
+     * @param _edgeList Initial topology
      */
-    Node_EACO(int _NODEID) {
-        NODEID = _NODEID;
+    Node_EACO(int _NODEID, ArrayList<Edge_ACO> _edgeList) {
+        /* Todo: Initialise topology */
+        numNodes = NODEID = _NODEID;
+        /* Todo: Initialise pheromone table */
     }
 
     /**
@@ -67,12 +70,11 @@ class Node_EACO {
 
     /* Todo: Implement actual updates? */
 
-    /* Todo: Update pheromone function */
-
     /**
      * Add a new node
      */
     void addNode() {
+        /* Todo: Update pheromone table size */
         nodes.add(false);
         ++numNodes;
     }
@@ -140,5 +142,18 @@ class Node_EACO {
             initDSU();
         }
         /* Todo: efficiently update viability */
+    }
+
+    /**
+     * Change the value by a certain amount
+     * Modifies other values as needed to
+     * achieve a sum of one
+     *
+     * @param neighbour ID of neighbour
+     * @param destination ID of destination
+     * @param change Pheromone change
+     */
+    private void updateHeuristics(int neighbour, int destination, double change) {
+
     }
 }

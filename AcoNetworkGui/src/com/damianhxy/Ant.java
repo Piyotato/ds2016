@@ -29,10 +29,23 @@ class Ant extends Packet {
      * @param node Current node
      */
     void addNode(int node) {
+        path.add(node);
         if (node == destination) {
             isBackwards = true;
+            path.add(null);
         }
-        path.add(node);
+    }
+
+    /**
+     * Find the previous node on the
+     * path of the backwards ant
+     *
+     * @return The previous node
+     */
+    Integer previousNode() {
+        int ID = path.get(path.size() - 1);
+        path.remove(path.size() - 1);
+        return ID;
     }
 
     /**
