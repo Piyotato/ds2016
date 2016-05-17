@@ -5,8 +5,7 @@ package com.damianhxy;
  */
 class AlgoBase {
 
-    protected final static int SIMUL_SPEED = 1; // Simulated Time : Real Time
-    protected final static int MAX_NODES = 100;
+    protected final static int SIM_SPEED = 1; // Simulated Time : Real Time
     protected int numNodes, currentTime;
     protected int source, destination;
 

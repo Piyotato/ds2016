@@ -1,7 +1,6 @@
 package com.damianhxy;
 
 import java.util.*;
-import javafx.util.*;
 
 /**
  * Created by damian on 16/5/16.
@@ -11,9 +10,9 @@ class Node_EACO {
     boolean isOffline;
     UFDS DSU;
     private ArrayList<ArrayList<Double>> pheromone; // Node, Destination
-    private ArrayList<ArrayList<Integer>> adjList;
-    private ArrayList<Edge_ACO> edgeList;
-    private int numNodes;
+    private ArrayList<Boolean> nodes; // Is offline
+    private ArrayList<SimpleEdge> edgeList;
+    int numNodes;
     Queue<Ant> fastQ;
     Queue<Packet> slowQ;
     int speed, ID;
@@ -35,6 +34,7 @@ class Node_EACO {
         for (Edge_ACO edge: edgeList) {
             if (edge.source == ID || edge.destination == ID) continue;
             if (edge.isOffline) continue;
+            if (nodes.get(edge.source) || nodes.get(edge.destination)) continue;
             DSU.unionSet(edge.source, edge.destination);
         }
     }
@@ -53,13 +53,61 @@ class Node_EACO {
         /* Stuff */
     }
 
-    /* Todo: Implement actual updates? */
+    /* Todo: Implement actual updates */
+
+    /* Todo: Update pheromone function */
 
     /**
-     * Process (propagated) updates to generate
-     * an up-to-date copy of the system topology
+     * Add a new node
      */
-    void update() {
-        /* Stuff */
+    void addNode() {
+        nodes.add(false);
+        ++numNodes;
+    }
+
+    /**
+     * Toggle state of a node
+     *
+     * @param ID Node ID
+     */
+    void toggleNode(int ID) {
+        nodes.set(ID, !nodes.get(ID));
+        update();
+    }
+
+    /**
+     * Add a bidirectional edge
+     *
+     * @param node1 First Node
+     * @param node2 Second Node
+     * @param cost Time Taken
+     */
+    void addEdge(int node1, int node2, int cost) {
+        edgeList.add(new SimpleEdge(node1, node2, cost));
+        edgeList.add(new SimpleEdge(node2, node1, cost));
+        DSU.unionSet(node1, node2);
+    }
+
+    /**
+     * Toggle state of en edge
+     *
+     * @param ID Edge ID
+     */
+    void toggleEdge(int ID) {
+        SimpleEdge edge = edgeList.get(ID);
+        edge.isOffline ^= true;
+        if (edge.isOffline) {
+            update();
+        } else {
+            DSU.unionSet(edge.source, edge.destination);
+        }
+    }
+
+    /**
+     * Update DSU and heuristic
+     */
+    private void update() {
+        initDSU();
+        /* Todo: efficiently update viability */
     }
 }

@@ -7,8 +7,8 @@ import java.util.*;
  */
 class Ant extends Packet {
 
-    int totalTime;
-    private boolean isBackwards = false;
+    double totalTime;
+    boolean isBackwards;
     ArrayList<Integer> path;
 
     /**
@@ -29,9 +29,10 @@ class Ant extends Packet {
      * @param node Current node
      */
     void addNode(int node) {
-        path.add(node);
         if (node == destination) {
             isBackwards = true;
+        } else {
+            path.add(node);
         }
     }
 

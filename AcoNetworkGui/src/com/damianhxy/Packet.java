@@ -5,8 +5,7 @@ package com.damianhxy;
  */
 class Packet {
 
-    int source, destination, TTL, nextHop;
-    int timestamp; // Timestamp at which Packet should be processed
+    int source, destination, TTL, nextHop, timestamp;
 
     /**
      * Initializes a packet
@@ -22,7 +21,7 @@ class Packet {
     }
 
     /**
-     * Decrements TTL and checks expiry
+     * Decrements TTL and checks expiration
      *
      * @return Whether packet is still valid
      */

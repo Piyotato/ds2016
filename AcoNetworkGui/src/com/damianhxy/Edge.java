@@ -3,11 +3,11 @@ package com.damianhxy;
 import java.util.*;
 
 /**
- * Created by damian on 16/5/16.
+ * Created by damian on 17/5/16.
  */
-class Edge_ACO extends Edge {
+class Edge extends SimpleEdge {
 
-    Queue<Ant> ants;
+    Queue<Packet> packets;
 
     /**
      * Initializes an edge
@@ -16,19 +16,18 @@ class Edge_ACO extends Edge {
      * @param _destination Endpoint
      * @param _cost Time taken to traverse
      */
-    Edge_ACO(int _source, int _destination, int _cost) {
+    Edge(int _source, int _destination, int _cost) {
         super(_source, _destination, _cost);
     }
 
     /**
-     * Transmit an ant
+     * Transmit a packet
      *
-     * @param ant Ant
+     * @param packet Packet
      * @param currentTime Timestamp
      */
-    void addAnt(Ant ant, int currentTime) {
-        ant.timestamp = currentTime + cost;
-        ant.totalTime += cost;
-        ants.add(ant);
+    void addPacket(Packet packet, int currentTime) {
+        packet.timestamp = currentTime + cost;
+        packets.add(packet);
     }
 }
