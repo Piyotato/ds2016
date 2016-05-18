@@ -103,17 +103,25 @@ public class EACO extends AlgoBase {
     void toggleEdge(int ID) {
         /* Propagated update */
         for (Node_EACO node: nodes) {
-            node.toggleEdge(ID);
+            node.toggleEdge(ID * 2);
+            node.toggleEdge(ID * 2 + 1);
         }
         /* For simulation purposes */
-        Edge_ACO edge = edgeList.get(ID);
-        edge.isOffline ^= true;
-        if (edge.isOffline) {
-            failure += edge.packets.size() + edge.ants.size();
-            edge.packets.clear();
-            edge.ants.clear();
+        Edge_ACO forward = edgeList.get(ID * 2);
+        forward.isOffline ^= true;
+        if (forward.isOffline) {
+            failure += forward.packets.size() + forward.ants.size();
+            forward.packets.clear();
+            forward.ants.clear();
         }
-
+        Edge_ACO backward = edgeList.get(ID * 2 + 1);
+        backward.isOffline ^= true;
+        backward.isOffline ^= true;
+        if (backward.isOffline) {
+            failure += backward.packets.size() + backward.ants.size();
+            backward.packets.clear();
+            backward.ants.clear();
+        }
     }
 
     /**
@@ -134,31 +142,41 @@ public class EACO extends AlgoBase {
                 int nxt = ant.nextNode();
                 ant.nextHop = nxt;
                 if (nodes.get(nxt).isOffline) continue; // Drop Ant
+                boolean found = false;
                 for (Edge_ACO edge: adjList.get(node.NODEID)) {
                     if (edge.destination == nxt) {
                         edge.addAnt(ant, currentTime);
+                        found = true;
                         break;
                     }
                 }
+                if (!found) throw new IllegalStateException();
             } else { // Forward ant
                 int nxt = node.nextHop(ant, alpha, beta, tabuSize);
+                if (nxt == -1) continue; // Drop Ant
                 ant.nextHop = nxt;
                 ant.addNode(nxt);
                 ant.totalTime += (double) node.slowQ.size() / node.speed;
                 if (ant.destination == node.NODEID) continue; // Reached destination
                 if (nodes.get(nxt).isOffline) continue; // Drop Ant
-                for (Edge_ACO edge : adjList.get(node.NODEID)) {
+                boolean found = false;
+                for (Edge_ACO edge: adjList.get(node.NODEID)) {
                     if (edge.destination == nxt) {
                         edge.addAnt(ant, currentTime);
+                        found = true;
                         break;
                     }
                 }
+                if (!found) throw new IllegalStateException();
             }
-            throw new IllegalStateException();
         }
         while (!node.slowQ.isEmpty() && left-- > 0) {
             Packet packet = node.slowQ.poll();
             int nxt = node.nextHop(packet, alpha, beta, tabuSize);
+            if (nxt == -1) {
+                ++failure;
+                continue; // Drop packet
+            }
             packet.nextHop = nxt;
             packet.addNode(nxt);
             if (packet.destination == node.NODEID) {
@@ -169,13 +187,15 @@ public class EACO extends AlgoBase {
                 ++failure;
                 continue; // Drop Packet
             }
+            boolean found = false;
             for (Edge_ACO edge: adjList.get(node.NODEID)) {
                 if (edge.destination == nxt) {
                     edge.addPacket(packet, currentTime);
+                    found = true;
                     break;
                 }
             }
-            throw new IllegalStateException();
+            if (!found) throw new IllegalStateException();
         }
     }
 
