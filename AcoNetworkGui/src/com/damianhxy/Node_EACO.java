@@ -7,9 +7,11 @@ import java.util.*;
  */
 class Node_EACO {
 
+    final static double EPS = 1e-5;
+
     boolean isOffline;
     private UFDS DSU;
-    private ArrayList<ArrayList<Double>> pheromone = new ArrayList<>(); // Node, Destination
+    private ArrayList<ArrayList<Double>> pheromone = new ArrayList<>(); // Destination, Node
     private ArrayList<ArrayList<SimpleEdge>> adjList = new ArrayList<>();
     private ArrayList<Boolean> nodes = new ArrayList<>(); // Is offline?
     private ArrayList<SimpleEdge> edgeList = new ArrayList<>();
@@ -166,32 +168,41 @@ class Node_EACO {
 
     /**
      * Change the value by a certain amount
-     * Modifies other values as needed to
+     * Modifies other values proportionally to
      * achieve a sum of one
      *
      * @param neighbour ID of neighbour
      * @param destination ID of destination
      * @param change Pheromone change
      */
-    void updateHeuristic(int neighbour, int destination, double change) {
-        if (change < 0) {
-
+    void updateHeuristic(int neighbour, int destination, double change) throws IllegalArgumentException {
+        double tot = .0;
+        ArrayList<Double> dest = pheromone.get(destination);
+        /* Change Value */
+        if (change < 0) { /* dest.get(neighbour) != null */
+            if (Math.abs(dest.get(neighbour) - change) < EPS) {
+                dest.set(neighbour, null);
+            } else {
+                dest.set(neighbour, dest.get(neighbour) + change);
+                if (dest.get(neighbour) < 0) throw new IllegalArgumentException();
+            }
         } else {
-
+            dest.set(neighbour, dest.get(neighbour) + change);
+            if (dest.get(neighbour) > 1) throw new IllegalArgumentException();
         }
-    }
-
-    /**
-     * Remove a neighbour from consideration
-     * as it is inviable now
-     *
-     * @param neighbour Node ID
-     */
-    void addHeuristic(int neighbour) {
-        /* Add neighbour from neighbours */
-        /* Add heuristic value */
-        for (int a = 0; a < numNodes; ++a) {
-
+        /* Calculate other sum */
+        for (int a = 0; a < dest.size(); ++a) {
+            if (a == neighbour) continue;
+            if (dest.get(a) != null) {
+                tot += dest.get(a);
+            }
+        }
+        /* Decrease proportionally */
+        for (int a = 0; a < dest.size(); ++a) {
+            if (a == neighbour) continue;
+            if (dest.get(a) != null) {
+                dest.set(a, dest.get(a) * (1 + change / tot));
+            }
         }
     }
 
@@ -201,11 +212,37 @@ class Node_EACO {
      *
      * @param neighbour Node ID
      */
-    void removeHeuristic(int neighbour) {
-        /* Remove neighbour from neighbours */
-        /* Remove heuristic value */
+    void addHeuristic(int neighbour) {
         for (int a = 0; a < numNodes; ++a) {
-            
+            updateHeuristic(neighbour, a, 1. / viableNeighbours(a));
         }
+    }
+
+    /**
+     * Remove a neighbour from consideration
+     * as it is inviable now
+     *
+     * @param neighbour Node ID
+     */
+    void removeHeuristic(int neighbour) {
+        for (int a = 0; a < numNodes; ++a) {
+            updateHeuristic(neighbour, a, -pheromone.get(neighbour).get(a));
+        }
+    }
+
+    /**
+     * Counts viable neighbours
+     * for a given destination
+     *
+     * @param destination ID of destination
+     * @return Number of viable neighbours
+     */
+    private int viableNeighbours(int destination) {
+        int cnt = 0;
+        for (SimpleEdge edge: adjList.get(NODEID)) {
+            if (edge.isOffline) continue;
+            if (DSU.sameSet(edge.destination, destination)) ++cnt;
+        }
+        return cnt;
     }
 }

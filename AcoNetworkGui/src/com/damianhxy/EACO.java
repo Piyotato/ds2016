@@ -116,7 +116,6 @@ public class EACO extends AlgoBase {
         }
         Edge_ACO backward = edgeList.get(ID * 2 + 1);
         backward.isOffline ^= true;
-        backward.isOffline ^= true;
         if (backward.isOffline) {
             failure += backward.packets.size() + backward.ants.size();
             backward.packets.clear();
