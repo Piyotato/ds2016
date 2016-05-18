@@ -12,11 +12,11 @@ class Node_EACO {
     private ArrayList<ArrayList<Double>> pheromone; // Node, Destination
     private ArrayList<Boolean> nodes; // Is offline
     private ArrayList<SimpleEdge> edgeList, neighbours;
-    int numNodes;
+    private int numNodes;
     Queue<Ant> fastQ;
     Queue<Packet> slowQ;
     int speed, NODEID;
-
+    /* Todo: Implement actual *propagated* updates */
     /**
      * Initialise a node
      *
@@ -24,9 +24,13 @@ class Node_EACO {
      * @param _edgeList Initial topology
      */
     Node_EACO(int _NODEID, ArrayList<Edge_ACO> _edgeList) {
-        /* Todo: Initialise topology */
+        for (Edge_ACO edge: _edgeList) {
+            edgeList.add(new SimpleEdge(edge.source, edge.destination, edge.cost));
+        }
         numNodes = NODEID = _NODEID;
-        /* Todo: Initialise pheromone table */
+        for (int a = 0; a < numNodes; ++a) {
+            pheromone.add(new ArrayList<>(numNodes));
+        }
     }
 
     /**
@@ -36,47 +40,48 @@ class Node_EACO {
         neighbours.clear();
         DSU = new UFDS(numNodes);
         for (SimpleEdge edge: edgeList) {
-            if (edge.source == NODEID)
-                neighbours.add(edge);
+            if (edge.source == NODEID) neighbours.add(edge);
             if (edge.source == NODEID || edge.destination == NODEID) continue;
             if (edge.isOffline) continue;
             if (nodes.get(edge.source) || nodes.get(edge.destination)) continue;
             DSU.unionSet(edge.source, edge.destination);
         }
     }
-
+    /* Todo: check tabulist in nextHop */
     /**
      * Use heuristics to calculate the
      * next best hop, for a given destination
      *
-     * @param destination Destination node
      * @param alpha Weightage of pheromone
      * @param beta Weightage of cost
+     * @param tabuSize Size of Taub list
      * @return Neighbour for next hop
      */
-    int nextHop(int destination, int alpha, int beta) throws IllegalStateException {
+    int nextHop(Packet packet, int alpha, int beta, int tabuSize) throws IllegalStateException {
         double RNG = Math.random();
-        double totval = .0;
+        double totVal = .0;
         for (SimpleEdge edge: neighbours) {
-            totval += Math.pow(pheromone.get(edge.destination).get(destination), alpha) * Math.pow(edge.cost, beta);
+            if (!packet.isValid(edge.destination, tabuSize)) continue;
+            totVal += Math.pow(pheromone.get(edge.destination).get(packet.destination), alpha) * Math.pow(edge.cost, beta);
         }
         for (SimpleEdge edge: neighbours) {
-            double val = Math.pow(pheromone.get(edge.destination).get(destination), alpha) * Math.pow(edge.cost, beta);
-            RNG -= val / totval;
+            if (!packet.isValid(edge.destination, tabuSize)) continue;
+            double val = Math.pow(pheromone.get(edge.destination).get(packet.destination), alpha) * Math.pow(edge.cost, beta);
+            RNG -= val / totVal;
             if (RNG <= 0) return edge.destination;
         }
         throw new IllegalStateException();
     }
 
-    /* Todo: Implement actual updates? */
-
     /**
      * Add a new node
      */
     void addNode() {
-        /* Todo: Update pheromone table size */
+        for (ArrayList<Double> node: pheromone) {
+            node.add(.0);
+        }
+        pheromone.add(new ArrayList<>(++numNodes));
         nodes.add(false);
-        ++numNodes;
     }
 
     /**
@@ -153,7 +158,7 @@ class Node_EACO {
      * @param destination ID of destination
      * @param change Pheromone change
      */
-    private void updateHeuristics(int neighbour, int destination, double change) {
+    void updateHeuristic(int neighbour, int destination, double change) {
 
     }
 }

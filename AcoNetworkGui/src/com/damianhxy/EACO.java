@@ -9,16 +9,28 @@ import javafx.util.*;
 public class EACO extends AlgoBase {
 
     private int success, failure;
-    private int alpha, beta, ratio, TTL;
+    private int alpha, beta, ratio, tabuSize, TTL;
     private ArrayList<Node_EACO> nodes;
     private ArrayList<Edge_ACO> edgeList;
     private ArrayList<ArrayList<Edge_ACO>> adjList;
 
     /**
-     * Initialize algorithm
+     * Initialize EACO
+     *
+     * @param _alpha Weightage of pheromone
+     * @param _beta Weightage of cost function
+     * @param _ratio Ratio of ants to packets
+     * @param _TTL Time To Live of packets
+     * @param _source Source node
+     * @param _destination Destination node
      */
-    public EACO() {
-
+    public EACO(int _alpha, int _beta, int _ratio, int _TTL, int _tabuSize, int _source, int _destination) {
+        super(_source, _destination);
+        alpha = _alpha;
+        beta = _beta;
+        ratio = _ratio;
+        TTL = _TTL;
+        tabuSize = _tabuSize;
     }
 
     /**
@@ -30,7 +42,7 @@ public class EACO extends AlgoBase {
             node.addNode();
         }
         /* For simulation purposes */
-        nodes.add(new Node_EACO(numNodes++));
+        nodes.add(new Node_EACO(numNodes++, edgeList));
         adjList.add(new ArrayList<>());
     }
 
@@ -109,17 +121,17 @@ public class EACO extends AlgoBase {
      *
      * @param node Node being processed
      */
-    private void processNode(Node_EACO node) {
-        int left = node.speed;
+    private void processNode(Node_EACO node) throws IllegalStateException {
+        int left = node.speed * SIM_SPEED;
         while (!node.fastQ.isEmpty() && left-- > 0) {
             Ant ant = node.fastQ.poll();
-            if (ant.isBackwards) {
-                Integer prev = ant.previousNode();
-                if (prev != null) {
-
+            if (ant.isBackwards) { // Backward ant
+                if (node.NODEID != ant.destination) {
+                    int prev = ant.previousNode();
+                    node.updateHeuristic(prev, ant.destination, 1. / ant.totalTime);
                 }
                 if (ant.source == node.NODEID) continue; // Reached source
-                int nxt = ant.path.get(ant.path.size() - 2);
+                int nxt = ant.nextNode();
                 ant.nextHop = nxt;
                 if (nodes.get(nxt).isOffline) continue; // Drop Ant
                 for (Edge_ACO edge: adjList.get(node.NODEID)) {
@@ -129,7 +141,7 @@ public class EACO extends AlgoBase {
                     }
                 }
             } else { // Forward ant
-                int nxt = node.nextHop(ant.destination, alpha, beta);
+                int nxt = node.nextHop(ant, alpha, beta, tabuSize);
                 ant.nextHop = nxt;
                 ant.addNode(nxt);
                 ant.totalTime += (double) node.slowQ.size() / node.speed;
@@ -142,11 +154,13 @@ public class EACO extends AlgoBase {
                     }
                 }
             }
+            throw new IllegalStateException();
         }
         while (!node.slowQ.isEmpty() && left-- > 0) {
             Packet packet = node.slowQ.poll();
-            int nxt = node.nextHop(packet.destination, alpha, beta);
+            int nxt = node.nextHop(packet, alpha, beta, tabuSize);
             packet.nextHop = nxt;
+            packet.addNode(nxt);
             if (packet.destination == node.NODEID) {
                 ++success;
                 continue;
@@ -161,6 +175,7 @@ public class EACO extends AlgoBase {
                     break;
                 }
             }
+            throw new IllegalStateException();
         }
     }
 
@@ -198,7 +213,7 @@ public class EACO extends AlgoBase {
 
     private void generatePackets() {
         Node_EACO src = nodes.get(source);
-        int amt = src.speed;
+        int amt = src.speed * SIM_SPEED;
         int numPackets = ratio * amt / (ratio + 1);
         int numAnts = amt / ratio;
         for (int a = 0; a < numPackets; ++a)

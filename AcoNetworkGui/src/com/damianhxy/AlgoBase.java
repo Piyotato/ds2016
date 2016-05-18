@@ -5,14 +5,18 @@ package com.damianhxy;
  */
 class AlgoBase {
 
-    protected final static int SIM_SPEED = 1; // Simulated Time : Real Time
-    protected int numNodes, currentTime;
-    protected int source, destination;
+    final static int SIM_SPEED = 1; // Simulated Time : Real Time
+    int numNodes, currentTime;
+    final int source, destination;
 
     /**
-     * Initialization
+     * Initialize algorithm
+     *
+     * @param _source Source node
+     * @param _destination Destination node
      */
-    AlgoBase() {
-
+    AlgoBase(int _source, int _destination) {
+        source = _source;
+        destination = _destination;
     }
 }

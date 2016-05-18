@@ -1,15 +1,12 @@
 package com.damianhxy;
 
-import java.util.*;
-
 /**
  * Created by damian on 16/5/16.
  */
 class Ant extends Packet {
-
+    /* Todo: add path to packet? */
     double totalTime;
     boolean isBackwards;
-    ArrayList<Integer> path;
 
     /**
      * Initializes an ant
@@ -25,6 +22,7 @@ class Ant extends Packet {
     /**
      * Add a node to the path
      * Assumes that node is valid
+     * Overrides Packet.addNode()
      *
      * @param node Current node
      */
@@ -32,7 +30,6 @@ class Ant extends Packet {
         path.add(node);
         if (node == destination) {
             isBackwards = true;
-            path.add(null);
         }
     }
 
@@ -42,26 +39,19 @@ class Ant extends Packet {
      *
      * @return The previous node
      */
-    Integer previousNode() {
+    int previousNode() {
         int ID = path.get(path.size() - 1);
         path.remove(path.size() - 1);
         return ID;
     }
 
     /**
-     * Check if a node is currently
-     * blacklisted in the Tabu list
+     * Find the next node on the
+     * path of the backwards ant
      *
-     * @param node Neighbouring node
-     * @param tabuSize Size of Tabu list
-     * @return Whether node is valid
+     * @return The next node
      */
-    boolean isValid(int node, int tabuSize) {
-        for (int a = 0; a < Math.min(tabuSize, path.size()); ++a) {
-            if (path.get(path.size() - a - 1) == node) {
-                return false;
-            }
-        }
-        return true;
+    int nextNode() {
+        return path.get(path.size() - 2);
     }
 }
