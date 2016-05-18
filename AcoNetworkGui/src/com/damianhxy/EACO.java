@@ -56,7 +56,6 @@ public class EACO extends AlgoBase {
         if (ID == source || ID == destination) {
             throw new IllegalArgumentException();
         }
-        /* Todo: Perhaps ensure that the graph is always complete */
         /* Propagated update */
         for (Node_EACO node: nodes) {
             node.toggleNode(ID);
@@ -81,7 +80,6 @@ public class EACO extends AlgoBase {
         if (node1 >= numNodes || node2 >= numNodes) {
             throw new IllegalArgumentException();
         }
-        /* Todo: Perhaps ensure that there are no multi-edges */
         /* Propagated update */
         for (Node_EACO node: nodes) {
             node.addEdge(node1, node2, cost);

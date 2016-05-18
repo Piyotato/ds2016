@@ -92,6 +92,7 @@ class Node_EACO {
             node.add(.0);
         }
         pheromone.add(new ArrayList<>(++numNodes));
+        pheromone.get(numNodes).set(numNodes, 1.); /* Destination is itself */
         adjList.add(new ArrayList<>());
         nodes.add(false);
     }
@@ -159,11 +160,31 @@ class Node_EACO {
         if (node == -1) { // Full update
             initDSU();
         }
-        /* Todo: update viability */
-        /* Find affected neighbours & destinations */
         ArrayList<SimpleEdge> neighbours = new ArrayList<>();
         ArrayList<Integer> destinations = new ArrayList<>();
-
+        for (SimpleEdge edge: adjList.get(node)) { // Each neighbour
+            if (DSU.sameSet(node, edge.destination)) {
+                neighbours.add(edge);
+            }
+        }
+        for (int a = 0; a < numNodes; ++a) {
+            if (a == NODEID) continue;
+            if (DSU.sameSet(a, node)) {
+                destinations.add(a);
+            }
+        }
+        for (SimpleEdge edge: neighbours) {
+            for (Integer dest: destinations) {
+                Double prev = pheromone.get(dest).get(edge.destination);
+                if (prev == null) { // Previously inviable
+                    if (DSU.sameSet(edge.destination, dest)) // Now viable
+                        addHeuristic(edge.destination, dest);
+                } else { // Previously viable
+                    if (!DSU.sameSet(edge.destination, dest)) // Now inviable
+                        removeHeuristic(edge.destination, dest);
+                }
+            }
+        }
     }
 
     /**
@@ -211,11 +232,10 @@ class Node_EACO {
      * as it is viable now
      *
      * @param neighbour Node ID
+     * @param destination Destination ID
      */
-    void addHeuristic(int neighbour) {
-        for (int a = 0; a < numNodes; ++a) {
-            updateHeuristic(neighbour, a, 1. / viableNeighbours(a));
-        }
+    void addHeuristic(int neighbour, int destination) {
+        updateHeuristic(neighbour, destination, 1. / viableNeighbours(destination));
     }
 
     /**
@@ -223,11 +243,10 @@ class Node_EACO {
      * as it is inviable now
      *
      * @param neighbour Node ID
+     * @param destination Destination ID
      */
-    void removeHeuristic(int neighbour) {
-        for (int a = 0; a < numNodes; ++a) {
-            updateHeuristic(neighbour, a, -pheromone.get(neighbour).get(a));
-        }
+    void removeHeuristic(int neighbour, int destination) {
+        updateHeuristic(neighbour, destination, -pheromone.get(neighbour).get(destination));
     }
 
     /**

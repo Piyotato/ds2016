@@ -4,7 +4,7 @@ package com.damianhxy;
  * Created by damian on 16/5/16.
  */
 class Ant extends Packet {
-    /* Todo: add path to packet? */
+
     double totalTime;
     boolean isBackwards;
 
