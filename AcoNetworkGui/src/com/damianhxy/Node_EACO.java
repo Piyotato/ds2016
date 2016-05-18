@@ -9,10 +9,10 @@ class Node_EACO {
 
     boolean isOffline;
     private UFDS DSU;
-    private ArrayList<ArrayList<Double>> pheromone; // Node, Destination
-    private ArrayList<ArrayList<SimpleEdge>> adjList;
-    private ArrayList<Boolean> nodes; // Is offline?
-    private ArrayList<SimpleEdge> edgeList;
+    private ArrayList<ArrayList<Double>> pheromone = new ArrayList<>(); // Node, Destination
+    private ArrayList<ArrayList<SimpleEdge>> adjList = new ArrayList<>();
+    private ArrayList<Boolean> nodes = new ArrayList<>(); // Is offline?
+    private ArrayList<SimpleEdge> edgeList = new ArrayList<>();
     private int numNodes;
     Queue<Ant> fastQ;
     Queue<Packet> slowQ;
@@ -60,6 +60,7 @@ class Node_EACO {
         double RNG = Math.random();
         double totVal = .0;
         boolean anyValid = false;
+        SimpleEdge last = null;
         for (SimpleEdge edge: adjList.get(packet.source)) {
             if (edge.isOffline) continue;
             if (nodes.get(edge.destination)) continue;
@@ -72,11 +73,13 @@ class Node_EACO {
             if (edge.isOffline) continue;
             if (nodes.get(edge.destination)) continue;
             if (!packet.isValid(edge.destination, tabuSize)) continue;
+            last = edge;
             double val = Math.pow(pheromone.get(edge.destination).get(packet.destination), alpha) * Math.pow(edge.cost, beta);
             RNG -= val / totVal;
             if (RNG <= 0) return edge.destination;
         }
-        throw new IllegalStateException();
+        if (last == null) throw new IllegalStateException();
+        return last.destination;
     }
 
     /**
@@ -154,16 +157,11 @@ class Node_EACO {
         if (node == -1) { // Full update
             initDSU();
         }
+        /* Todo: update viability */
         /* Find affected neighbours & destinations */
-        ArrayList<SimpleEdge> neighbours, destinations;
-        /* Todo: efficiently update viability */
-        for (SimpleEdge edge: adjList.get(NODEID)) {
+        ArrayList<SimpleEdge> neighbours = new ArrayList<>();
+        ArrayList<Integer> destinations = new ArrayList<>();
 
-        }
-        /* Todo: Wrap a bidirectional edge class? */
-        for (SimpleEdge edge: edgeList) {
-
-        }
     }
 
     /**
@@ -176,7 +174,11 @@ class Node_EACO {
      * @param change Pheromone change
      */
     void updateHeuristic(int neighbour, int destination, double change) {
+        if (change < 0) {
 
+        } else {
+
+        }
     }
 
     /**
@@ -188,6 +190,9 @@ class Node_EACO {
     void addHeuristic(int neighbour) {
         /* Add neighbour from neighbours */
         /* Add heuristic value */
+        for (int a = 0; a < numNodes; ++a) {
+
+        }
     }
 
     /**
@@ -199,5 +204,8 @@ class Node_EACO {
     void removeHeuristic(int neighbour) {
         /* Remove neighbour from neighbours */
         /* Remove heuristic value */
+        for (int a = 0; a < numNodes; ++a) {
+            
+        }
     }
 }

@@ -7,7 +7,8 @@ import java.util.*;
  */
 class Packet {
 
-    int source, destination, TTL, nextHop, timestamp;
+    int source, destination, nextHop, timestamp;
+    private int TTL;
     ArrayList<Integer> path;
 
     /**

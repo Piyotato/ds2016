@@ -10,9 +10,9 @@ public class EACO extends AlgoBase {
 
     private int success, failure;
     private int alpha, beta, ratio, tabuSize, TTL;
-    private ArrayList<Node_EACO> nodes;
-    private ArrayList<Edge_ACO> edgeList;
-    private ArrayList<ArrayList<Edge_ACO>> adjList;
+    private ArrayList<Node_EACO> nodes = new ArrayList<>();
+    private ArrayList<Edge_ACO> edgeList = new ArrayList<>();
+    private ArrayList<ArrayList<Edge_ACO>> adjList = new ArrayList<>();
 
     /**
      * Initialize EACO
@@ -157,8 +157,6 @@ public class EACO extends AlgoBase {
                 ant.nextHop = nxt;
                 ant.addNode(nxt);
                 ant.totalTime += (double) node.slowQ.size() / node.speed;
-                if (ant.destination == node.NODEID) continue; // Reached destination
-                if (nodes.get(nxt).isOffline) continue; // Drop Ant
                 boolean found = false;
                 for (Edge_ACO edge: adjList.get(node.NODEID)) {
                     if (edge.destination == nxt) {
@@ -182,10 +180,6 @@ public class EACO extends AlgoBase {
             if (packet.destination == node.NODEID) {
                 ++success;
                 continue;
-            }
-            if (nodes.get(nxt).isOffline) {
-                ++failure;
-                continue; // Drop Packet
             }
             boolean found = false;
             for (Edge_ACO edge: adjList.get(node.NODEID)) {
