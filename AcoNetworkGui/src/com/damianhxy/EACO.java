@@ -127,7 +127,7 @@ public class EACO extends AlgoBase {
      * @param node Node being processed
      */
     private void processNode(Node_EACO node) throws IllegalStateException {
-        int left = node.speed * SIM_SPEED;
+        int left = node.speed;
         while (!node.fastQ.isEmpty() && left-- > 0) {
             Ant ant = node.fastQ.poll();
             if (ant.isBackwards) { // Backward ant
@@ -153,7 +153,7 @@ public class EACO extends AlgoBase {
                 if (nxt == -1) continue; // Drop Ant
                 ant.nextHop = nxt;
                 ant.addNode(nxt);
-                ant.totalTime += (double) node.slowQ.size() / node.speed;
+                ant.totalTime += (double)node.slowQ.size() / node.speed;
                 boolean found = false;
                 for (Edge_ACO edge: adjList.get(node.NODEID)) {
                     if (edge.destination == nxt) {
@@ -196,7 +196,7 @@ public class EACO extends AlgoBase {
      * @param edge Edge being processed
      */
     private void processEdge(Edge_ACO edge) {
-        int left = edge.cost * SIM_SPEED;
+        int left = edge.cost;
         while (!edge.ants.isEmpty() && left > 0) {
             if (edge.ants.peek().timestamp > currentTime) break;
             Ant ant = edge.ants.poll();
@@ -224,7 +224,7 @@ public class EACO extends AlgoBase {
 
     private void generatePackets() {
         Node_EACO src = nodes.get(source);
-        int amt = src.speed * SIM_SPEED;
+        int amt = src.speed;
         int numPackets = ratio * amt / (ratio + 1);
         int numAnts = amt / ratio;
         for (int a = 0; a < numPackets; ++a)
@@ -239,7 +239,7 @@ public class EACO extends AlgoBase {
      * @return Success, Failure
      */
     Pair<Integer, Integer> tick() {
-        currentTime += SIM_SPEED;
+        ++currentTime;
         generatePackets();
         for (Edge_ACO edge: edgeList) {
             if (edge.isOffline) continue;

@@ -6,8 +6,7 @@ import javafx.util.*;
  * Created by damian on 17/5/16.
  */
 abstract class AlgoBase {
-
-    final static int SIM_SPEED = 1; // Simulated Time : Real Time
+    /* Todo: Add option to speedup simulation? */
     int numNodes, currentTime;
     final int source, destination;
 

@@ -7,12 +7,12 @@ import java.util.*;
  */
 class Node_EACO {
 
-    final static double EPS = 1e-5;
+    private final static double EPS = 1e-5;
 
     boolean isOffline;
     private UFDS DSU;
     private ArrayList<ArrayList<Double>> pheromone = new ArrayList<>(); // Destination, Node
-    private ArrayList<ArrayList<SimpleEdge>> adjList = new ArrayList<>();
+    private ArrayList<ArrayList<SimpleEdge>> adjList;
     private ArrayList<Boolean> nodes = new ArrayList<>(); // Is offline?
     private ArrayList<SimpleEdge> edgeList = new ArrayList<>();
     private int numNodes;
@@ -34,6 +34,7 @@ class Node_EACO {
         for (int a = 0; a < numNodes; ++a) {
             pheromone.add(new ArrayList<>(numNodes));
         }
+        adjList = new ArrayList<>(numNodes);
     }
 
     /**
@@ -62,7 +63,6 @@ class Node_EACO {
         double RNG = Math.random();
         double totVal = .0;
         boolean anyValid = false;
-        SimpleEdge last = null;
         for (SimpleEdge edge: adjList.get(packet.source)) {
             if (edge.isOffline) continue;
             if (nodes.get(edge.destination)) continue;
@@ -75,13 +75,11 @@ class Node_EACO {
             if (edge.isOffline) continue;
             if (nodes.get(edge.destination)) continue;
             if (!packet.isValid(edge.destination, tabuSize)) continue;
-            last = edge;
             double val = Math.pow(pheromone.get(edge.destination).get(packet.destination), alpha) * Math.pow(edge.cost, beta);
             RNG -= val / totVal;
-            if (RNG <= 0) return edge.destination;
+            if (RNG <= EPS) return edge.destination;
         }
-        if (last == null) throw new IllegalStateException();
-        return last.destination;
+        throw new IllegalStateException();
     }
 
     /**
@@ -92,7 +90,6 @@ class Node_EACO {
             node.add(.0);
         }
         pheromone.add(new ArrayList<>(++numNodes));
-        pheromone.get(numNodes).set(numNodes, 1.); /* Destination is itself */
         adjList.add(new ArrayList<>());
         nodes.add(false);
     }
@@ -176,11 +173,11 @@ class Node_EACO {
         for (SimpleEdge edge: neighbours) {
             for (Integer dest: destinations) {
                 Double prev = pheromone.get(dest).get(edge.destination);
-                if (prev == null) { // Previously inviable
+                if (prev == null) { // Previously not viable
                     if (DSU.sameSet(edge.destination, dest)) // Now viable
                         addHeuristic(edge.destination, dest);
                 } else { // Previously viable
-                    if (!DSU.sameSet(edge.destination, dest)) // Now inviable
+                    if (!DSU.sameSet(edge.destination, dest)) // Now not viable
                         removeHeuristic(edge.destination, dest);
                 }
             }
@@ -201,15 +198,15 @@ class Node_EACO {
         ArrayList<Double> dest = pheromone.get(destination);
         /* Change Value */
         if (change < 0) { /* dest.get(neighbour) != null */
-            if (Math.abs(dest.get(neighbour) - change) < EPS) {
+            if (Math.abs(dest.get(neighbour) + change) < EPS) {
                 dest.set(neighbour, null);
             } else {
+                if (dest.get(neighbour) + change < 0) throw new IllegalArgumentException();
                 dest.set(neighbour, dest.get(neighbour) + change);
-                if (dest.get(neighbour) < 0) throw new IllegalArgumentException();
             }
         } else {
+            if (dest.get(neighbour) + change > 1) throw new IllegalArgumentException();
             dest.set(neighbour, dest.get(neighbour) + change);
-            if (dest.get(neighbour) > 1) throw new IllegalArgumentException();
         }
         /* Calculate other sum */
         for (int a = 0; a < dest.size(); ++a) {
@@ -234,18 +231,18 @@ class Node_EACO {
      * @param neighbour Node ID
      * @param destination Destination ID
      */
-    void addHeuristic(int neighbour, int destination) {
+    private void addHeuristic(int neighbour, int destination) {
         updateHeuristic(neighbour, destination, 1. / viableNeighbours(destination));
     }
 
     /**
      * Remove a neighbour from consideration
-     * as it is inviable now
+     * as it is not viable now
      *
      * @param neighbour Node ID
      * @param destination Destination ID
      */
-    void removeHeuristic(int neighbour, int destination) {
+    private void removeHeuristic(int neighbour, int destination) {
         updateHeuristic(neighbour, destination, -pheromone.get(neighbour).get(destination));
     }
 
