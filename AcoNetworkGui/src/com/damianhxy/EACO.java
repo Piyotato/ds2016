@@ -40,7 +40,9 @@ public class EACO extends AlgorithmBase {
      */
     void addNode(int speed) {
         /* Propagated update */
-        nodes.forEach(Node_EACO::addNode);
+        for (Node_EACO node: nodes) {
+            node.addNode();
+        }
         /* For simulation purposes */
         nodes.add(new Node_EACO(numNodes++, speed, edgeList));
         adjList.add(new ArrayList<>());
@@ -48,7 +50,6 @@ public class EACO extends AlgorithmBase {
 
     /**
      * Toggle state of a node
-     * Toggles states of neighbouring edges
      *
      * @param ID Node ID
      */
@@ -64,6 +65,7 @@ public class EACO extends AlgorithmBase {
         Node_EACO node = nodes.get(ID);
         node.isOffline ^= true;
         if (node.isOffline) {
+            failure += node.slowQ.size();
             node.fastQ.clear();
             node.slowQ.clear();
         }
@@ -106,16 +108,13 @@ public class EACO extends AlgorithmBase {
         }
         /* For simulation purposes */
         Edge_ACO forward = edgeList.get(ID * 2);
+        Edge_ACO backward = edgeList.get(ID * 2 + 1);
         forward.isOffline ^= true;
+        backward.isOffline ^= true;
         if (forward.isOffline) {
-            failure += forward.packets.size() + forward.ants.size();
+            failure += forward.packets.size() + backward.packets.size();
             forward.packets.clear();
             forward.ants.clear();
-        }
-        Edge_ACO backward = edgeList.get(ID * 2 + 1);
-        backward.isOffline ^= true;
-        if (backward.isOffline) {
-            failure += backward.packets.size() + backward.ants.size();
             backward.packets.clear();
             backward.ants.clear();
         }
@@ -196,20 +195,17 @@ public class EACO extends AlgorithmBase {
      * @param edge Edge being processed
      */
     private void processEdge(Edge_ACO edge) {
-        int left = edge.cost;
-        while (!edge.ants.isEmpty() && left > 0) {
+        while (!edge.ants.isEmpty()) {
             if (edge.ants.peek().timestamp > currentTime) break;
             Ant ant = edge.ants.poll();
-            --left;
             if (nodes.get(ant.nextHop).isOffline) continue; // Drop this Ant
             if (ant.nextHop == destination || ant.decrementTTL()) {
                 nodes.get(ant.nextHop).fastQ.add(ant);
             }
         }
-        while (!edge.packets.isEmpty() && left > 0) {
+        while (!edge.packets.isEmpty()) {
             if (edge.packets.peek().timestamp > currentTime) break;
             Packet packet = edge.packets.poll();
-            --left;
             if (nodes.get(packet.nextHop).isOffline) {
                 ++failure;
                 continue; // Drop this packet
