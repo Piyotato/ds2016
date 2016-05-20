@@ -7,9 +7,10 @@ import java.util.*;
  */
 class Packet {
 
-    int source, destination, nextHop, timestamp;
+    final int source, destination;
+    int nextHop, timestamp;
     private int TTL;
-    ArrayList<Integer> path;
+    ArrayList<Integer> path = new ArrayList<>();
 
     /**
      * Initializes a packet

@@ -33,7 +33,7 @@ public class Gui extends JFrame {
      * Initializes a new container for containing all the UI
      * elements in the program
      *
-     * @param panels The JPanels that hold the smaller UI elemtnts
+     * @param panels The JPanels that hold the smaller UI elements
      * @return the newly initialized container
      */
     private JPanel initContainer(JPanel... panels) {

@@ -5,7 +5,7 @@ import javafx.util.*;
 /**
  * Created by damian on 17/5/16.
  */
-abstract class AlgoBase {
+abstract class AlgorithmBase {
     /* Todo: Add option to speedup simulation? */
     int numNodes, currentTime;
     final int source, destination;
@@ -16,12 +16,12 @@ abstract class AlgoBase {
      * @param _source Source node
      * @param _destination Destination node
      */
-    AlgoBase(int _source, int _destination) {
+    AlgorithmBase(int _source, int _destination) {
         source = _source;
         destination = _destination;
     }
 
-    abstract void addNode();
+    abstract void addNode(int speed);
 
     abstract void toggleNode(int ID);
 

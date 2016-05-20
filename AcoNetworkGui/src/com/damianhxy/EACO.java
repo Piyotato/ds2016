@@ -6,13 +6,13 @@ import javafx.util.*;
 /**
  * Created by damian on 16/5/16.
  */
-public class EACO extends AlgoBase {
+public class EACO extends AlgorithmBase {
 
     private int success, failure;
-    private int alpha, beta, ratio, tabuSize, TTL;
-    private ArrayList<Node_EACO> nodes = new ArrayList<>();
-    private ArrayList<Edge_ACO> edgeList = new ArrayList<>();
-    private ArrayList<ArrayList<Edge_ACO>> adjList = new ArrayList<>();
+    private final int alpha, beta, ratio, tabuSize, TTL;
+    private final ArrayList<Node_EACO> nodes = new ArrayList<>();
+    private final ArrayList<Edge_ACO> edgeList = new ArrayList<>();
+    private final ArrayList<ArrayList<Edge_ACO>> adjList = new ArrayList<>();
 
     /**
      * Initialize EACO
@@ -35,14 +35,14 @@ public class EACO extends AlgoBase {
 
     /**
      * Add a new node
+     *
+     * @param speed Processing speed
      */
-    void addNode() {
+    void addNode(int speed) {
         /* Propagated update */
-        for (Node_EACO node: nodes) {
-            node.addNode();
-        }
+        nodes.forEach(Node_EACO::addNode);
         /* For simulation purposes */
-        nodes.add(new Node_EACO(numNodes++, edgeList));
+        nodes.add(new Node_EACO(numNodes++, speed, edgeList));
         adjList.add(new ArrayList<>());
     }
 
@@ -131,16 +131,16 @@ public class EACO extends AlgoBase {
         while (!node.fastQ.isEmpty() && left-- > 0) {
             Ant ant = node.fastQ.poll();
             if (ant.isBackwards) { // Backward ant
-                if (node.NODEID != ant.destination) {
+                if (node.nodeID != ant.destination) {
                     int prev = ant.previousNode();
                     node.updateHeuristic(prev, ant.destination, 1. / ant.totalTime);
                 }
-                if (ant.source == node.NODEID) continue; // Reached source
+                if (ant.source == node.nodeID) continue; // Reached source
                 int nxt = ant.nextNode();
                 ant.nextHop = nxt;
                 if (nodes.get(nxt).isOffline) continue; // Drop Ant
                 boolean found = false;
-                for (Edge_ACO edge: adjList.get(node.NODEID)) {
+                for (Edge_ACO edge: adjList.get(node.nodeID)) {
                     if (edge.destination == nxt) {
                         edge.addAnt(ant, currentTime);
                         found = true;
@@ -149,13 +149,13 @@ public class EACO extends AlgoBase {
                 }
                 if (!found) throw new IllegalStateException();
             } else { // Forward ant
-                int nxt = node.nextHop(ant, alpha, beta, tabuSize);
-                if (nxt == -1) continue; // Drop Ant
+                Integer nxt = node.nextHop(ant, alpha, beta, tabuSize);
+                if (nxt == null) continue; // Drop Ant
                 ant.nextHop = nxt;
                 ant.addNode(nxt);
                 ant.totalTime += (double)node.slowQ.size() / node.speed;
                 boolean found = false;
-                for (Edge_ACO edge: adjList.get(node.NODEID)) {
+                for (Edge_ACO edge: adjList.get(node.nodeID)) {
                     if (edge.destination == nxt) {
                         edge.addAnt(ant, currentTime);
                         found = true;
@@ -167,19 +167,19 @@ public class EACO extends AlgoBase {
         }
         while (!node.slowQ.isEmpty() && left-- > 0) {
             Packet packet = node.slowQ.poll();
-            int nxt = node.nextHop(packet, alpha, beta, tabuSize);
-            if (nxt == -1) {
+            Integer nxt = node.nextHop(packet, alpha, beta, tabuSize);
+            if (nxt == null) {
                 ++failure;
                 continue; // Drop packet
             }
             packet.nextHop = nxt;
             packet.addNode(nxt);
-            if (packet.destination == node.NODEID) {
+            if (packet.destination == node.nodeID) {
                 ++success;
                 continue;
             }
             boolean found = false;
-            for (Edge_ACO edge: adjList.get(node.NODEID)) {
+            for (Edge_ACO edge: adjList.get(node.nodeID)) {
                 if (edge.destination == nxt) {
                     edge.addPacket(packet, currentTime);
                     found = true;

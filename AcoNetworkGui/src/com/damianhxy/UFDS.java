@@ -7,7 +7,7 @@ import java.util.*;
  */
 class UFDS {
 
-    private ArrayList<Integer> P, RANK;
+    private ArrayList<Integer> P = new ArrayList<>(), RANK = new ArrayList<>();
 
     /**
      * Finds the set of an element
