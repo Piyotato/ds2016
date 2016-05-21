@@ -132,6 +132,7 @@ public class EACO extends AlgorithmBase {
             if (ant.isBackwards) { // Backward ant
                 if (node.nodeID != ant.destination) {
                     int prev = ant.previousNode();
+                    /* Todo: Update time for only the relevant part of the trip? */
                     node.updateHeuristic(prev, ant.destination, 1. / ant.totalTime);
                 }
                 if (ant.source == node.nodeID) continue; // Reached source
@@ -219,10 +220,13 @@ public class EACO extends AlgorithmBase {
     }
 
     private void generatePackets() {
+        /* Todo: Limit the number of ants in network? (See: AntNet 1.1) */
         Node_EACO src = nodes.get(source);
         int amt = src.speed;
+        /* Todo: handle this better, if amt < ratio no ants will ever be sent */
         int numPackets = ratio * amt / (ratio + 1);
         int numAnts = amt / ratio;
+        /* Todo: Randomly selected destination? */
         for (int a = 0; a < numPackets; ++a)
             src.slowQ.add(new Packet(source, destination, TTL));
         for (int a = 0; a < numAnts; ++a)

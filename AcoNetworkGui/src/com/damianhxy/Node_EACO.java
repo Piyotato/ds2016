@@ -65,12 +65,15 @@ class Node_EACO {
      * @return Neighbour for next hop, or null if cycle exists
      */
     Integer nextHop(Packet packet, int alpha, int beta, int tabuSize) throws IllegalStateException {
+        /* Todo: Dual Method for selection of jumping node (See: AntNet 1.1) */
         double RNG = Math.random();
         double totVal = .0;
         ArrayList<Pair<Integer, Double>> neighbours = new ArrayList<>(); // Neighbour, Heuristic
         for (SimpleEdge edge: adjList.get(packet.source)) {
             if (edge.isOffline) continue;
             if (nodes.get(edge.destination)) continue;
+            /* Todo: Delete cycle instead of dropping packet? */
+            /* Unless cycle size > 1/2 trip length (As per AntNet 1.1)? */
             if (!packet.isValid(edge.destination, tabuSize)) continue;
             Double tau = pheromone.get(edge.destination).get(packet.destination); // Pheromone
             Double eta = 1. / edge.cost; // 1 / Distance
@@ -125,6 +128,8 @@ class Node_EACO {
      * @param cost Time Taken
      */
     void addEdge(int node1, int node2, int cost) {
+        /* Todo: Intelligent Initialization (See: AntNet 1.1) */
+        /* Todo: Intelligent Updating (See: AntNet 1.1) */
         SimpleEdge forward = new SimpleEdge(node1, node2, cost);
         SimpleEdge backward = new SimpleEdge(node2, node1, cost);
         edgeList.add(forward);
@@ -157,45 +162,34 @@ class Node_EACO {
      * @param node Updated node, or null if full rebuild
      */
     private void update(Integer node) {
-        if (node == null) { // Full update
+        if (node == null) {
             initDSU();
-            for (SimpleEdge edge: adjList.get(nodeID)) {
-                for (int a = 0; a < numNodes; ++a) {
-                    if (a == nodeID) continue;
-                    Double prev = pheromone.get(a).get(edge.destination);
-                    if (prev == null) { // Previously not viable
-                        if (DSU.sameSet(edge.destination, a)) // Now viable
-                            addHeuristic(edge.destination, a);
-                    } else { // Previously viable
-                        if (!DSU.sameSet(edge.destination, a)) // Now not viable
-                            removeHeuristic(edge.destination, a);
-                    }
-                }
+            node = nodeID;
+        }
+        ArrayList<SimpleEdge> neighbours = new ArrayList<>();
+        ArrayList<Integer> destinations = new ArrayList<>();
+        for (SimpleEdge edge: adjList.get(nodeID)) { // Affected neighbours
+            if (edge.isOffline || nodes.get(edge.destination)) continue;
+            if (DSU.sameSet(edge.destination, node)) {
+                neighbours.add(edge);
             }
-        } else { // More efficient update
-            ArrayList<SimpleEdge> neighbours = new ArrayList<>();
-            ArrayList<Integer> destinations = new ArrayList<>();
-            for (SimpleEdge edge: adjList.get(nodeID)) { // Affect neighbours
-                if (DSU.sameSet(edge.destination, node)) {
-                    neighbours.add(edge);
-                }
+        }
+        for (int a = 0; a < numNodes; ++a) { // Affected destinations
+            if (a == nodeID) continue;
+            if (nodes.get(a)) continue;
+            if (DSU.sameSet(a, node)) {
+                destinations.add(a);
             }
-            for (int a = 0; a < numNodes; ++a) { // Affected destinations
-                if (a == nodeID) continue;
-                if (DSU.sameSet(a, node)) {
-                    destinations.add(a);
-                }
-            }
-            for (SimpleEdge edge: neighbours) {
-                for (Integer dest: destinations) {
-                    Double prev = pheromone.get(dest).get(edge.destination);
-                    if (prev == null) { // Previously not viable
-                        if (DSU.sameSet(edge.destination, dest)) // Now viable
-                            addHeuristic(edge.destination, dest);
-                    } else { // Previously viable
-                        if (!DSU.sameSet(edge.destination, dest)) // Now not viable
-                            removeHeuristic(edge.destination, dest);
-                    }
+        }
+        for (SimpleEdge edge: neighbours) {
+            for (Integer dest: destinations) {
+                Double prev = pheromone.get(dest).get(edge.destination);
+                if (prev == null) { // Previously not viable
+                    if (DSU.sameSet(edge.destination, dest)) // Now viable
+                        addHeuristic(edge.destination, dest);
+                } else { // Previously viable
+                    if (!DSU.sameSet(edge.destination, dest)) // Now not viable
+                        removeHeuristic(edge.destination, dest);
                 }
             }
         }
