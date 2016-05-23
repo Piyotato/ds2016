@@ -64,16 +64,13 @@ class Node_EACO {
      * @param tabuSize Size of Tabu list
      * @return Neighbour for next hop, or null if cycle exists
      */
-    Integer nextHop(Packet packet, int alpha, int beta, int tabuSize) throws IllegalStateException {
-        /* Todo: Dual Method for selection of jumping node (See: AntNet 1.1) */
+    Integer nextHop(Packet packet, int alpha, int beta, int tabuSize) {
         double RNG = Math.random();
         double totVal = .0;
         ArrayList<Pair<Integer, Double>> neighbours = new ArrayList<>(); // Neighbour, Heuristic
         for (SimpleEdge edge: adjList.get(packet.source)) {
             if (edge.isOffline) continue;
             if (nodes.get(edge.destination)) continue;
-            /* Todo: Delete cycle instead of dropping packet? */
-            /* Unless cycle size > 1/2 trip length (As per AntNet 1.1)? */
             if (!packet.isValid(edge.destination, tabuSize)) continue;
             Double tau = pheromone.get(edge.destination).get(packet.destination); // Pheromone
             Double eta = 1. / edge.cost; // 1 / Distance
@@ -85,18 +82,21 @@ class Node_EACO {
             RNG -= neighbour.getValue() / totVal;
             if (RNG <= EPS) return neighbour.getKey();
         }
-        throw new IllegalStateException();
+        return neighbours.get(neighbours.size() - 1).getKey();
     }
 
     /**
      * Add a new node
      */
     void addNode() {
+        /* Resize pheromone matrix */
         for (ArrayList<Double> node: pheromone) {
             node.add(.0);
         }
         pheromone.add(new ArrayList<>(++numNodes));
+        /* Add entry for node in adjList */
         adjList.add(new ArrayList<>());
+        /* New node is not offline */
         nodes.add(false);
     }
 
@@ -110,6 +110,7 @@ class Node_EACO {
         if (nodes.get(ID)) {
             update(null);
         } else {
+            /* Merge all adj edges */
             for (SimpleEdge edge: edgeList) {
                 if (edge.source != ID) continue;
                 if (!edge.isOffline) {
@@ -128,8 +129,8 @@ class Node_EACO {
      * @param cost Time Taken
      */
     void addEdge(int node1, int node2, int cost) {
-        /* Todo: Intelligent Initialization (See: AntNet 1.1) */
-        /* Todo: Intelligent Updating (See: AntNet 1.1) */
+        /* Todo: Intelligent initialization (See: AntNet 1.1) */
+        /* Todo: Coefficient of memory (See: AntNet 1.1) */
         SimpleEdge forward = new SimpleEdge(node1, node2, cost);
         SimpleEdge backward = new SimpleEdge(node2, node1, cost);
         edgeList.add(forward);
@@ -152,7 +153,7 @@ class Node_EACO {
             update(null);
         } else {
             DSU.unionSet(edge.source, edge.destination);
-            update(edge.destination);
+            update(edge.destination); // OR edge.source
         }
     }
 
@@ -183,7 +184,7 @@ class Node_EACO {
         }
         for (SimpleEdge edge: neighbours) {
             for (Integer dest: destinations) {
-                Double prev = pheromone.get(dest).get(edge.destination);
+                Double prev = getPheromone(edge.destination, dest);
                 if (prev == null) { // Previously not viable
                     if (DSU.sameSet(edge.destination, dest)) // Now viable
                         addHeuristic(edge.destination, dest);
@@ -204,19 +205,20 @@ class Node_EACO {
      * @param destination ID of destination
      * @param change Pheromone change
      */
-    void updateHeuristic(int neighbour, int destination, double change) throws IllegalArgumentException {
+    void updateHeuristic(int neighbour, int destination, double change) throws IllegalStateException {
         double tot = .0;
         ArrayList<Double> dest = pheromone.get(destination);
+        /* Todo: Use another array to track viability? */
         /* Change Value */
         if (change < 0) { /* dest.get(neighbour) != null */
             if (Math.abs(dest.get(neighbour) + change) < EPS) {
                 dest.set(neighbour, null);
             } else {
-                if (dest.get(neighbour) + change < 0) throw new IllegalArgumentException();
+                if (dest.get(neighbour) + change < 0) throw new IllegalStateException();
                 dest.set(neighbour, dest.get(neighbour) + change);
             }
         } else {
-            if (dest.get(neighbour) + change > 1) throw new IllegalArgumentException();
+            if (dest.get(neighbour) + change > 1) throw new IllegalStateException();
             dest.set(neighbour, dest.get(neighbour) + change);
         }
         /* Calculate other sum */
@@ -254,7 +256,7 @@ class Node_EACO {
      * @param destination Destination ID
      */
     private void removeHeuristic(int neighbour, int destination) {
-        updateHeuristic(neighbour, destination, -pheromone.get(neighbour).get(destination));
+        updateHeuristic(neighbour, destination, -getPheromone(neighbour, destination));
     }
 
     /**
@@ -271,5 +273,16 @@ class Node_EACO {
             if (DSU.sameSet(edge.destination, destination)) ++cnt;
         }
         return cnt;
+    }
+
+    /**
+     * Returns pheromone level
+     *
+     * @param neighbour neighbour ID
+     * @param destination destination ID
+     * @return
+     */
+    double getPheromone(int neighbour, int destination) {
+        return pheromone.get(destination).get(neighbour);
     }
 }

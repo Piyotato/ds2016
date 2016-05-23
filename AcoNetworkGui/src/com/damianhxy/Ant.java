@@ -20,20 +20,6 @@ class Ant extends Packet {
     }
 
     /**
-     * Add a node to the path
-     * Assumes that node is valid
-     * Overrides Packet.addNode()
-     *
-     * @param node Current node
-     */
-    void addNode(int node) {
-        path.add(node);
-        if (node == destination) {
-            isBackwards = true;
-        }
-    }
-
-    /**
      * Find the previous node on the
      * path of the backwards ant
      *

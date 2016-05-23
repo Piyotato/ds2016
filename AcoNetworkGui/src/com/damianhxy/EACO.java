@@ -8,10 +8,11 @@ import javafx.util.*;
  */
 public class EACO extends AlgorithmBase {
 
-    private int success, failure;
+    private int success, failure, numPackets, numAnts;
     private final int alpha, beta, ratio, tabuSize, TTL;
     private final ArrayList<Node_EACO> nodes = new ArrayList<>();
     private final ArrayList<Edge_ACO> edgeList = new ArrayList<>();
+    /* Todo: Use an adjMat instead? */
     private final ArrayList<ArrayList<Edge_ACO>> adjList = new ArrayList<>();
 
     /**
@@ -68,6 +69,13 @@ public class EACO extends AlgorithmBase {
             failure += node.slowQ.size();
             node.fastQ.clear();
             node.slowQ.clear();
+            for (Edge_ACO edge: edgeList) {
+                if (edge.source == ID || edge.destination == ID) {
+                    failure += edge.packets.size();
+                    edge.packets.clear();
+                    edge.ants.clear();
+                }
+            }
         }
     }
 
@@ -130,14 +138,14 @@ public class EACO extends AlgorithmBase {
         while (!node.fastQ.isEmpty() && left-- > 0) {
             Ant ant = node.fastQ.poll();
             if (ant.isBackwards) { // Backward ant
-                if (node.nodeID != ant.destination) {
-                    int prev = ant.previousNode();
-                    /* Todo: Update time for only the relevant part of the trip? */
-                    node.updateHeuristic(prev, ant.destination, 1. / ant.totalTime);
-                }
+                int prev = ant.previousNode();
+                double P = node.getPheromone(prev, ant.destination);
+                /* Todo: Update time for only the relevant part of the trip */
+                double R = 1./ ant.totalTime;
+                double change = (P * (1 - R) + R) - P;
+                node.updateHeuristic(prev, ant.destination, change);
                 if (ant.source == node.nodeID) continue; // Reached source
                 int nxt = ant.nextNode();
-                ant.nextHop = nxt;
                 if (nodes.get(nxt).isOffline) continue; // Drop Ant
                 boolean found = false;
                 for (Edge_ACO edge: adjList.get(node.nodeID)) {
@@ -149,11 +157,16 @@ public class EACO extends AlgorithmBase {
                 }
                 if (!found) throw new IllegalStateException();
             } else { // Forward ant
-                Integer nxt = node.nextHop(ant, alpha, beta, tabuSize);
-                if (nxt == null) continue; // Drop Ant
-                ant.nextHop = nxt;
-                ant.addNode(nxt);
                 ant.totalTime += (double)node.slowQ.size() / node.speed;
+                Integer nxt;
+                if (ant.destination == node.nodeID) {
+                    ant.isBackwards = true;
+                    nxt = ant.nextNode();
+                } else {
+                    nxt = node.nextHop(ant, alpha, beta, tabuSize);
+                    if (nxt == null) continue; // Drop Ant
+                    ant.addNode(nxt);
+                }
                 boolean found = false;
                 for (Edge_ACO edge: adjList.get(node.nodeID)) {
                     if (edge.destination == nxt) {
@@ -167,17 +180,16 @@ public class EACO extends AlgorithmBase {
         }
         while (!node.slowQ.isEmpty() && left-- > 0) {
             Packet packet = node.slowQ.poll();
+            if (packet.destination == node.nodeID) {
+                ++success;
+                continue;
+            }
             Integer nxt = node.nextHop(packet, alpha, beta, tabuSize);
             if (nxt == null) {
                 ++failure;
                 continue; // Drop packet
             }
-            packet.nextHop = nxt;
             packet.addNode(nxt);
-            if (packet.destination == node.nodeID) {
-                ++success;
-                continue;
-            }
             boolean found = false;
             for (Edge_ACO edge: adjList.get(node.nodeID)) {
                 if (edge.destination == nxt) {
@@ -196,23 +208,19 @@ public class EACO extends AlgorithmBase {
      * @param edge Edge being processed
      */
     private void processEdge(Edge_ACO edge) {
+        /* Invariant: destination will not be offline if there are packets here */
         while (!edge.ants.isEmpty()) {
             if (edge.ants.peek().timestamp > currentTime) break;
             Ant ant = edge.ants.poll();
-            if (nodes.get(ant.nextHop).isOffline) continue; // Drop this Ant
-            if (ant.nextHop == destination || ant.decrementTTL()) {
-                nodes.get(ant.nextHop).fastQ.add(ant);
+            if (edge.destination == ant.destination || ant.decrementTTL()) {
+                nodes.get(edge.destination).fastQ.add(ant);
             }
         }
         while (!edge.packets.isEmpty()) {
             if (edge.packets.peek().timestamp > currentTime) break;
             Packet packet = edge.packets.poll();
-            if (nodes.get(packet.nextHop).isOffline) {
-                ++failure;
-                continue; // Drop this packet
-            }
-            if (packet.nextHop == destination || packet.decrementTTL()) {
-                nodes.get(packet.nextHop).slowQ.add(packet);
+            if (edge.destination == packet.destination || packet.decrementTTL()) {
+                nodes.get(edge.destination).slowQ.add(packet);
             } else {
                 ++failure;
             }
@@ -220,17 +228,20 @@ public class EACO extends AlgorithmBase {
     }
 
     private void generatePackets() {
-        /* Todo: Limit the number of ants in network? (See: AntNet 1.1) */
         Node_EACO src = nodes.get(source);
-        int amt = src.speed;
-        /* Todo: handle this better, if amt < ratio no ants will ever be sent */
-        int numPackets = ratio * amt / (ratio + 1);
-        int numAnts = amt / ratio;
-        /* Todo: Randomly selected destination? */
-        for (int a = 0; a < numPackets; ++a)
-            src.slowQ.add(new Packet(source, destination, TTL));
-        for (int a = 0; a < numAnts; ++a)
-            src.fastQ.add(new Ant(source, destination, TTL));
+        int amt = src.speed * currentTime;
+        int totPackets = ratio * amt / (ratio + 1);
+        int totAnts = amt / ratio;
+        for (; numPackets < totPackets; ++numPackets) {
+            Packet P = new Packet(source, destination, TTL);
+            P.addNode(source);
+            src.slowQ.add(P);
+        }
+        for (; numAnts < totAnts; ++numAnts) {
+            Ant A = new Ant(source, destination, TTL);
+            A.addNode(source);
+            src.fastQ.add(A);
+        }
     }
 
     /**

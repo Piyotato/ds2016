@@ -6,7 +6,7 @@ import javafx.util.*;
  * Created by damian on 17/5/16.
  */
 abstract class AlgorithmBase {
-    /* Todo: Add option to speedup simulation? */
+
     int numNodes, currentTime;
     final int source, destination;
 
