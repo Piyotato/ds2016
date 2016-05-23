@@ -12,7 +12,7 @@ class Node_EACO {
 
     boolean isOffline;
     private UFDS DSU;
-    private final ArrayList<ArrayList<Double>> pheromone = new ArrayList<>(); // Destination, Node
+    final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node
     private final ArrayList<ArrayList<SimpleEdge>> adjList;
     private final ArrayList<Boolean> nodes = new ArrayList<>(); // Is offline?
     private final ArrayList<SimpleEdge> edgeList = new ArrayList<>();
@@ -36,9 +36,6 @@ class Node_EACO {
             edgeList.add(new SimpleEdge(edge.source, edge.destination, edge.cost));
         }
         numNodes = nodeID = _nodeID;
-        for (int a = 0; a < numNodes; ++a) {
-            pheromone.add(new ArrayList<>(numNodes));
-        }
         adjList = new ArrayList<>(numNodes);
     }
 
@@ -72,7 +69,7 @@ class Node_EACO {
             if (edge.isOffline) continue;
             if (nodes.get(edge.destination)) continue;
             if (!packet.isValid(edge.destination, tabuSize)) continue;
-            Double tau = pheromone.get(edge.destination).get(packet.destination); // Pheromone
+            Double tau = pheromone.get(packet.destination, edge.destination); // Pheromone
             Double eta = 1. / edge.cost; // 1 / Distance
             neighbours.add(new Pair<>(edge.destination, Math.pow(tau, alpha) * Math.pow(eta, beta)));
             totVal += neighbours.get(neighbours.size() - 1).getValue();
@@ -89,11 +86,6 @@ class Node_EACO {
      * Add a new node
      */
     void addNode() {
-        /* Resize pheromone matrix */
-        for (ArrayList<Double> node: pheromone) {
-            node.add(.0);
-        }
-        pheromone.add(new ArrayList<>(++numNodes));
         /* Add entry for node in adjList */
         adjList.add(new ArrayList<>());
         /* New node is not offline */
@@ -111,7 +103,7 @@ class Node_EACO {
             update(null);
         } else {
             /* Merge all adj edges */
-            for (SimpleEdge edge: edgeList) {
+            for (SimpleEdge edge: adjList.get(ID)) {
                 if (edge.source != ID) continue;
                 if (!edge.isOffline) {
                     DSU.unionSet(edge.source, edge.destination);
@@ -184,7 +176,7 @@ class Node_EACO {
         }
         for (SimpleEdge edge: neighbours) {
             for (Integer dest: destinations) {
-                Double prev = getPheromone(edge.destination, dest);
+                Double prev = pheromone.get(dest, edge.destination);
                 if (prev == null) { // Previously not viable
                     if (DSU.sameSet(edge.destination, dest)) // Now viable
                         addHeuristic(edge.destination, dest);
@@ -207,32 +199,28 @@ class Node_EACO {
      */
     void updateHeuristic(int neighbour, int destination, double change) throws IllegalStateException {
         double tot = .0;
-        ArrayList<Double> dest = pheromone.get(destination);
-        /* Todo: Use another array to track viability? */
         /* Change Value */
-        if (change < 0) { /* dest.get(neighbour) != null */
-            if (Math.abs(dest.get(neighbour) + change) < EPS) {
-                dest.set(neighbour, null);
-            } else {
-                if (dest.get(neighbour) + change < 0) throw new IllegalStateException();
-                dest.set(neighbour, dest.get(neighbour) + change);
-            }
+        Double old = pheromone.get(destination, neighbour);
+        if (old + change < 0 || old + change > 1) throw new IllegalStateException();
+        if (Math.abs(old + change) < EPS) {
+            pheromone.put(destination, neighbour, null);
         } else {
-            if (dest.get(neighbour) + change > 1) throw new IllegalStateException();
-            dest.set(neighbour, dest.get(neighbour) + change);
+            pheromone.put(destination, neighbour, old + change);
         }
         /* Calculate other sum */
-        for (int a = 0; a < dest.size(); ++a) {
+        for (int a = 0; a < numNodes; ++a) {
             if (a == neighbour) continue;
-            if (dest.get(a) != null) {
-                tot += dest.get(a);
+            Double val = pheromone.get(destination, a);
+            if (val != null) {
+                tot += val;
             }
         }
         /* Decrease proportionally */
-        for (int a = 0; a < dest.size(); ++a) {
+        for (int a = 0; a < numNodes; ++a) {
             if (a == neighbour) continue;
-            if (dest.get(a) != null) {
-                dest.set(a, dest.get(a) * (1 + change / tot));
+            Double val = pheromone.get(destination, a);
+            if (val != null) {
+                pheromone.put(destination, a, val * (1 + change / tot));
             }
         }
     }
@@ -256,7 +244,7 @@ class Node_EACO {
      * @param destination Destination ID
      */
     private void removeHeuristic(int neighbour, int destination) {
-        updateHeuristic(neighbour, destination, -getPheromone(neighbour, destination));
+        updateHeuristic(neighbour, destination, -pheromone.get(destination, neighbour));
     }
 
     /**
@@ -273,16 +261,5 @@ class Node_EACO {
             if (DSU.sameSet(edge.destination, destination)) ++cnt;
         }
         return cnt;
-    }
-
-    /**
-     * Returns pheromone level
-     *
-     * @param neighbour neighbour ID
-     * @param destination destination ID
-     * @return
-     */
-    double getPheromone(int neighbour, int destination) {
-        return pheromone.get(destination).get(neighbour);
     }
 }

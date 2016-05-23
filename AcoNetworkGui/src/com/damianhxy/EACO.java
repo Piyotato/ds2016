@@ -12,8 +12,7 @@ public class EACO extends AlgorithmBase {
     private final int alpha, beta, ratio, tabuSize, TTL;
     private final ArrayList<Node_EACO> nodes = new ArrayList<>();
     private final ArrayList<Edge_ACO> edgeList = new ArrayList<>();
-    /* Todo: Use an adjMat instead? */
-    private final ArrayList<ArrayList<Edge_ACO>> adjList = new ArrayList<>();
+    private final HashMap2D<Integer, Integer, Edge_ACO> adjMat = new HashMap2D<>();
 
     /**
      * Initialize EACO
@@ -46,7 +45,6 @@ public class EACO extends AlgorithmBase {
         }
         /* For simulation purposes */
         nodes.add(new Node_EACO(numNodes++, speed, edgeList));
-        adjList.add(new ArrayList<>());
     }
 
     /**
@@ -99,8 +97,8 @@ public class EACO extends AlgorithmBase {
         Edge_ACO backward = new Edge_ACO(node2, node1, cost);
         edgeList.add(forward);
         edgeList.add(backward);
-        adjList.get(node1).add(forward);
-        adjList.get(node2).add(backward);
+        adjMat.put(node1, node2, forward);
+        adjMat.put(node2, node1, backward);
     }
 
     /**
@@ -133,29 +131,21 @@ public class EACO extends AlgorithmBase {
      *
      * @param node Node being processed
      */
-    private void processNode(Node_EACO node) throws IllegalStateException {
+    private void processNode(Node_EACO node) {
         int left = node.speed;
         while (!node.fastQ.isEmpty() && left-- > 0) {
             Ant ant = node.fastQ.poll();
             if (ant.isBackwards) { // Backward ant
                 int prev = ant.previousNode();
-                double P = node.getPheromone(prev, ant.destination);
+                double P = node.pheromone.get(ant.destination, prev);
                 /* Todo: Update time for only the relevant part of the trip */
-                double R = 1./ ant.totalTime;
+                double R = 1. / ant.totalTime;
                 double change = (P * (1 - R) + R) - P;
                 node.updateHeuristic(prev, ant.destination, change);
                 if (ant.source == node.nodeID) continue; // Reached source
                 int nxt = ant.nextNode();
                 if (nodes.get(nxt).isOffline) continue; // Drop Ant
-                boolean found = false;
-                for (Edge_ACO edge: adjList.get(node.nodeID)) {
-                    if (edge.destination == nxt) {
-                        edge.addAnt(ant, currentTime);
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) throw new IllegalStateException();
+                adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
             } else { // Forward ant
                 ant.totalTime += (double)node.slowQ.size() / node.speed;
                 Integer nxt;
@@ -167,15 +157,7 @@ public class EACO extends AlgorithmBase {
                     if (nxt == null) continue; // Drop Ant
                     ant.addNode(nxt);
                 }
-                boolean found = false;
-                for (Edge_ACO edge: adjList.get(node.nodeID)) {
-                    if (edge.destination == nxt) {
-                        edge.addAnt(ant, currentTime);
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) throw new IllegalStateException();
+                adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
             }
         }
         while (!node.slowQ.isEmpty() && left-- > 0) {
@@ -190,15 +172,7 @@ public class EACO extends AlgorithmBase {
                 continue; // Drop packet
             }
             packet.addNode(nxt);
-            boolean found = false;
-            for (Edge_ACO edge: adjList.get(node.nodeID)) {
-                if (edge.destination == nxt) {
-                    edge.addPacket(packet, currentTime);
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) throw new IllegalStateException();
+            adjMat.get(node.nodeID, nxt).addPacket(packet, currentTime);
         }
     }
 
