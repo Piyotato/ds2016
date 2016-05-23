@@ -27,13 +27,17 @@ class Node_EACO {
      *
      * @param _nodeID Unique Identifier
      * @param _speed Processing speed
+     * @param _nodes Initial status of nodes
      * @param _edgeList Initial topology
      */
 
-    Node_EACO(int _nodeID, int _speed, ArrayList<Edge_ACO> _edgeList) {
+    Node_EACO(int _nodeID, int _speed, ArrayList<Node_EACO> _nodes, ArrayList<Edge_ACO> _edgeList) {
         speed = _speed;
         for (Edge_ACO edge: _edgeList) {
             edgeList.add(new SimpleEdge(edge.source, edge.destination, edge.cost));
+        }
+        for (Node_EACO node: _nodes) {
+            nodes.add(node.isOffline);
         }
         numNodes = nodeID = _nodeID;
         adjList = new ArrayList<>(numNodes);
@@ -88,6 +92,7 @@ class Node_EACO {
     void addNode() {
         /* Add entry for node in adjList */
         adjList.add(new ArrayList<>());
+        ++numNodes;
         /* New node is not offline */
         nodes.add(false);
     }
@@ -104,7 +109,6 @@ class Node_EACO {
         } else {
             /* Merge all adj edges */
             for (SimpleEdge edge: adjList.get(ID)) {
-                if (edge.source != ID) continue;
                 if (!edge.isOffline) {
                     DSU.unionSet(edge.source, edge.destination);
                 }

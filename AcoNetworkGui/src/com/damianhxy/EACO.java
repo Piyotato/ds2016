@@ -44,7 +44,7 @@ public class EACO extends AlgorithmBase {
             node.addNode();
         }
         /* For simulation purposes */
-        nodes.add(new Node_EACO(numNodes++, speed, edgeList));
+        nodes.add(new Node_EACO(numNodes++, speed, nodes, edgeList));
     }
 
     /**
