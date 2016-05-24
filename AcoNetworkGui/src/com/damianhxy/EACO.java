@@ -136,9 +136,9 @@ public class EACO extends AlgorithmBase {
         while (!node.fastQ.isEmpty() && left-- > 0) {
             Ant ant = node.fastQ.poll();
             if (ant.isBackwards) { // Backward ant
+                ant.updateTotalTime();
                 int prev = ant.previousNode();
                 double P = node.pheromone.get(ant.destination, prev);
-                /* Todo: Update time for only the relevant part of the trip */
                 double R = 1. / ant.totalTime;
                 double change = (P * (1 - R) + R) - P;
                 node.updateHeuristic(prev, ant.destination, change);
@@ -147,7 +147,7 @@ public class EACO extends AlgorithmBase {
                 if (nodes.get(nxt).isOffline) continue; // Drop Ant
                 adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
             } else { // Forward ant
-                ant.totalTime += (double)node.slowQ.size() / node.speed;
+                ant.timings.add((double)node.slowQ.size() / node.speed);
                 Integer nxt;
                 if (ant.destination == node.nodeID) {
                     ant.isBackwards = true;
@@ -156,6 +156,7 @@ public class EACO extends AlgorithmBase {
                     nxt = node.nextHop(ant, alpha, beta, tabuSize);
                     if (nxt == null) continue; // Drop Ant
                     ant.addNode(nxt);
+                    ant.timings.add((double)adjMat.get(node.nodeID, nxt).cost);
                 }
                 adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
             }

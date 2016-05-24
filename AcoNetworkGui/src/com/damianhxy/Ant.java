@@ -1,11 +1,14 @@
 package com.damianhxy;
 
+import java.util.*;
+
 /**
  * Created by damian on 16/5/16.
  */
 class Ant extends Packet {
 
     double totalTime;
+    ArrayList<Double> timings = new ArrayList<>();
     boolean isBackwards;
 
     /**
@@ -39,5 +42,16 @@ class Ant extends Packet {
      */
     int nextNode() {
         return path.get(path.size() - 2);
+    }
+
+    /**
+     * Calculate time taken for journey from
+     * current node to destination
+     */
+    void updateTotalTime() {
+        totalTime += timings.get(timings.size() - 1);
+        totalTime += timings.get(timings.size() - 2);
+        timings.remove(timings.size() - 1);
+        timings.remove(timings.size() - 1);
     }
 }
