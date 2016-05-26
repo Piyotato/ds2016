@@ -152,12 +152,12 @@ public class EACO extends AlgorithmBase {
                 if (ant.destination == node.nodeID) {
                     ant.isBackwards = true;
                     nxt = ant.nextNode();
-                } else {
+                } else if (ant.decrementTTL()) {
                     nxt = node.nextHop(ant, alpha, beta, tabuSize);
                     if (nxt == null) continue; // Drop Ant
                     ant.addNode(nxt);
                     ant.timings.add((double)adjMat.get(node.nodeID, nxt).cost);
-                }
+                } else continue;
                 adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
             }
         }
@@ -165,6 +165,9 @@ public class EACO extends AlgorithmBase {
             Packet packet = node.slowQ.poll();
             if (packet.destination == node.nodeID) {
                 ++success;
+                continue;
+            } else if (!packet.decrementTTL()) {
+                ++failure;
                 continue;
             }
             Integer nxt = node.nextHop(packet, alpha, beta, tabuSize);
@@ -187,18 +190,12 @@ public class EACO extends AlgorithmBase {
         while (!edge.ants.isEmpty()) {
             if (edge.ants.peek().timestamp > currentTime) break;
             Ant ant = edge.ants.poll();
-            if (edge.destination == ant.destination || ant.decrementTTL()) {
-                nodes.get(edge.destination).fastQ.add(ant);
-            }
+            nodes.get(edge.destination).fastQ.add(ant);
         }
         while (!edge.packets.isEmpty()) {
             if (edge.packets.peek().timestamp > currentTime) break;
             Packet packet = edge.packets.poll();
-            if (edge.destination == packet.destination || packet.decrementTTL()) {
-                nodes.get(edge.destination).slowQ.add(packet);
-            } else {
-                ++failure;
-            }
+            nodes.get(edge.destination).slowQ.add(packet);
         }
     }
 
@@ -206,16 +203,12 @@ public class EACO extends AlgorithmBase {
         Node_EACO src = nodes.get(source);
         int amt = src.speed * currentTime;
         int totPackets = ratio * amt / (ratio + 1);
-        int totAnts = amt / ratio;
+        int totAnts = amt / (ratio + 1);
         for (; numPackets < totPackets; ++numPackets) {
-            Packet P = new Packet(source, destination, TTL);
-            P.addNode(source);
-            src.slowQ.add(P);
+            src.slowQ.add(new Packet(source, destination, TTL));
         }
         for (; numAnts < totAnts; ++numAnts) {
-            Ant A = new Ant(source, destination, TTL);
-            A.addNode(source);
-            src.fastQ.add(A);
+            src.fastQ.add(new Ant(source, destination, TTL));
         }
     }
 

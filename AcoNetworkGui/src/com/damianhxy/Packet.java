@@ -23,6 +23,7 @@ class Packet {
         source = _source;
         destination = _destination;
         TTL = _TTL;
+        path.add(_source);
     }
 
     /**

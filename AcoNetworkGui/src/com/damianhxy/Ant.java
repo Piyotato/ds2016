@@ -29,9 +29,7 @@ class Ant extends Packet {
      * @return The previous node
      */
     int previousNode() {
-        int ID = path.get(path.size() - 1);
-        path.remove(path.size() - 1);
-        return ID;
+        return path.remove(path.size() - 1);
     }
 
     /**
@@ -50,8 +48,8 @@ class Ant extends Packet {
      */
     void updateTotalTime() {
         totalTime += timings.get(timings.size() - 1);
-        totalTime += timings.get(timings.size() - 2);
         timings.remove(timings.size() - 1);
+        totalTime += timings.get(timings.size() - 1);
         timings.remove(timings.size() - 1);
     }
 }

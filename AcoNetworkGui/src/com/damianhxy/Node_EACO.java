@@ -70,11 +70,12 @@ class Node_EACO {
         double totVal = .0;
         ArrayList<Pair<Integer, Double>> neighbours = new ArrayList<>(); // Neighbour, Heuristic
         for (SimpleEdge edge: adjList.get(packet.source)) {
-            if (edge.isOffline) continue;
-            if (nodes.get(edge.destination)) continue;
-            if (!packet.isValid(edge.destination, tabuSize)) continue;
+            if (edge.isOffline) continue; // Link is offline
+            if (nodes.get(edge.destination)) continue; // Node is offline
+            if (!packet.isValid(edge.destination, tabuSize)) continue; // Cycle detection
             Double tau = pheromone.get(packet.destination, edge.destination); // Pheromone
             Double eta = 1. / edge.cost; // 1 / Distance
+            if (tau == null) continue; // Not viable
             neighbours.add(new Pair<>(edge.destination, Math.pow(tau, alpha) * Math.pow(eta, beta)));
             totVal += neighbours.get(neighbours.size() - 1).getValue();
         }
@@ -110,7 +111,7 @@ class Node_EACO {
             /* Merge all adj edges */
             for (SimpleEdge edge: adjList.get(ID)) {
                 if (!edge.isOffline) {
-                    DSU.unionSet(edge.source, edge.destination);
+                    DSU.unionSet(ID, edge.destination);
                 }
             }
             update(ID);
@@ -134,7 +135,7 @@ class Node_EACO {
         adjList.get(node1).add(forward);
         adjList.get(node2).add(backward);
         DSU.unionSet(node1, node2);
-        update(node2);
+        update(node2); // OR: node1
     }
 
     /**
@@ -163,6 +164,7 @@ class Node_EACO {
             initDSU();
             node = nodeID;
         }
+        /* Todo: Rewrite this part */
         ArrayList<SimpleEdge> neighbours = new ArrayList<>();
         ArrayList<Integer> destinations = new ArrayList<>();
         for (SimpleEdge edge: adjList.get(nodeID)) { // Affected neighbours
@@ -201,24 +203,16 @@ class Node_EACO {
      * @param destination ID of destination
      * @param change Pheromone change
      */
-    void updateHeuristic(int neighbour, int destination, double change) throws IllegalStateException {
-        double tot = .0;
+    void updateHeuristic(int neighbour, int destination, double change) throws IllegalArgumentException {
         /* Change Value */
         Double old = pheromone.get(destination, neighbour);
-        if (old + change < 0 || old + change > 1) throw new IllegalStateException();
+        if (old + change < 0 || old + change > 1) throw new IllegalArgumentException();
         if (Math.abs(old + change) < EPS) {
             pheromone.put(destination, neighbour, null);
         } else {
             pheromone.put(destination, neighbour, old + change);
         }
-        /* Calculate other sum */
-        for (int a = 0; a < numNodes; ++a) {
-            if (a == neighbour) continue;
-            Double val = pheromone.get(destination, a);
-            if (val != null) {
-                tot += val;
-            }
-        }
+        double tot = 1 - old;
         /* Decrease proportionally */
         for (int a = 0; a < numNodes; ++a) {
             if (a == neighbour) continue;
@@ -237,7 +231,11 @@ class Node_EACO {
      * @param destination Destination ID
      */
     private void addHeuristic(int neighbour, int destination) {
-        updateHeuristic(neighbour, destination, 1. / viableNeighbours(destination));
+        int cnt = 0;
+        for (SimpleEdge edge: adjList.get(nodeID)) {
+            if (DSU.sameSet(edge.destination, destination)) ++cnt;
+        }
+        updateHeuristic(neighbour, destination, 1. / cnt);
     }
 
     /**
@@ -249,21 +247,5 @@ class Node_EACO {
      */
     private void removeHeuristic(int neighbour, int destination) {
         updateHeuristic(neighbour, destination, -pheromone.get(destination, neighbour));
-    }
-
-    /**
-     * Counts viable neighbours
-     * for a given destination
-     *
-     * @param destination ID of destination
-     * @return Number of viable neighbours
-     */
-    private int viableNeighbours(int destination) {
-        int cnt = 0;
-        for (SimpleEdge edge: adjList.get(nodeID)) {
-            if (edge.isOffline) continue;
-            if (DSU.sameSet(edge.destination, destination)) ++cnt;
-        }
-        return cnt;
     }
 }
