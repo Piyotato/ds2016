@@ -7,15 +7,9 @@ import javafx.util.*;
  */
 abstract class AlgorithmBase {
 
-    int numNodes, currentTime;
+    int currentTime;
     final int source, destination;
 
-    /**
-     * Initialize algorithm
-     *
-     * @param _source Source node
-     * @param _destination Destination node
-     */
     AlgorithmBase(int _source, int _destination) {
         source = _source;
         destination = _destination;

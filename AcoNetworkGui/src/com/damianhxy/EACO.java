@@ -21,6 +21,7 @@ public class EACO extends AlgorithmBase {
      * @param _beta Weightage of cost function
      * @param _ratio Ratio of ants to packets
      * @param _TTL Time To Live of packets
+     * @param _tabuSize Size of tabu list
      * @param _source Source node
      * @param _destination Destination node
      */
@@ -39,12 +40,7 @@ public class EACO extends AlgorithmBase {
      * @param speed Processing speed
      */
     void addNode(int speed) {
-        /* Propagated update */
-        for (Node_EACO node: nodes) {
-            node.addNode();
-        }
-        /* For simulation purposes */
-        nodes.add(new Node_EACO(numNodes++, speed, nodes, edgeList));
+        nodes.add(new Node_EACO(speed, nodes, edgeList, adjMat, alpha, beta, tabuSize));
     }
 
     /**
@@ -85,12 +81,12 @@ public class EACO extends AlgorithmBase {
      * @param cost Time taken
      */
     void addEdge(int node1, int node2, int cost) throws IllegalArgumentException {
-        if (node1 >= numNodes || node2 >= numNodes) {
+        if (node1 >= nodes.size() || node2 >= nodes.size()) {
             throw new IllegalArgumentException();
         }
         /* Propagated update */
         for (Node_EACO node: nodes) {
-            node.addEdge(node1, node2, cost);
+            node.addEdge(node1, node2);
         }
         /* For simulation purposes */
         Edge_ACO forward = new Edge_ACO(node1, node2, cost);
@@ -138,7 +134,8 @@ public class EACO extends AlgorithmBase {
             if (ant.isBackwards) { // Backward ant
                 ant.updateTotalTime();
                 int prev = ant.previousNode();
-                double P = node.pheromone.get(ant.destination, prev);
+                Double P = node.pheromone.get(ant.destination, prev);
+                if (P == null) continue; // This path is no longer viable
                 double R = 1. / ant.totalTime;
                 double change = (P * (1 - R) + R) - P;
                 node.updateHeuristic(prev, ant.destination, change);
@@ -153,7 +150,7 @@ public class EACO extends AlgorithmBase {
                     ant.isBackwards = true;
                     nxt = ant.nextNode();
                 } else if (ant.decrementTTL()) {
-                    nxt = node.nextHop(ant, alpha, beta, tabuSize);
+                    nxt = node.nextHop(ant);
                     if (nxt == null) continue; // Drop Ant
                     ant.addNode(nxt);
                     ant.timings.add((double)adjMat.get(node.nodeID, nxt).cost);
@@ -170,7 +167,7 @@ public class EACO extends AlgorithmBase {
                 ++failure;
                 continue;
             }
-            Integer nxt = node.nextHop(packet, alpha, beta, tabuSize);
+            Integer nxt = node.nextHop(packet);
             if (nxt == null) {
                 ++failure;
                 continue; // Drop packet
@@ -186,7 +183,6 @@ public class EACO extends AlgorithmBase {
      * @param edge Edge being processed
      */
     private void processEdge(Edge_ACO edge) {
-        /* Invariant: destination will not be offline if there are packets here */
         while (!edge.ants.isEmpty()) {
             if (edge.ants.peek().timestamp > currentTime) break;
             Ant ant = edge.ants.poll();

@@ -29,6 +29,16 @@ public class HashMap2D<K1, K2, V> {
     }
 
     /**
+     * Retrieves a row
+     *
+     * @param key1 First Key
+     * @return The row corresponding to the first key
+     */
+    HashMap<K2, V> get(K1 key1) {
+        return M.get(key1);
+    }
+
+    /**
      * Retrieves a value for an entry
      *
      * @param key1 First Key
