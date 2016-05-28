@@ -52,11 +52,6 @@ public class ACO extends AlgorithmBase {
         if (ID == source || ID == destination) {
             throw new IllegalArgumentException();
         }
-        /* Propagated update */
-        for (Node_ACO node: nodes) {
-            node.toggleNode(ID);
-        }
-        /* For simulation purposes */
         Node_ACO node = nodes.get(ID);
         node.isOffline ^= true;
         if (node.isOffline) {
@@ -64,12 +59,14 @@ public class ACO extends AlgorithmBase {
             node.fastQ.clear();
             node.slowQ.clear();
             for (Edge_ACO edge: edgeList) {
-                if (edge.source == ID || edge.destination == ID) {
-                    failure += edge.packets.size();
-                    edge.packets.clear();
-                    edge.ants.clear();
-                }
+                if (edge.source != ID && edge.destination != ID) continue;
+                failure += edge.packets.size();
+                edge.packets.clear();
+                edge.ants.clear();
             }
+        }
+        for (Node_ACO _node: nodes) {
+            _node.toggleNode(ID);
         }
     }
 
@@ -84,17 +81,15 @@ public class ACO extends AlgorithmBase {
         if (node1 >= nodes.size() || node2 >= nodes.size()) {
             throw new IllegalArgumentException();
         }
-        /* Propagated update */
-        for (Node_ACO node: nodes) {
-            node.addEdge(node1, node2);
-        }
-        /* For simulation purposes */
         Edge_ACO forward = new Edge_ACO(node1, node2, cost);
         Edge_ACO backward = new Edge_ACO(node2, node1, cost);
         edgeList.add(forward);
         edgeList.add(backward);
         adjMat.put(node1, node2, forward);
         adjMat.put(node2, node1, backward);
+        for (Node_ACO node: nodes) {
+            node.addEdge(node1, node2);
+        }
     }
 
     /**
@@ -103,12 +98,6 @@ public class ACO extends AlgorithmBase {
      * @param ID Edge ID
      */
     void toggleEdge(int ID) {
-        /* Propagated update */
-        for (Node_ACO node: nodes) {
-            node.toggleEdge(ID * 2);
-            node.toggleEdge(ID * 2 + 1);
-        }
-        /* For simulation purposes */
         Edge_ACO forward = edgeList.get(ID * 2);
         Edge_ACO backward = edgeList.get(ID * 2 + 1);
         forward.isOffline ^= true;
@@ -119,6 +108,10 @@ public class ACO extends AlgorithmBase {
             forward.ants.clear();
             backward.packets.clear();
             backward.ants.clear();
+        }
+        for (Node_ACO node: nodes) {
+            node.toggleEdge(ID * 2);
+            node.toggleEdge(ID * 2 + 1);
         }
     }
 
@@ -185,13 +178,11 @@ public class ACO extends AlgorithmBase {
     private void processEdge(Edge_ACO edge) {
         while (!edge.ants.isEmpty()) {
             if (edge.ants.peek().timestamp > currentTime) break;
-            Ant ant = edge.ants.poll();
-            nodes.get(edge.destination).fastQ.add(ant);
+            nodes.get(edge.destination).fastQ.add(edge.ants.poll());
         }
         while (!edge.packets.isEmpty()) {
             if (edge.packets.peek().timestamp > currentTime) break;
-            Packet packet = edge.packets.poll();
-            nodes.get(edge.destination).slowQ.add(packet);
+            nodes.get(edge.destination).slowQ.add(edge.packets.poll());
         }
     }
 

@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Created by damian on 23/5/16.
  */
-public class HashMap2D<K1, K2, V> {
+class HashMap2D<K1, K2, V> {
     
     private final HashMap<K1, HashMap<K2, V>> M = new HashMap<>();
 

@@ -6,7 +6,7 @@ import javafx.util.*;
 /**
  * Created by damian on 27/5/16.
  */
-public class Node_ACO extends Node {
+class Node_ACO extends Node {
 
     private final static double EPS = 1e-5;
 
@@ -24,7 +24,7 @@ public class Node_ACO extends Node {
      * Initialize a node
      *
      * @param _speed Processing speed
-     * @param _nodes ArrayList of Node_EACO
+     * @param _nodes ArrayList of Node_ACO
      * @param _edgeList ArrayList of Edge_ACO
      * @param _adjMat Adjacency Matrix
      * @param _alpha Weightage of pheromone
