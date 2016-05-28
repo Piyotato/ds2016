@@ -70,6 +70,8 @@ class Node_ACO extends Node {
      * @param node2 Second Node
      */
     void addEdge(int node1, int node2) {
+        /* Todo: Intelligent initialization (See: AntNet 1.1) */
+        /* Todo: Coefficient of memory (See: AntNet 1.1) */
         /* Only care about neighbours */
         if (node1 != nodeID && node2 != nodeID) return;
         int otherNode = (node1 == nodeID ? node2: node1);

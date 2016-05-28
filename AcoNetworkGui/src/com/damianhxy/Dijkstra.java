@@ -65,6 +65,7 @@ class Dijkstra {
         if (B.get(node) != -1) return B.get(node);
         if (P.get(node).equals(-1)) return -1; // Graph is not complete yet
         if (P.get(node).equals(source)) return node;
-        return calc(P.get(node));
+        B.set(node, calc(P.get(node)));
+        return B.get(node);
     }
 }

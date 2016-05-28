@@ -8,7 +8,7 @@ import javafx.util.*;
  */
 public class OSPF extends AlgorithmBase {
 
-    /* Todo: Figure out TTL */
+    private final static int TTL = 1000;
 
     private int success, failure;
     private final ArrayList<Node_OSPF> nodes = new ArrayList<>();
@@ -135,12 +135,23 @@ public class OSPF extends AlgorithmBase {
     }
 
     /**
+     * Generate packets from source
+     */
+    private void generatePackets() {
+        Node_OSPF src = nodes.get(source);
+        for (int a = 0; a < src.speed; ++a) {
+            src.Q.add(new Packet(source, destination, TTL));
+        }
+    }
+
+    /**
      * One tick of the simulation
      *
      * @return Success, Failure
      */
     Pair<Integer, Integer> tick() {
         ++currentTime;
+        generatePackets();
         for (Edge edge: edgeList) {
             if (edge.isOffline) continue;
             processEdge(edge);
