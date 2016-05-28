@@ -7,7 +7,7 @@ import java.util.*;
  */
 class Edge extends SimpleEdge {
 
-    Queue<Packet> packets = new ArrayDeque<>();
+    final Queue<Packet> packets = new ArrayDeque<>();
 
     /**
      * Initializes an edge

@@ -7,7 +7,7 @@ import java.util.*;
  */
 class Edge_ACO extends Edge {
 
-    Queue<Ant> ants = new ArrayDeque<>();
+    final Queue<Ant> ants = new ArrayDeque<>();
 
     /**
      * Initializes an edge

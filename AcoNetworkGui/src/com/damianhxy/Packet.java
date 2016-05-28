@@ -10,7 +10,7 @@ class Packet {
     final int source, destination;
     int timestamp;
     private int TTL;
-    ArrayList<Integer> path = new ArrayList<>();
+    final ArrayList<Integer> path = new ArrayList<>();
 
     /**
      * Initializes a packet

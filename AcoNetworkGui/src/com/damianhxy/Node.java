@@ -5,7 +5,7 @@ package com.damianhxy;
  */
 abstract class Node {
 
-    protected final int speed, nodeID;
+    final int speed, nodeID;
     boolean isOffline;
 
     Node(int _speed, int _nodeID) {

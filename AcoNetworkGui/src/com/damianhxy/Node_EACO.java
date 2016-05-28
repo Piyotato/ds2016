@@ -7,7 +7,7 @@ import javafx.util.*;
  * Created by damian on 16/5/16.
  */
 class Node_EACO extends Node {
-    /* Todo: Make this class extend Node_ACO instead */
+
     private final static double EPS = 1e-5;
 
     private UFDS DSU;

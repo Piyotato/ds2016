@@ -8,7 +8,7 @@ import java.util.*;
 class Ant extends Packet {
 
     double totalTime;
-    ArrayList<Double> timings = new ArrayList<>();
+    final ArrayList<Double> timings = new ArrayList<>();
     boolean isBackwards;
 
     /**

@@ -4,13 +4,13 @@ import java.util.*;
 import javafx.util.*;
 
 /**
- * Created by damian on 16/5/16.
+ * Created by damian on 28/5/16.
  */
-public class EACO extends AlgorithmBase {
+public class ACO extends AlgorithmBase {
 
     private int success, failure, numPackets, numAnts;
     private final int alpha, beta, ratio, tabuSize, TTL;
-    private final ArrayList<Node_EACO> nodes = new ArrayList<>();
+    private final ArrayList<Node_ACO> nodes = new ArrayList<>();
     private final ArrayList<Edge_ACO> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat = new HashMap2D<>();
 
@@ -25,7 +25,7 @@ public class EACO extends AlgorithmBase {
      * @param _source Source node
      * @param _destination Destination node
      */
-    public EACO(int _alpha, int _beta, int _ratio, int _TTL, int _tabuSize, int _source, int _destination) {
+    public ACO(int _alpha, int _beta, int _ratio, int _TTL, int _tabuSize, int _source, int _destination) {
         super(_source, _destination);
         alpha = _alpha;
         beta = _beta;
@@ -40,7 +40,7 @@ public class EACO extends AlgorithmBase {
      * @param speed Processing speed
      */
     void addNode(int speed) {
-        nodes.add(new Node_EACO(speed, nodes, edgeList, adjMat, alpha, beta, tabuSize));
+        nodes.add(new Node_ACO(speed, nodes, edgeList, adjMat, alpha, beta, tabuSize));
     }
 
     /**
@@ -53,11 +53,11 @@ public class EACO extends AlgorithmBase {
             throw new IllegalArgumentException();
         }
         /* Propagated update */
-        for (Node_EACO node: nodes) {
+        for (Node_ACO node: nodes) {
             node.toggleNode(ID);
         }
         /* For simulation purposes */
-        Node_EACO node = nodes.get(ID);
+        Node_ACO node = nodes.get(ID);
         node.isOffline ^= true;
         if (node.isOffline) {
             failure += node.slowQ.size();
@@ -85,7 +85,7 @@ public class EACO extends AlgorithmBase {
             throw new IllegalArgumentException();
         }
         /* Propagated update */
-        for (Node_EACO node: nodes) {
+        for (Node_ACO node: nodes) {
             node.addEdge(node1, node2);
         }
         /* For simulation purposes */
@@ -104,7 +104,7 @@ public class EACO extends AlgorithmBase {
      */
     void toggleEdge(int ID) {
         /* Propagated update */
-        for (Node_EACO node: nodes) {
+        for (Node_ACO node: nodes) {
             node.toggleEdge(ID * 2);
             node.toggleEdge(ID * 2 + 1);
         }
@@ -127,7 +127,7 @@ public class EACO extends AlgorithmBase {
      *
      * @param node Node being processed
      */
-    private void processNode(Node_EACO node) {
+    private void processNode(Node_ACO node) {
         int left = node.speed;
         while (!node.fastQ.isEmpty() && left-- > 0) {
             Ant ant = node.fastQ.poll();
@@ -177,6 +177,11 @@ public class EACO extends AlgorithmBase {
         }
     }
 
+    /**
+     * Simulate edge
+     *
+     * @param edge Edge being processed
+     */
     private void processEdge(Edge_ACO edge) {
         while (!edge.ants.isEmpty()) {
             if (edge.ants.peek().timestamp > currentTime) break;
@@ -191,7 +196,7 @@ public class EACO extends AlgorithmBase {
     }
 
     private void generatePackets() {
-        Node_EACO src = nodes.get(source);
+        Node_ACO src = nodes.get(source);
         int amt = src.speed * currentTime;
         int totPackets = ratio * amt / (ratio + 1);
         int totAnts = amt / (ratio + 1);
@@ -215,7 +220,7 @@ public class EACO extends AlgorithmBase {
             if (edge.isOffline) continue;
             processEdge(edge);
         }
-        for (Node_EACO node: nodes) {
+        for (Node_ACO node: nodes) {
             if (node.isOffline) continue;
             processNode(node);
         }

@@ -16,7 +16,7 @@ public class Node_ACO extends Node {
     final Queue<Ant> fastQ = new ArrayDeque<>();
     final Queue<Packet> slowQ = new ArrayDeque<>();
 
-    private final ArrayList<Node_EACO> nodes;
+    private final ArrayList<Node_ACO> nodes;
     private final ArrayList<Edge_ACO> edgeList;
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat;
 
@@ -31,7 +31,7 @@ public class Node_ACO extends Node {
      * @param _beta Weightage of cost function
      * @param _tabuSize Size of tabu list
      */
-    Node_ACO(int _speed, ArrayList<Node_EACO> _nodes, ArrayList<Edge_ACO> _edgeList,
+    Node_ACO(int _speed, ArrayList<Node_ACO> _nodes, ArrayList<Edge_ACO> _edgeList,
              HashMap2D<Integer, Integer, Edge_ACO> _adjMat, int _alpha, int _beta, int _tabuSize) {
         super(_speed, _nodes.size());
         alpha = _alpha;
