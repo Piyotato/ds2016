@@ -10,6 +10,18 @@ class UFDS {
     private final ArrayList<Integer> P = new ArrayList<>(), RANK = new ArrayList<>();
 
     /**
+     * Initializes UFDS data structure
+     *
+     * @param N Number of elements
+     */
+    UFDS(int N) {
+        for (int a = 0; a < N; ++a) {
+            P.add(a);
+            RANK.add(a, 1);
+        }
+    }
+
+    /**
      * Finds the set of an element
      *
      * @param node The element
@@ -48,17 +60,5 @@ class UFDS {
             RANK.set(Y, RANK.get(Y) + 1);
         }
         P.set(X, Y);
-    }
-
-    /**
-     * Initializes UFDS data structure
-     *
-     * @param N Number of elements
-     */
-    UFDS(int N) {
-        for (int a = 0; a < N; ++a) {
-            P.add(a);
-            RANK.add(a, 1);
-        }
     }
 }

@@ -27,10 +27,20 @@ class Node_OSPF extends Node {
         SSSP = new Dijkstra(nodeID, nodes, adjMat);
     }
 
+    /**
+     * React to updates
+     */
     void update() {
         SSSP = new Dijkstra(nodeID, nodes, adjMat);
     }
 
+    /**
+     * Calculate next best hop, for a
+     * given destination
+     *
+     * @param packet Packet being processed
+     * @return Neighbour for next hop
+     */
     Integer nextHop(Packet packet) {
         return SSSP.B.get(packet.destination);
     }

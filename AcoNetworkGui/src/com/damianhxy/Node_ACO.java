@@ -107,6 +107,7 @@ class Node_ACO extends Node {
      * Use heuristics to calculate the
      * next best hop, for a given destination
      *
+     * @param packet Packet being processed
      * @return Neighbour for next hop, or null if no candidates
      */
     Integer nextHop(Packet packet) {
@@ -138,6 +139,7 @@ class Node_ACO extends Node {
      * @param neighbour ID of neighbour
      * @param destination ID of destination
      * @param change Pheromone change
+     * @throws IllegalArgumentException
      */
     void updateHeuristic(int neighbour, int destination, double change) throws IllegalArgumentException {
         Double old = pheromone.get(destination, neighbour);

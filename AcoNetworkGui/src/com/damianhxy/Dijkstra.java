@@ -14,6 +14,13 @@ class Dijkstra {
     final ArrayList<Integer> B = new ArrayList<>();
     private final int source;
 
+    /**
+     * Initialize Dijkstra data structure
+     *
+     * @param _source Source node
+     * @param _nodes ArrayList of Node_OSPF
+     * @param _adjMat Adjacency Matrix
+     */
     Dijkstra(int _source, ArrayList<Node_OSPF> _nodes, HashMap2D<Integer, Integer, Edge> _adjMat) {
         final ArrayList<Integer> D = new ArrayList<>();
         final PriorityQueue<Pair<Integer, Integer>> PQ = new PriorityQueue<>();
@@ -47,6 +54,13 @@ class Dijkstra {
         }
     }
 
+    /**
+     * Calculates best neighbour from source
+     * to reach given destination
+     *
+     * @param node Node ID
+     * @return Best neighbour node ID
+     */
     private int calc(int node) {
         if (B.get(node) != -1) return B.get(node);
         if (P.get(node).equals(-1)) return -1; // Graph is not complete yet

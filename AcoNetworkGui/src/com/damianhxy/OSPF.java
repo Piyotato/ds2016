@@ -25,10 +25,21 @@ public class OSPF extends AlgorithmBase {
         super(_source, _destination);
     }
 
+    /**
+     * Add a new node
+     *
+     * @param speed Processing speed
+     */
     void addNode(int speed) {
         nodes.add(new Node_OSPF(speed, nodes, adjMat));
     }
 
+    /**
+     * Toggle state of anode
+     *
+     * @param ID Node ID
+     * @throws IllegalArgumentException
+     */
     void toggleNode(int ID) throws IllegalArgumentException {
         if (ID == source || ID == destination) {
             throw new IllegalArgumentException();
@@ -49,6 +60,14 @@ public class OSPF extends AlgorithmBase {
         }
     }
 
+    /**
+     * Add a bidirectional edge
+     *
+     * @param node1 First node
+     * @param node2 Second node
+     * @param cost Time taken
+     * @throws IllegalArgumentException
+     */
     void addEdge(int node1, int node2, int cost) throws IllegalArgumentException {
         if (node1 >= nodes.size() || node2 >= nodes.size()) {
             throw new IllegalArgumentException();
@@ -64,6 +83,11 @@ public class OSPF extends AlgorithmBase {
         }
     }
 
+    /**
+     * Toggle state of an edge
+     *
+     * @param ID Edge ID
+     */
     void toggleEdge(int ID) {
         Edge forward = edgeList.get(ID * 2);
         Edge backward = edgeList.get(ID * 2 + 1);
@@ -80,6 +104,11 @@ public class OSPF extends AlgorithmBase {
         }
     }
 
+    /**
+     * Simulate node
+     *
+     * @param node Node being processed
+     */
     private void processNode(Node_OSPF node) {
         int left = node.speed;
         while (!node.Q.isEmpty() && left-- > 0) {
@@ -93,6 +122,11 @@ public class OSPF extends AlgorithmBase {
         }
     }
 
+    /**
+     * Simulate edge
+     *
+     * @param edge Edge being processed
+     */
     private void processEdge(Edge edge) {
         while (!edge.packets.isEmpty()) {
             if (edge.packets.peek().timestamp >= currentTime) break;
@@ -100,6 +134,11 @@ public class OSPF extends AlgorithmBase {
         }
     }
 
+    /**
+     * One tick of the simulation
+     *
+     * @return Success, Failure
+     */
     Pair<Integer, Integer> tick() {
         ++currentTime;
         for (Edge edge: edgeList) {

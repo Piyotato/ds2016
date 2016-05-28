@@ -47,6 +47,7 @@ public class EACO extends AlgorithmBase {
      * Toggle state of a node
      *
      * @param ID Node ID
+     * @throws IllegalArgumentException
      */
     void toggleNode(int ID) throws IllegalArgumentException {
         if (ID == source || ID == destination) {
@@ -76,6 +77,7 @@ public class EACO extends AlgorithmBase {
      * @param node1 First node
      * @param node2 Second node
      * @param cost Time taken
+     * @throws IllegalArgumentException
      */
     void addEdge(int node1, int node2, int cost) throws IllegalArgumentException {
         if (node1 >= nodes.size() || node2 >= nodes.size()) {
@@ -170,6 +172,11 @@ public class EACO extends AlgorithmBase {
         }
     }
 
+    /**
+     * Simulate edge
+     *
+     * @param edge Edge being processed
+     */
     private void processEdge(Edge_ACO edge) {
         while (!edge.ants.isEmpty()) {
             if (edge.ants.peek().timestamp > currentTime) break;
@@ -181,6 +188,9 @@ public class EACO extends AlgorithmBase {
         }
     }
 
+    /**
+     * Generate packets from source
+     */
     private void generatePackets() {
         Node_EACO src = nodes.get(source);
         int amt = src.speed * currentTime;
