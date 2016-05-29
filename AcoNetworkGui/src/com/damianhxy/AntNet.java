@@ -6,11 +6,11 @@ import javafx.util.*;
 /**
  * Created by damian on 28/5/16.
  */
-public class ACO extends AlgorithmBase {
+public class AntNet extends AlgorithmBase {
 
     private int success, failure, numPackets, numAnts;
     private final int alpha, beta, ratio, tabuSize, TTL;
-    private final ArrayList<Node_ACO> nodes = new ArrayList<>();
+    private final ArrayList<Node_AntNet> nodes = new ArrayList<>();
     private final ArrayList<Edge_ACO> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat = new HashMap2D<>();
 
@@ -25,7 +25,7 @@ public class ACO extends AlgorithmBase {
      * @param _source Source node
      * @param _destination Destination node
      */
-    public ACO(int _alpha, int _beta, int _ratio, int _TTL, int _tabuSize, int _source, int _destination) {
+    public AntNet(int _alpha, int _beta, int _ratio, int _TTL, int _tabuSize, int _source, int _destination) {
         super(_source, _destination);
         alpha = _alpha;
         beta = _beta;
@@ -40,7 +40,7 @@ public class ACO extends AlgorithmBase {
      * @param speed Processing speed
      */
     void addNode(int speed) {
-        nodes.add(new Node_ACO(speed, nodes, edgeList, adjMat, alpha, beta, tabuSize));
+        nodes.add(new Node_AntNet(speed, nodes, edgeList, adjMat, alpha, beta, tabuSize));
     }
 
     /**
@@ -53,7 +53,7 @@ public class ACO extends AlgorithmBase {
         if (ID == source || ID == destination) {
             throw new IllegalArgumentException();
         }
-        Node_ACO node = nodes.get(ID);
+        Node_AntNet node = nodes.get(ID);
         node.isOffline ^= true;
         if (node.isOffline) {
             failure += node.slowQ.size();
@@ -66,7 +66,7 @@ public class ACO extends AlgorithmBase {
                 edge.ants.clear();
             }
         }
-        for (Node_ACO _node: nodes) {
+        for (Node_AntNet _node: nodes) {
             _node.toggleNode(ID);
         }
     }
@@ -89,7 +89,7 @@ public class ACO extends AlgorithmBase {
         edgeList.add(backward);
         adjMat.put(node1, node2, forward);
         adjMat.put(node2, node1, backward);
-        for (Node_ACO node: nodes) {
+        for (Node_AntNet node: nodes) {
             node.addEdge(node1, node2);
         }
     }
@@ -111,7 +111,7 @@ public class ACO extends AlgorithmBase {
             backward.packets.clear();
             backward.ants.clear();
         }
-        for (Node_ACO node: nodes) {
+        for (Node_AntNet node: nodes) {
             node.toggleEdge(ID * 2);
             node.toggleEdge(ID * 2 + 1);
         }
@@ -122,7 +122,7 @@ public class ACO extends AlgorithmBase {
      *
      * @param node Node being processed
      */
-    private void processNode(Node_ACO node) {
+    private void processNode(Node_AntNet node) {
         int left = node.speed;
         while (!node.fastQ.isEmpty() && left-- > 0) {
             Ant ant = node.fastQ.poll();
@@ -192,7 +192,7 @@ public class ACO extends AlgorithmBase {
      * Generate packets from source
      */
     private void generatePackets() {
-        Node_ACO src = nodes.get(source);
+        Node_AntNet src = nodes.get(source);
         int amt = src.speed * currentTime;
         int totPackets = ratio * amt / (ratio + 1);
         int totAnts = amt / (ratio + 1);
@@ -216,7 +216,7 @@ public class ACO extends AlgorithmBase {
             if (edge.isOffline) continue;
             processEdge(edge);
         }
-        for (Node_ACO node: nodes) {
+        for (Node_AntNet node: nodes) {
             if (node.isOffline) continue;
             processNode(node);
         }
