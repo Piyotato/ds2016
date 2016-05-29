@@ -5,23 +5,15 @@ import javafx.util.*;
 /**
  * Created by damian on 17/5/16.
  */
-abstract class AlgorithmBase {
+interface AlgorithmBase {
 
-    int currentTime;
-    final int source, destination;
+    void addNode(int speed);
 
-    AlgorithmBase(int _source, int _destination) {
-        source = _source;
-        destination = _destination;
-    }
+    void toggleNode(int ID);
 
-    abstract void addNode(int speed);
+    void addEdge(int node1, int node2, int cost);
 
-    abstract void toggleNode(int ID);
+    void toggleEdge(int ID);
 
-    abstract void addEdge(int node1, int node2, int cost);
-
-    abstract void toggleEdge(int ID);
-
-    abstract Pair<Integer, Integer> tick();
+    Pair<Integer, Integer> tick();
 }

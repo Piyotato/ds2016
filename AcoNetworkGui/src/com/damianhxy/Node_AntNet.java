@@ -6,10 +6,12 @@ import javafx.util.*;
 /**
  * Created by damian on 27/5/16.
  */
-class Node_AntNet extends Node_ACO {
+class Node_AntNet implements Node_ACO {
 
     private final static double EPS = 1e-5;
 
+    boolean isOffline;
+    final int speed, nodeID;
     final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node
     private final int alpha, beta, tabuSize;
 
@@ -33,7 +35,8 @@ class Node_AntNet extends Node_ACO {
      */
     Node_AntNet(int _speed, ArrayList<Node_AntNet> _nodes, ArrayList<Edge_ACO> _edgeList,
              HashMap2D<Integer, Integer, Edge_ACO> _adjMat, int _alpha, int _beta, int _tabuSize) {
-        super(_speed, _nodes.size());
+        speed = _speed;
+        nodeID = _nodes.size();
         alpha = _alpha;
         beta = _beta;
         tabuSize = _tabuSize;
@@ -47,7 +50,7 @@ class Node_AntNet extends Node_ACO {
      *
      * @param ID Node ID
      */
-    void toggleNode(int ID) {
+    public void toggleNode(int ID) {
         /* Only care about neighbours */
         if (!adjMat.get(nodeID).keySet().contains(ID)) return;
         if (nodes.get(ID).isOffline) {
@@ -69,7 +72,7 @@ class Node_AntNet extends Node_ACO {
      * @param node1 First Node
      * @param node2 Second Node
      */
-    void addEdge(int node1, int node2) {
+    public void addEdge(int node1, int node2) {
         /* Todo: Intelligent initialization (See: AntNet 1.1) */
         /* Todo: Coefficient of memory (See: AntNet 1.1) */
         /* Only care about neighbours */
@@ -86,7 +89,7 @@ class Node_AntNet extends Node_ACO {
      *
      * @param ID Edge ID
      */
-    void toggleEdge(int ID) {
+    public void toggleEdge(int ID) {
         /* Only care about neighbours */
         Edge_ACO edge = edgeList.get(ID);
         if (edge.source != nodeID && edge.destination != nodeID) return;
@@ -112,7 +115,7 @@ class Node_AntNet extends Node_ACO {
      * @param packet Packet being processed
      * @return Neighbour for next hop, or null if no candidates
      */
-    Integer nextHop(Packet packet) {
+    public Integer nextHop(Packet packet) {
         double RNG = Math.random(), totVal = .0;
         ArrayList<Pair<Integer, Double>> neighbours = new ArrayList<>(); // Neighbour, Heuristic
         for (Edge_ACO edge: adjMat.get(nodeID).values()) {

@@ -6,11 +6,12 @@ import javafx.util.*;
 /**
  * Created by damian on 28/5/16.
  */
-public class OSPF extends AlgorithmBase {
+public class OSPF implements AlgorithmBase {
 
     private final static int TTL = 1000;
 
-    private int success, failure;
+    private int success, failure, currentTime;
+    final private int source, destination;
     private final ArrayList<Node_OSPF> nodes = new ArrayList<>();
     private final ArrayList<Edge> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge> adjMat = new HashMap2D<>();
@@ -22,7 +23,8 @@ public class OSPF extends AlgorithmBase {
      * @param _destination Destination node
      */
     public OSPF(int _source, int _destination) {
-        super(_source, _destination);
+        source = _source;
+        destination = _destination;
     }
 
     /**
@@ -30,7 +32,7 @@ public class OSPF extends AlgorithmBase {
      *
      * @param speed Processing speed
      */
-    void addNode(int speed) {
+    public void addNode(int speed) {
         nodes.add(new Node_OSPF(speed, nodes, adjMat));
     }
 
@@ -40,7 +42,7 @@ public class OSPF extends AlgorithmBase {
      * @param ID Node ID
      * @throws IllegalArgumentException
      */
-    void toggleNode(int ID) throws IllegalArgumentException {
+    public void toggleNode(int ID) throws IllegalArgumentException {
         if (ID == source || ID == destination) {
             throw new IllegalArgumentException();
         }
@@ -68,7 +70,7 @@ public class OSPF extends AlgorithmBase {
      * @param cost Time taken
      * @throws IllegalArgumentException
      */
-    void addEdge(int node1, int node2, int cost) throws IllegalArgumentException {
+    public void addEdge(int node1, int node2, int cost) throws IllegalArgumentException {
         if (node1 >= nodes.size() || node2 >= nodes.size()) {
             throw new IllegalArgumentException();
         }
@@ -88,7 +90,7 @@ public class OSPF extends AlgorithmBase {
      *
      * @param ID Edge ID
      */
-    void toggleEdge(int ID) {
+    public void toggleEdge(int ID) {
         Edge forward = edgeList.get(ID * 2);
         Edge backward = edgeList.get(ID * 2 + 1);
         forward.isOffline ^= true;
@@ -117,7 +119,7 @@ public class OSPF extends AlgorithmBase {
                 ++success;
                 continue;
             }
-            int nxt = node.nextHop(packet); // Should never be null
+            int nxt = node.nextHop(packet);
             adjMat.get(node.nodeID, nxt).addPacket(packet, currentTime);
         }
     }
@@ -149,7 +151,7 @@ public class OSPF extends AlgorithmBase {
      *
      * @return Success, Failure
      */
-    Pair<Integer, Integer> tick() {
+    public Pair<Integer, Integer> tick() {
         ++currentTime;
         generatePackets();
         for (Edge edge: edgeList) {

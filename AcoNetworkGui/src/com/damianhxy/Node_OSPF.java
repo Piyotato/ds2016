@@ -23,7 +23,7 @@ class Node_OSPF {
      * @param _nodes ArrayList of Node_OSPF
      * @param _adjMat Adjacency Matrix
      */
-    public Node_OSPF(int _speed, ArrayList<Node_OSPF> _nodes, HashMap2D<Integer, Integer, Edge> _adjMat) {
+    Node_OSPF(int _speed, ArrayList<Node_OSPF> _nodes, HashMap2D<Integer, Integer, Edge> _adjMat) {
         speed = _speed;
         nodeID = _nodes.size();
         nodes = _nodes;
@@ -45,7 +45,7 @@ class Node_OSPF {
      * @param packet Packet being processed
      * @return Neighbour for next hop
      */
-    Integer nextHop(Packet packet) {
+    int nextHop(Packet packet) {
         return SSSP.B.get(packet.destination);
     }
 }

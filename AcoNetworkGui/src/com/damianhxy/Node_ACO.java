@@ -3,15 +3,13 @@ package com.damianhxy;
 /**
  * Created by damian on 27/5/16.
  */
-abstract class Node_ACO {
+interface Node_ACO {
 
-    final int speed, nodeID;
-    boolean isOffline;
+    void toggleNode(int ID);
 
-    Node_ACO(int _speed, int _nodeID) {
-        speed = _speed;
-        nodeID = _nodeID;
-    }
+    void addEdge(int node1, int node2);
 
-    abstract Integer nextHop(Packet packet);
+    void toggleEdge(int ID);
+
+    Integer nextHop(Packet packet);
 }

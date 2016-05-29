@@ -6,10 +6,10 @@ import javafx.util.*;
 /**
  * Created by damian on 16/5/16.
  */
-public class EACO extends AlgorithmBase {
+public class EACO implements AlgorithmBase {
 
-    private int success, failure, numPackets, numAnts;
-    private final int alpha, beta, ratio, tabuSize, TTL;
+    private int success, failure, numPackets, numAnts, currentTime;
+    private final int alpha, beta, ratio, tabuSize, TTL, source, destination;
     private final ArrayList<Node_EACO> nodes = new ArrayList<>();
     private final ArrayList<Edge_ACO> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat = new HashMap2D<>();
@@ -26,7 +26,8 @@ public class EACO extends AlgorithmBase {
      * @param _destination Destination node
      */
     public EACO(int _alpha, int _beta, int _ratio, int _TTL, int _tabuSize, int _source, int _destination) {
-        super(_source, _destination);
+        source = _source;
+        destination = _destination;
         alpha = _alpha;
         beta = _beta;
         ratio = _ratio;
@@ -39,7 +40,7 @@ public class EACO extends AlgorithmBase {
      *
      * @param speed Processing speed
      */
-    void addNode(int speed) {
+    public void addNode(int speed) {
         nodes.add(new Node_EACO(speed, nodes, edgeList, adjMat, alpha, beta, tabuSize));
     }
 
@@ -49,7 +50,7 @@ public class EACO extends AlgorithmBase {
      * @param ID Node ID
      * @throws IllegalArgumentException
      */
-    void toggleNode(int ID) throws IllegalArgumentException {
+    public void toggleNode(int ID) throws IllegalArgumentException {
         if (ID == source || ID == destination) {
             throw new IllegalArgumentException();
         }
@@ -79,7 +80,7 @@ public class EACO extends AlgorithmBase {
      * @param cost Time taken
      * @throws IllegalArgumentException
      */
-    void addEdge(int node1, int node2, int cost) throws IllegalArgumentException {
+    public void addEdge(int node1, int node2, int cost) throws IllegalArgumentException {
         if (node1 >= nodes.size() || node2 >= nodes.size()) {
             throw new IllegalArgumentException();
         }
@@ -99,7 +100,7 @@ public class EACO extends AlgorithmBase {
      *
      * @param ID Edge ID
      */
-    void toggleEdge(int ID) {
+    public void toggleEdge(int ID) {
         Edge_ACO forward = edgeList.get(ID * 2);
         Edge_ACO backward = edgeList.get(ID * 2 + 1);
         forward.isOffline ^= true;
@@ -209,7 +210,7 @@ public class EACO extends AlgorithmBase {
      *
      * @return Success, Failure
      */
-    Pair<Integer, Integer> tick() {
+    public Pair<Integer, Integer> tick() {
         ++currentTime;
         generatePackets();
         for (Edge_ACO edge: edgeList) {
