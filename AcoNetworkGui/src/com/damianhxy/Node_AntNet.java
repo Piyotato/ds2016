@@ -8,8 +8,6 @@ import javafx.util.*;
  */
 class Node_AntNet implements Node_ACO {
 
-    private final static double EPS = 1e-5;
-
     boolean isOffline;
     final int speed, nodeID;
     final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node

@@ -8,8 +8,6 @@ import javafx.util.*;
  */
 class Node_EACO implements Node_ACO {
 
-    private final static double EPS = 1e-5;
-
     boolean isOffline;
     final int speed, nodeID;
     private UFDS DSU;

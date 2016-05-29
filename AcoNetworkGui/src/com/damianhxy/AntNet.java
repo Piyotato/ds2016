@@ -8,11 +8,11 @@ import javafx.util.*;
  */
 public class AntNet implements AlgorithmBase {
 
-    private int success, failure, numPackets, numAnts, currentTime;
-    private final int alpha, beta, ratio, tabuSize, TTL, source, destination;
+    protected int success, failure, numPackets, numAnts, currentTime;
+    protected final int alpha, beta, ratio, tabuSize, TTL, source, destination;
     private final ArrayList<Node_AntNet> nodes = new ArrayList<>();
-    private final ArrayList<Edge_ACO> edgeList = new ArrayList<>();
-    private final HashMap2D<Integer, Integer, Edge_ACO> adjMat = new HashMap2D<>();
+    final ArrayList<Edge_ACO> edgeList = new ArrayList<>();
+    final HashMap2D<Integer, Integer, Edge_ACO> adjMat = new HashMap2D<>();
 
     /**
      * Initialize EACO
@@ -67,7 +67,7 @@ public class AntNet implements AlgorithmBase {
                 edge.ants.clear();
             }
         }
-        for (Node_AntNet _node: nodes) {
+        for (Node_ACO _node: nodes) {
             _node.toggleNode(ID);
         }
     }
@@ -90,7 +90,7 @@ public class AntNet implements AlgorithmBase {
         edgeList.add(backward);
         adjMat.put(node1, node2, forward);
         adjMat.put(node2, node1, backward);
-        for (Node_AntNet node: nodes) {
+        for (Node_ACO node: nodes) {
             node.addEdge(node1, node2);
         }
     }
@@ -112,7 +112,7 @@ public class AntNet implements AlgorithmBase {
             backward.packets.clear();
             backward.ants.clear();
         }
-        for (Node_AntNet node: nodes) {
+        for (Node_ACO node: nodes) {
             node.toggleEdge(ID * 2);
             node.toggleEdge(ID * 2 + 1);
         }
@@ -178,7 +178,7 @@ public class AntNet implements AlgorithmBase {
      *
      * @param edge Edge being processed
      */
-    private void processEdge(Edge_ACO edge) {
+    protected void processEdge(Edge_ACO edge) {
         while (!edge.ants.isEmpty()) {
             if (edge.ants.peek().timestamp > currentTime) break;
             nodes.get(edge.destination).fastQ.add(edge.ants.poll());
