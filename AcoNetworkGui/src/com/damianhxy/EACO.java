@@ -34,7 +34,33 @@ public class EACO extends AntNet {
         nodes.add(new Node_EACO(speed, nodes, edgeList, adjMat, alpha, beta, tabuSize));
     }
 
-    /* Inherits AntNet.toggleNode() */
+    /**
+     * Toggle state of a node
+     *
+     * @param ID Node ID
+     * @throws IllegalArgumentException
+     */
+    public void toggleNode(int ID) throws IllegalArgumentException {
+        if (ID == source || ID == destination) {
+            throw new IllegalArgumentException();
+        }
+        Node_EACO node = nodes.get(ID);
+        node.isOffline ^= true;
+        if (node.isOffline) {
+            failure += node.slowQ.size();
+            node.fastQ.clear();
+            node.slowQ.clear();
+            for (Edge_ACO edge: edgeList) {
+                if (edge.source != ID && edge.destination != ID) continue;
+                failure += edge.packets.size();
+                edge.packets.clear();
+                edge.ants.clear();
+            }
+        }
+        for (Node_EACO _node: nodes) {
+            _node.toggleNode(ID);
+        }
+    }
 
     /* Inherits AntNet.addEdge() */
 

@@ -67,7 +67,7 @@ public class AntNet implements AlgorithmBase {
                 edge.ants.clear();
             }
         }
-        for (Node_ACO _node: nodes) {
+        for (Node_AntNet _node: nodes) {
             _node.toggleNode(ID);
         }
     }
