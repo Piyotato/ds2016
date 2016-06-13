@@ -1,7 +1,9 @@
-package com.damianhxy;
+package com.ds2016;
 
-import java.util.*;
 import javafx.util.*;
+
+import java.util.ArrayList;
+import java.util.PriorityQueue;
 
 /**
  * Created by damian on 28/5/16.
@@ -9,9 +11,8 @@ import javafx.util.*;
 class Dijkstra {
 
     private final static int INF = 1000000000;
-
-    private final ArrayList<Integer> P = new ArrayList<>();
     final ArrayList<Integer> B = new ArrayList<>();
+    private final ArrayList<Integer> P = new ArrayList<>();
     private final int source;
 
     /**

@@ -1,19 +1,18 @@
-package com.damianhxy;
+package com.ds2016;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 
 /**
  * Created by damian on 28/5/16.
  */
 class Node_OSPF {
 
-    boolean isOffline;
     final int speed, nodeID;
-
     final ArrayDeque<Packet> Q = new ArrayDeque<>();
-
     private final ArrayList<Node_OSPF> nodes;
     private final HashMap2D<Integer, Integer, Edge> adjMat;
+    boolean isOffline;
     private Dijkstra SSSP;
 
     /**

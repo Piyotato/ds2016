@@ -1,7 +1,8 @@
-package com.damianhxy;
+package com.ds2016;
 
-import java.util.*;
 import javafx.util.*;
+
+import java.util.ArrayList;
 
 /**
  * Created by damian on 28/5/16.
@@ -9,12 +10,11 @@ import javafx.util.*;
 public class OSPF implements AlgorithmBase {
 
     private final static int TTL = 1000;
-
-    private int success, failure, currentTime;
     final private int source, destination;
     private final ArrayList<Node_OSPF> nodes = new ArrayList<>();
     private final ArrayList<Edge> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge> adjMat = new HashMap2D<>();
+    private int success, failure, currentTime;
 
     /**
      * Initialize OSPF

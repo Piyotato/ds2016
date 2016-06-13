@@ -1,9 +1,10 @@
-package com.zwliew;
+package com.ds2016;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
- * Created by zwliew on 2/4/16.
+ * Created by ds2016 on 2/4/16.
  */
 final class GuiPanel extends JPanel {
     /**
@@ -12,8 +13,10 @@ final class GuiPanel extends JPanel {
      * @param string Text to be displayed
      */
     void addLabel(String string) {
+        JPanel panel = new JPanel(new BorderLayout());
         JLabel label = new JLabel(string);
-        add(label);
+        panel.add(label, BorderLayout.NORTH);
+        add(panel);
     }
 
     /**
@@ -22,8 +25,18 @@ final class GuiPanel extends JPanel {
      * @param columns number of columns to be displayed
      */
     void addTextField(int columns) {
+        JPanel panel = new JPanel(new BorderLayout());
         JTextField textField = new JTextField(columns);
-        add(textField);
+        panel.add(textField, BorderLayout.NORTH);
+        add(panel);
+    }
+
+    void addParameterField(String labelString) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add(new JLabel(labelString));
+        panel.add(new JTextField(10));
+        add(panel);
     }
 
     /**
@@ -31,7 +44,7 @@ final class GuiPanel extends JPanel {
      *
      * @param vertical whether the axis is vertical or horizontal
      */
-    public void setAxis(boolean vertical) {
+    void setVerticalAxis(boolean vertical) {
         int axis = vertical ? BoxLayout.Y_AXIS : BoxLayout.X_AXIS;
         setLayout(new BoxLayout(this, axis));
     }

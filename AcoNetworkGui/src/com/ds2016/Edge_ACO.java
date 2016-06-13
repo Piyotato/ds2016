@@ -1,6 +1,6 @@
-package com.damianhxy;
+package com.ds2016;
 
-import java.util.*;
+import java.util.ArrayDeque;
 
 /**
  * Created by damian on 16/5/16.

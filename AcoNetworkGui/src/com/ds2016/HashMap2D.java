@@ -1,6 +1,6 @@
-package com.damianhxy;
+package com.ds2016;
 
-import java.util.*;
+import java.util.HashMap;
 
 /**
  * Created by damian on 23/5/16.

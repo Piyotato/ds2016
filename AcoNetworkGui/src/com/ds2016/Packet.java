@@ -1,6 +1,6 @@
-package com.damianhxy;
+package com.ds2016;
 
-import java.util.*;
+import java.util.ArrayList;
 
 /**
  * Created by damian on 16/5/16.
@@ -8,9 +8,9 @@ import java.util.*;
 class Packet {
 
     final int source, destination;
+    final ArrayList<Integer> path = new ArrayList<>();
     int timestamp;
     private int TTL;
-    final ArrayList<Integer> path = new ArrayList<>();
 
     /**
      * Initializes a packet

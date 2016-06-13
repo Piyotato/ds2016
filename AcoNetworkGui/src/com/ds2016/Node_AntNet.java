@@ -1,24 +1,25 @@
-package com.damianhxy;
+package com.ds2016;
 
-import java.util.*;
 import javafx.util.*;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Queue;
 
 /**
  * Created by damian on 27/5/16.
  */
 class Node_AntNet implements Node_ACO {
 
-    boolean isOffline;
     final int speed, nodeID;
     final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node
-    private final int alpha, beta, tabuSize;
-
     final Queue<Ant> fastQ = new ArrayDeque<>();
     final Queue<Packet> slowQ = new ArrayDeque<>();
-
+    private final int alpha, beta, tabuSize;
     private final ArrayList<Node_AntNet> nodes;
     private final ArrayList<Edge_ACO> edgeList;
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat;
+    boolean isOffline;
 
     /**
      * Initialize a node

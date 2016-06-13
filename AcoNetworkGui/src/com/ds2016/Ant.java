@@ -1,14 +1,14 @@
-package com.damianhxy;
+package com.ds2016;
 
-import java.util.*;
+import java.util.ArrayList;
 
 /**
  * Created by damian on 16/5/16.
  */
 class Ant extends Packet {
 
-    double totalTime;
     final ArrayList<Double> timings = new ArrayList<>();
+    double totalTime;
     boolean isBackwards;
 
     /**

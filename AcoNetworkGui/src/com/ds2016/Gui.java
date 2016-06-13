@@ -1,9 +1,10 @@
-package com.zwliew;
+package com.ds2016;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
- * Created by zwliew on 25/3/16.
+ * Created by ds2016 on 25/3/16.
  */
 public class Gui extends JFrame {
 
@@ -54,12 +55,13 @@ public class Gui extends JFrame {
      * @return the newly initialized network panel
      */
     private JPanel initNetworkPanel() {
+        JPanel panel = new JPanel();
 
         /*
          * TODO: Initialize the graph
          */
 
-        return new JPanel();
+        return panel;
     }
 
     /**
@@ -87,8 +89,9 @@ public class Gui extends JFrame {
      * @return the newly initialized graph config panel
      */
     private JPanel initGraphConfigs() {
+        JPanel panel = new JPanel();
         // TODO: Initialize the graphs
-        return new JPanel();
+        return panel;
     }
 
     /**
@@ -99,29 +102,26 @@ public class Gui extends JFrame {
      */
     private JPanel initMiscConfigs() {
         JPanel configs = new JPanel();
-        configs.setLayout(new BoxLayout(configs, BoxLayout.Y_AXIS));
+        configs.setLayout(new BoxLayout(configs, BoxLayout.X_AXIS));
+        configs.setMaximumSize(new Dimension(448, 504));
 
-        GuiPanel firstPanel = new GuiPanel();
-        firstPanel.addLabel("Packet : ants ratio");
-        firstPanel.addTextField(10);
-        firstPanel.addLabel("Size of tabu list");
-        firstPanel.addTextField(10);
+        GuiPanel leftPanel = new GuiPanel();
+        leftPanel.setVerticalAxis(true);
+        leftPanel.addParameterField("Packet : ants ratio");
+        leftPanel.addLabel("Relative weightage");
+        leftPanel.addLabel("Source / destination");
 
-        GuiPanel secondPanel = new GuiPanel();
-        secondPanel.addLabel("Relative weightage");
-        secondPanel.addLabel("α");
-        secondPanel.addTextField(10);
-        secondPanel.addLabel("β");
-        secondPanel.addTextField(10);
+        GuiPanel rightPanel = new GuiPanel();
+        rightPanel.setVerticalAxis(true);
+        rightPanel.addParameterField("Size of tabu list");
+        rightPanel.addParameterField("α");
+        rightPanel.addParameterField("β");
+        rightPanel.addTextField(10);
+        rightPanel.addTextField(10);
 
-        GuiPanel thirdPanel = new GuiPanel();
-        thirdPanel.addLabel("Source / destination");
-        thirdPanel.addTextField(10);
-        thirdPanel.addTextField(10);
+        configs.add(leftPanel);
+        configs.add(rightPanel);
 
-        configs.add(firstPanel);
-        configs.add(secondPanel);
-        configs.add(thirdPanel);
         return configs;
     }
 }
