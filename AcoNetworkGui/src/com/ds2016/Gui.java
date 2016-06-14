@@ -1,11 +1,11 @@
 package com.ds2016;
 
+import org.jfree.chart.ChartPanel;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import static com.ds2016.Main.params;
+import static com.ds2016.Main.mParams;
 
 /**
  * Created by ds2016 on 25/3/16.
@@ -13,17 +13,22 @@ import static com.ds2016.Main.params;
 class Gui extends JFrame {
 
     private static final String FRAME_TITLE = "ACO Network Simulation";
+    private static final int TEXTFIELD_COLUMN = 10;
 
-    private JButton saveButton;
-    private JTextField packToAntRatioField;
-    private JTextField alphaWeightageField;
-    private JTextField betaWeightageField;
-    private JTextField tabuListSizeField;
-    private JTextField sourceField;
-    private JTextField destinationField;
+    private JTextField mPackToAntRatioField;
+    private JTextField mAlphaWeightageField;
+    private JTextField mBetaWeightageField;
+    private JTextField mTabuListSizeField;
+    private JTextField mSourceField;
+    private JTextField mDestinationField;
 
+    private LineGraph mSuccessGraph;
+    private LineGraph mThroughputGraph;
+
+    private JPanel mGraphPanel;
 
     private Gui() {
+        super(FRAME_TITLE);
         initComponents();
     }
 
@@ -102,9 +107,17 @@ class Gui extends JFrame {
      * @return the newly initialized graph config panel
      */
     private JPanel initGraphConfigs() {
-        JPanel panel = new JPanel();
-        // TODO: Initialize the graphs
-        return panel;
+        mGraphPanel = new JPanel();
+        mGraphPanel.setLayout(new BoxLayout(mGraphPanel, BoxLayout.X_AXIS));
+
+        mSuccessGraph = new LineGraph("Success rate");
+        mThroughputGraph = new LineGraph("Throughput");
+        ChartPanel successPanel = mSuccessGraph.createLineGraph(null, null);
+        ChartPanel throughputPanel = mThroughputGraph.createLineGraph(null, null);
+
+        mGraphPanel.add(successPanel);
+        mGraphPanel.add(throughputPanel);
+        return mGraphPanel;
     }
 
     /**
@@ -118,46 +131,45 @@ class Gui extends JFrame {
         configs.setLayout(new BoxLayout(configs, BoxLayout.X_AXIS));
         configs.setMaximumSize(new Dimension(448, 504));
 
-        packToAntRatioField = new JTextField(10);
-        alphaWeightageField = new JTextField(10);
-        betaWeightageField = new JTextField(10);
-        tabuListSizeField = new JTextField(10);
-        sourceField = new JTextField(10);
-        destinationField = new JTextField(10);
+        mPackToAntRatioField = new JTextField(TEXTFIELD_COLUMN);
+        mAlphaWeightageField = new JTextField(TEXTFIELD_COLUMN);
+        mBetaWeightageField = new JTextField(TEXTFIELD_COLUMN);
+        mTabuListSizeField = new JTextField(TEXTFIELD_COLUMN);
+        mSourceField = new JTextField(TEXTFIELD_COLUMN);
+        mDestinationField = new JTextField(TEXTFIELD_COLUMN);
+
+        mPackToAntRatioField.setMaximumSize(new Dimension(100, 20));
 
         GuiPanel leftPanel = new GuiPanel();
         leftPanel.setVerticalAxis(true);
-        leftPanel.addParameterField("Packet : ants ratio", packToAntRatioField);
+        leftPanel.addParameterField("Packet : ants ratio", mPackToAntRatioField);
         leftPanel.addLabel("Relative weightage");
         leftPanel.addLabel("Source / destination");
 
         GuiPanel rightPanel = new GuiPanel();
         rightPanel.setVerticalAxis(true);
-        rightPanel.addParameterField("Size of tabu list", tabuListSizeField);
-        rightPanel.addParameterField("α", alphaWeightageField);
-        rightPanel.addParameterField("β", betaWeightageField);
-        rightPanel.add(sourceField);
-        rightPanel.add(destinationField);
+        rightPanel.addParameterField("Size of tabu list", mTabuListSizeField);
+        rightPanel.addParameterField("α", mAlphaWeightageField);
+        rightPanel.addParameterField("β", mBetaWeightageField);
+        rightPanel.add(mSourceField);
+        rightPanel.add(mDestinationField);
 
-        saveButton = new JButton();
+        JButton saveButton = new JButton();
         saveButton.setText("Save config");
-        saveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                params.setPackToAntRatio(packToAntRatioField.getText());
-                params.setAlphaWeightage(alphaWeightageField.getText());
-                params.setBetaWeightage(betaWeightageField.getText());
-                params.setTabuListSize(tabuListSizeField.getText());
-                params.setSourceNode(sourceField.getText());
-                params.setDestinationNode(destinationField.getText());
+        saveButton.addActionListener(actionEvent -> {
+            mParams.setPackToAntRatio(mPackToAntRatioField.getText());
+            mParams.setAlphaWeightage(mAlphaWeightageField.getText());
+            mParams.setBetaWeightage(mBetaWeightageField.getText());
+            mParams.setTabuListSize(mTabuListSizeField.getText());
+            mParams.setSourceNode(mSourceField.getText());
+            mParams.setDestinationNode(mDestinationField.getText());
 
-                packToAntRatioField.setText(String.valueOf(params.getPackToAntRatio()));
-                alphaWeightageField.setText(String.valueOf(params.getAlphaWeightage()));
-                betaWeightageField.setText(String.valueOf(params.getBetaWeightage()));
-                tabuListSizeField.setText(String.valueOf(params.getTabuListSize()));
-                sourceField.setText(String.valueOf(params.getSourceNode()));
-                destinationField.setText(String.valueOf(params.getDestinationNode()));
-            }
+            mPackToAntRatioField.setText(String.valueOf(mParams.getPackToAntRatio()));
+            mAlphaWeightageField.setText(String.valueOf(mParams.getAlphaWeightage()));
+            mBetaWeightageField.setText(String.valueOf(mParams.getBetaWeightage()));
+            mTabuListSizeField.setText(String.valueOf(mParams.getTabuListSize()));
+            mSourceField.setText(String.valueOf(mParams.getSourceNode()));
+            mDestinationField.setText(String.valueOf(mParams.getDestinationNode()));
         });
         rightPanel.add(saveButton);
 
@@ -167,4 +179,12 @@ class Gui extends JFrame {
         return configs;
     }
 
+    private void updateGraphPanel(ChartPanel successPanel, ChartPanel throughputPanel) {
+        mGraphPanel.removeAll();
+        mGraphPanel.invalidate();
+        mGraphPanel.add(successPanel);
+        mGraphPanel.add(throughputPanel);
+        mGraphPanel.revalidate();
+        mGraphPanel.repaint();
+    }
 }

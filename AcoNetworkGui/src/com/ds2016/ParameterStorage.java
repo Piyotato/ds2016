@@ -10,16 +10,21 @@ class ParameterStorage {
     private int tabuListSize;
     private int sourceNode;
     private int destinationNode;
+    private long data[];
+    private long timeStamp[];
 
     ParameterStorage(double packToAntRatio, double alphaWeightage,
                      double betaWeightage, int tabuListSize,
-                     int sourceNode, int destinationNode) {
+                     int sourceNode, int destinationNode,
+                     long[] data, long[] timeStamp) {
         this.packToAntRatio = packToAntRatio;
         this.alphaWeightage = alphaWeightage;
         this.betaWeightage = betaWeightage;
         this.tabuListSize = tabuListSize;
         this.sourceNode = sourceNode;
         this.destinationNode = destinationNode;
+        this.data = data;
+        this.timeStamp = timeStamp;
     }
 
     double getPackToAntRatio() {
@@ -92,5 +97,21 @@ class ParameterStorage {
 
     void setDestinationNode(int destinationNode) {
         this.destinationNode = destinationNode;
+    }
+
+    public long[] getData() {
+        return data;
+    }
+
+    public void setData(long[] data) {
+        this.data = data;
+    }
+
+    public long[] getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(long[] timeStamp) {
+        this.timeStamp = timeStamp;
     }
 }

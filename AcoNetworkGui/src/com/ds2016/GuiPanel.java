@@ -32,11 +32,7 @@ final class GuiPanel extends JPanel {
     }
 
     void addParameterField(String labelString) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        panel.add(new JLabel(labelString));
-        panel.add(new JTextField(10));
-        add(panel);
+        addParameterField(labelString, new JTextField(10));
     }
 
     void addParameterField(String labelString, JTextField textField) {
