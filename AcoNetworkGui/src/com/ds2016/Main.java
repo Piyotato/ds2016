@@ -6,7 +6,7 @@ package com.ds2016;
 public class Main {
     static ParameterStorage mParams = new ParameterStorage(1, 1, 1, 1, 1, 1, null, null);
 
-    public void main(String[] args) {
+    public static void main(String[] args) {
         Gui.main(args);
     }
 }
