@@ -3,59 +3,94 @@ package com.ds2016;
 /**
  * Created by ds2016 on 13/6/16.
  */
-public class ParameterStorage {
+class ParameterStorage {
     private double packToAntRatio;
     private double alphaWeightage;
     private double betaWeightage;
-    private int TabuListSize;
-    private int source;
+    private int tabuListSize;
+    private int sourceNode;
     private int destinationNode;
 
-    public double getPackToAntRatio() {
+    ParameterStorage(double packToAntRatio, double alphaWeightage,
+                     double betaWeightage, int tabuListSize,
+                     int sourceNode, int destinationNode) {
+        this.packToAntRatio = packToAntRatio;
+        this.alphaWeightage = alphaWeightage;
+        this.betaWeightage = betaWeightage;
+        this.tabuListSize = tabuListSize;
+        this.sourceNode = sourceNode;
+        this.destinationNode = destinationNode;
+    }
+
+    double getPackToAntRatio() {
         return packToAntRatio;
     }
 
-    public void setPackToAntRatio(double packToAntRatio) {
+    void setPackToAntRatio(String packToAntRatioStr) {
+        setPackToAntRatio(packToAntRatioStr == null ? 1 : Double.parseDouble(packToAntRatioStr));
+    }
+
+    void setPackToAntRatio(double packToAntRatio) {
         this.packToAntRatio = packToAntRatio;
     }
 
-    public double getAlphaWeightage() {
+    double getAlphaWeightage() {
         return alphaWeightage;
     }
 
-    public void setAlphaWeightage(double alphaWeightage) {
+    void setAlphaWeightage(String alphaWeightageStr) {
+        setAlphaWeightage(alphaWeightageStr == null ? 1 : Double.parseDouble(alphaWeightageStr));
+    }
+
+    void setAlphaWeightage(double alphaWeightage) {
         this.alphaWeightage = alphaWeightage;
     }
 
-    public double getBetaWeightage() {
+    double getBetaWeightage() {
         return betaWeightage;
     }
 
-    public void setBetaWeightage(double betaWeightage) {
+    void setBetaWeightage(String betaWeightageStr) {
+        setBetaWeightage(betaWeightageStr == null ? 1 : Double.parseDouble(betaWeightageStr));
+    }
+
+    void setBetaWeightage(double betaWeightage) {
         this.betaWeightage = betaWeightage;
     }
 
-    public int getTabuListSize() {
-        return TabuListSize;
+    int getTabuListSize() {
+        return tabuListSize;
     }
 
-    public void setTabuListSize(int tabuListSize) {
-        TabuListSize = tabuListSize;
+    void setTabuListSize(String tabuListSizeStr) {
+        setTabuListSize(tabuListSizeStr == null ? 1 : Integer.parseInt(tabuListSizeStr));
     }
 
-    public int getSource() {
-        return source;
+    void setTabuListSize(int tabuListSize) {
+        tabuListSize = tabuListSize;
     }
 
-    public void setSource(int source) {
-        this.source = source;
+    int getSourceNode() {
+        return sourceNode;
     }
 
-    public int getDestinationNode() {
+    void setSourceNode(String sourceNodeStr) {
+        setSourceNode(sourceNodeStr == null ? 1 : Integer.parseInt(sourceNodeStr));
+    }
+
+    void setSourceNode(int sourceNode) {
+        this.sourceNode = sourceNode;
+    }
+
+    int getDestinationNode() {
         return destinationNode;
     }
 
-    public void setDestinationNode(int destinationNode) {
+    void setDestinationNode(String destinationNodeStr) {
+        setDestinationNode(destinationNodeStr == null ? 1 : Integer.parseInt(destinationNodeStr));
+    }
+
+    void setDestinationNode(int destinationNode) {
         this.destinationNode = destinationNode;
     }
 }

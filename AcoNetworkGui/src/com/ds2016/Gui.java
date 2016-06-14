@@ -2,19 +2,34 @@ package com.ds2016;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import static com.ds2016.Main.params;
 
 /**
  * Created by ds2016 on 25/3/16.
  */
-public class Gui extends JFrame {
+class Gui extends JFrame {
 
     private static final String FRAME_TITLE = "ACO Network Simulation";
 
+    private JButton saveButton;
+    private JTextField packToAntRatioField;
+    private JTextField alphaWeightageField;
+    private JTextField betaWeightageField;
+    private JTextField tabuListSizeField;
+    private JTextField sourceField;
+    private JTextField destinationField;
+
+
     private Gui() {
+        /* Initialise the params */
+        params = new ParameterStorage(1, 1, 1, 1, 1, 1);
         initComponents();
     }
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         // Initialize GUI in an Event-Dispatching thread for thread-safety
         SwingUtilities.invokeLater(() -> new Gui().setVisible(true));
     }
@@ -105,23 +120,53 @@ public class Gui extends JFrame {
         configs.setLayout(new BoxLayout(configs, BoxLayout.X_AXIS));
         configs.setMaximumSize(new Dimension(448, 504));
 
+        packToAntRatioField = new JTextField(10);
+        alphaWeightageField = new JTextField(10);
+        betaWeightageField = new JTextField(10);
+        tabuListSizeField = new JTextField(10);
+        sourceField = new JTextField(10);
+        destinationField = new JTextField(10);
+
         GuiPanel leftPanel = new GuiPanel();
         leftPanel.setVerticalAxis(true);
-        leftPanel.addParameterField("Packet : ants ratio");
+        leftPanel.addParameterField("Packet : ants ratio", packToAntRatioField);
         leftPanel.addLabel("Relative weightage");
         leftPanel.addLabel("Source / destination");
 
         GuiPanel rightPanel = new GuiPanel();
         rightPanel.setVerticalAxis(true);
-        rightPanel.addParameterField("Size of tabu list");
-        rightPanel.addParameterField("α");
-        rightPanel.addParameterField("β");
-        rightPanel.addTextField(10);
-        rightPanel.addTextField(10);
+        rightPanel.addParameterField("Size of tabu list", tabuListSizeField);
+        rightPanel.addParameterField("α", alphaWeightageField);
+        rightPanel.addParameterField("β", betaWeightageField);
+        rightPanel.add(sourceField);
+        rightPanel.add(destinationField);
+
+        saveButton = new JButton();
+        saveButton.setText("Save config");
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                params.setPackToAntRatio(packToAntRatioField.getText());
+                params.setAlphaWeightage(alphaWeightageField.getText());
+                params.setBetaWeightage(betaWeightageField.getText());
+                params.setTabuListSize(tabuListSizeField.getText());
+                params.setSourceNode(sourceField.getText());
+                params.setDestinationNode(destinationField.getText());
+
+                packToAntRatioField.setText(String.valueOf(params.getPackToAntRatio()));
+                alphaWeightageField.setText(String.valueOf(params.getAlphaWeightage()));
+                betaWeightageField.setText(String.valueOf(params.getBetaWeightage()));
+                tabuListSizeField.setText(String.valueOf(params.getTabuListSize()));
+                sourceField.setText(String.valueOf(params.getSourceNode()));
+                destinationField.setText(String.valueOf(params.getDestinationNode()));
+            }
+        });
+        rightPanel.add(saveButton);
 
         configs.add(leftPanel);
         configs.add(rightPanel);
 
         return configs;
     }
+
 }
