@@ -24,8 +24,6 @@ class Gui extends JFrame {
 
 
     private Gui() {
-        /* Initialise the params */
-        params = new ParameterStorage(1, 1, 1, 1, 1, 1);
         initComponents();
     }
 
