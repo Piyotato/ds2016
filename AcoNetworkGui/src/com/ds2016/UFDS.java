@@ -1,7 +1,6 @@
 package com.ds2016;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 /**
  * Created by damian on 16/5/16.
@@ -55,8 +54,9 @@ class UFDS {
         Y = findSet(Y);
         if (X == Y) return;
         if (RANK.get(X) > RANK.get(Y)) {
-            Collections.swap(RANK, X, Y);
-            Collections.swap(P, X, Y);
+            int T = X;
+            X = Y;
+            Y = T;
         } else if (RANK.get(X).equals(RANK.get(Y))) {
             RANK.set(Y, RANK.get(Y) + 1);
         }

@@ -14,7 +14,33 @@ public class OSPF implements AlgorithmBase {
     private final ArrayList<Node_OSPF> nodes = new ArrayList<>();
     private final ArrayList<Edge> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge> adjMat = new HashMap2D<>();
-    private int success, failure, currentTime;
+    private int success, currentTime;
+
+    /**
+     * Retrieve the current load of the network's nodes
+     *
+     * @return Number of packets at each node
+     */
+    public ArrayList<Integer> getNodeStatus() {
+        ArrayList<Integer> ret = new ArrayList<>();
+        for (Node_OSPF node: nodes) {
+            ret.add(node.Q.size());
+        }
+        return ret;
+    }
+
+    /**
+     * Retrieve the current load of the network's edges
+     *
+     * @return Number of packets on each edge
+     */
+    public ArrayList<Integer> getEdgeStatus() {
+        ArrayList<Integer> ret = new ArrayList<>();
+        for (int a = 0; a < edgeList.size() - 1; a += 2) { // They come in pairs
+            ret.add(edgeList.get(a).packets.size() + edgeList.get(a + 1).packets.size());
+        }
+        return ret;
+    }
 
     /**
      * Initialize OSPF
@@ -49,11 +75,9 @@ public class OSPF implements AlgorithmBase {
         Node_OSPF node = nodes.get(ID);
         node.isOffline ^= true;
         if (node.isOffline) {
-            failure += node.Q.size();
             node.Q.clear();
             for (Edge edge: edgeList) {
                 if (edge.source != ID || edge.destination != ID) continue;
-                failure += edge.packets.size();
                 edge.packets.clear();
             }
         }
@@ -96,8 +120,6 @@ public class OSPF implements AlgorithmBase {
         forward.isOffline ^= true;
         backward.isOffline ^= true;
         if (forward.isOffline) {
-            failure += forward.packets.size();
-            failure += backward.packets.size();
             forward.packets.clear();
             backward.packets.clear();
         }
@@ -162,8 +184,8 @@ public class OSPF implements AlgorithmBase {
             if (node.isOffline) continue;
             processNode(node);
         }
-        Pair<Integer, Integer> ret = new Pair<>(success, failure);
-        success = failure = 0;
+        Pair<Integer, Integer> ret = new Pair<>(success, 0);
+        success = 0;
         return ret;
     }
 }

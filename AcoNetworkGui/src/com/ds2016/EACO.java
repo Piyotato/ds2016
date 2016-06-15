@@ -7,9 +7,13 @@ import java.util.ArrayList;
 /**
  * Created by damian on 16/5/16.
  */
-public class EACO extends AntNet {
+public class EACO implements AlgorithmBase {
 
+    private final int alpha, beta, ratio, tabuSize, TTL, source, destination;
+    private final ArrayList<Edge_ACO> edgeList = new ArrayList<>();
+    private final HashMap2D<Integer, Integer, Edge_ACO> adjMat = new HashMap2D<>();
     private final ArrayList<Node_EACO> nodes = new ArrayList<>();
+    private int success, failure, numPackets, numAnts, currentTime;
 
     /**
      * Initialize EACO
@@ -23,7 +27,39 @@ public class EACO extends AntNet {
      * @param _destination Destination node
      */
     public EACO(int _alpha, int _beta, int _ratio, int _TTL, int _tabuSize, int _source, int _destination) {
-        super(_alpha, _beta, _ratio, _TTL, _tabuSize, _source, _destination);
+        source = _source;
+        destination = _destination;
+        alpha = _alpha;
+        beta = _beta;
+        ratio = _ratio;
+        TTL = _TTL;
+        tabuSize = _tabuSize;
+    }
+
+    /**
+     * Retrieve the current load of the network's nodes
+     *
+     * @return Number of packets at each node
+     */
+    public ArrayList<Integer> getNodeStatus() {
+        ArrayList<Integer> ret = new ArrayList<>();
+        for (Node_EACO node: nodes) {
+            ret.add(node.slowQ.size());
+        }
+        return ret;
+    }
+
+    /**
+     * Retrieve the current load of the network's edges
+     *
+     * @return Number of packets on each edge
+     */
+    public ArrayList<Integer> getEdgeStatus() {
+        ArrayList<Integer> ret = new ArrayList<>();
+        for (int a = 0; a < edgeList.size() - 1; a += 2) { // They come in pairs
+            ret.add(edgeList.get(a).packets.size() + edgeList.get(a + 1).packets.size());
+        }
+        return ret;
     }
 
     /**
@@ -48,12 +84,10 @@ public class EACO extends AntNet {
         Node_EACO node = nodes.get(ID);
         node.isOffline ^= true;
         if (node.isOffline) {
-            failure += node.slowQ.size();
             node.fastQ.clear();
             node.slowQ.clear();
             for (Edge_ACO edge: edgeList) {
                 if (edge.source != ID && edge.destination != ID) continue;
-                failure += edge.packets.size();
                 edge.packets.clear();
                 edge.ants.clear();
             }
@@ -63,9 +97,50 @@ public class EACO extends AntNet {
         }
     }
 
-    /* Inherits AntNet.addEdge() */
+    /**
+     * Add a bidirectional edge
+     *
+     * @param node1 First node
+     * @param node2 Second node
+     * @param cost Time taken
+     * @throws IllegalArgumentException
+     */
+    public void addEdge(int node1, int node2, int cost) throws IllegalArgumentException {
+        if (node1 >= nodes.size() || node2 >= nodes.size()) {
+            throw new IllegalArgumentException();
+        }
+        Edge_ACO forward = new Edge_ACO(node1, node2, cost);
+        Edge_ACO backward = new Edge_ACO(node2, node1, cost);
+        edgeList.add(forward);
+        edgeList.add(backward);
+        adjMat.put(node1, node2, forward);
+        adjMat.put(node2, node1, backward);
+        for (Node_ACO node: nodes) {
+            node.addEdge(node1, node2);
+        }
+    }
 
-    /* Inherits AntNet.toggleEdge() */
+    /**
+     * Toggle state of an edge
+     *
+     * @param ID Edge ID
+     */
+    public void toggleEdge(int ID) {
+        Edge_ACO forward = edgeList.get(ID * 2);
+        Edge_ACO backward = edgeList.get(ID * 2 + 1);
+        forward.isOffline ^= true;
+        backward.isOffline ^= true;
+        if (forward.isOffline) {
+            forward.packets.clear();
+            forward.ants.clear();
+            backward.packets.clear();
+            backward.ants.clear();
+        }
+        for (Node_ACO node: nodes) {
+            node.toggleEdge(ID * 2);
+            node.toggleEdge(ID * 2 + 1);
+        }
+    }
 
     /**
      * Simulate node
@@ -122,7 +197,21 @@ public class EACO extends AntNet {
         }
     }
 
-    /* Inherits AntNet.processEdge() */
+    /**
+     * Simulate edge
+     *
+     * @param edge Edge being processed
+     */
+    private void processEdge(Edge_ACO edge) {
+        while (!edge.ants.isEmpty()) {
+            if (edge.ants.peek().timestamp > currentTime) break;
+            nodes.get(edge.destination).fastQ.add(edge.ants.poll());
+        }
+        while (!edge.packets.isEmpty()) {
+            if (edge.packets.peek().timestamp > currentTime) break;
+            nodes.get(edge.destination).slowQ.add(edge.packets.poll());
+        }
+    }
 
     /**
      * Generate packets from source

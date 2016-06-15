@@ -2,10 +2,16 @@ package com.ds2016;
 
 import javafx.util.*;
 
+import java.util.ArrayList;
+
 /**
  * Created by damian on 17/5/16.
  */
 interface AlgorithmBase {
+
+    ArrayList<Integer> getNodeStatus();
+
+    ArrayList<Integer> getEdgeStatus();
 
     void addNode(int speed);
 

@@ -9,11 +9,11 @@ import java.util.ArrayList;
  */
 public class AntNet implements AlgorithmBase {
 
-    protected final int alpha, beta, ratio, tabuSize, TTL, source, destination;
-    final ArrayList<Edge_ACO> edgeList = new ArrayList<>();
-    final HashMap2D<Integer, Integer, Edge_ACO> adjMat = new HashMap2D<>();
+    private final int alpha, beta, ratio, tabuSize, TTL, source, destination;
+    private final ArrayList<Edge_ACO> edgeList = new ArrayList<>();
+    private final HashMap2D<Integer, Integer, Edge_ACO> adjMat = new HashMap2D<>();
     private final ArrayList<Node_AntNet> nodes = new ArrayList<>();
-    protected int success, failure, numPackets, numAnts, currentTime;
+    private int success, failure, numPackets, numAnts, currentTime;
 
     /**
      * Initialize EACO
@@ -34,6 +34,32 @@ public class AntNet implements AlgorithmBase {
         ratio = _ratio;
         TTL = _TTL;
         tabuSize = _tabuSize;
+    }
+
+    /**
+     * Retrieve the current load of the network's nodes
+     *
+     * @return Number of packets at each node
+     */
+    public ArrayList<Integer> getNodeStatus() {
+        ArrayList<Integer> ret = new ArrayList<>();
+        for (Node_AntNet node: nodes) {
+            ret.add(node.slowQ.size());
+        }
+        return ret;
+    }
+
+    /**
+     * Retrieve the current load of the network's edges
+     *
+     * @return Number of packets on each edge
+     */
+    public ArrayList<Integer> getEdgeStatus() {
+        ArrayList<Integer> ret = new ArrayList<>();
+        for (int a = 0; a < edgeList.size() - 1; a += 2) { // They come in pairs
+            ret.add(edgeList.get(a).packets.size() + edgeList.get(a + 1).packets.size());
+        }
+        return ret;
     }
 
     /**
@@ -58,12 +84,10 @@ public class AntNet implements AlgorithmBase {
         Node_AntNet node = nodes.get(ID);
         node.isOffline ^= true;
         if (node.isOffline) {
-            failure += node.slowQ.size();
             node.fastQ.clear();
             node.slowQ.clear();
             for (Edge_ACO edge: edgeList) {
                 if (edge.source != ID && edge.destination != ID) continue;
-                failure += edge.packets.size();
                 edge.packets.clear();
                 edge.ants.clear();
             }
@@ -107,7 +131,6 @@ public class AntNet implements AlgorithmBase {
         forward.isOffline ^= true;
         backward.isOffline ^= true;
         if (forward.isOffline) {
-            failure += forward.packets.size() + backward.packets.size();
             forward.packets.clear();
             forward.ants.clear();
             backward.packets.clear();
@@ -179,7 +202,7 @@ public class AntNet implements AlgorithmBase {
      *
      * @param edge Edge being processed
      */
-    protected void processEdge(Edge_ACO edge) {
+    private void processEdge(Edge_ACO edge) {
         while (!edge.ants.isEmpty()) {
             if (edge.ants.peek().timestamp > currentTime) break;
             nodes.get(edge.destination).fastQ.add(edge.ants.poll());
