@@ -1,12 +1,36 @@
 package com.ds2016;
 
+import org.graphstream.graph.Graph;
+
 /**
  * Created by zwliew on 13/6/16.
  */
 public class Main {
-    static ParameterStorage mParams = new ParameterStorage(1, 1, 1, 1, 1, 1, null, null);
+    private static final String ALGO_THREAD = "ALGO_THREAD";
+
+    static ParameterStorage mParams = new ParameterStorage(1, 1, 1, 1, 1, 1, 1, null, null);
+
+    static AlgorithmBase mAlgo;
+
+    static Graph mGraph;
+
+    private static Thread mThread;
+    private static Runnable mRunnable;
 
     public static void main(String[] args) {
-        Gui.main(args);
+        new NewGui().main();
+
+        mRunnable = () -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    /* Algo stuff */
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
+                }
+            }
+        };
+        mThread = new Thread(mRunnable, ALGO_THREAD);
     }
 }

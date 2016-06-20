@@ -1,5 +1,7 @@
 package com.ds2016;
 
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.implementations.SingleGraph;
 import org.jfree.chart.ChartPanel;
 
 import javax.swing.*;
@@ -9,6 +11,9 @@ import static com.ds2016.Main.mParams;
 
 /**
  * Created by ds2016 on 25/3/16.
+ *
+ * Old, use NewGui!
+ *
  */
 class Gui extends JFrame {
 
@@ -32,10 +37,10 @@ class Gui extends JFrame {
         initComponents();
     }
 
-    static void main(String[] args) {
-        // Initialize GUI in an Event-Dispatching thread for thread-safety
+    void init() {
         SwingUtilities.invokeLater(() -> new Gui().setVisible(true));
     }
+
 
     private void initComponents() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -74,10 +79,13 @@ class Gui extends JFrame {
      */
     private JPanel initNetworkPanel() {
         JPanel panel = new JPanel();
-
-        /*
-         * TODO: Initialize the graph
-         */
+        Graph graph = new SingleGraph("Tutorial 1");
+        graph.setStrict(false);
+        graph.setAutoCreate(true);
+        graph.addEdge("AB", "A", "B");
+        graph.addEdge("BC", "B", "C");
+        graph.addEdge("CA", "C", "A");
+        graph.display();
 
         return panel;
     }
@@ -157,19 +165,19 @@ class Gui extends JFrame {
         JButton saveButton = new JButton();
         saveButton.setText("Save config");
         saveButton.addActionListener(actionEvent -> {
-            mParams.setPackToAntRatio(mPackToAntRatioField.getText());
-            mParams.setAlphaWeightage(mAlphaWeightageField.getText());
-            mParams.setBetaWeightage(mBetaWeightageField.getText());
-            mParams.setTabuListSize(mTabuListSizeField.getText());
-            mParams.setSourceNode(mSourceField.getText());
-            mParams.setDestinationNode(mDestinationField.getText());
+            mParams.setRatio(mPackToAntRatioField.getText());
+            mParams.setAlpha(mAlphaWeightageField.getText());
+            mParams.setBeta(mBetaWeightageField.getText());
+            mParams.setTabuSize(mTabuListSizeField.getText());
+            mParams.setSource(Integer.parseInt(mSourceField.getText()));
+            mParams.setDestination(Integer.parseInt(mDestinationField.getText()));
 
-            mPackToAntRatioField.setText(String.valueOf(mParams.getPackToAntRatio()));
-            mAlphaWeightageField.setText(String.valueOf(mParams.getAlphaWeightage()));
-            mBetaWeightageField.setText(String.valueOf(mParams.getBetaWeightage()));
-            mTabuListSizeField.setText(String.valueOf(mParams.getTabuListSize()));
-            mSourceField.setText(String.valueOf(mParams.getSourceNode()));
-            mDestinationField.setText(String.valueOf(mParams.getDestinationNode()));
+            mPackToAntRatioField.setText(String.valueOf(mParams.getRatio()));
+            mAlphaWeightageField.setText(String.valueOf(mParams.getAlpha()));
+            mBetaWeightageField.setText(String.valueOf(mParams.getBeta()));
+            mTabuListSizeField.setText(String.valueOf(mParams.getTabuSize()));
+            mSourceField.setText(String.valueOf(mParams.getSource()));
+            mDestinationField.setText(String.valueOf(mParams.getDestination()));
         });
         rightPanel.add(saveButton);
 

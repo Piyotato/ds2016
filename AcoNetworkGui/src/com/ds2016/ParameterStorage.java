@@ -4,99 +4,93 @@ package com.ds2016;
  * Created by ds2016 on 13/6/16.
  */
 class ParameterStorage {
-    private double packToAntRatio;
-    private double alphaWeightage;
-    private double betaWeightage;
-    private int tabuListSize;
-    private int sourceNode;
-    private int destinationNode;
+    private static final int ALGO_OSPF = 1;
+    private static final int ALGO_ANTNET = 2;
+    private static final int ALGO_EACO = 3;
+
+    private int alpha;
+    private int beta;
+    private int ratio;
+    private int tabuSize;
+    private int source;
+    private int destination;
+    private int algorithm;
     private long data[];
     private long timeStamp[];
 
-    ParameterStorage(double packToAntRatio, double alphaWeightage,
-                     double betaWeightage, int tabuListSize,
-                     int sourceNode, int destinationNode,
-                     long[] data, long[] timeStamp) {
-        this.packToAntRatio = packToAntRatio;
-        this.alphaWeightage = alphaWeightage;
-        this.betaWeightage = betaWeightage;
-        this.tabuListSize = tabuListSize;
-        this.sourceNode = sourceNode;
-        this.destinationNode = destinationNode;
+    ParameterStorage(int alpha, int beta,
+                     int ratio, int tabuSize,
+                     int source, int destination,
+                     int algorithm, long[] data, long[] timeStamp) {
+        this.ratio = ratio;
+        this.alpha = alpha;
+        this.beta = beta;
+        this.tabuSize = tabuSize;
+        this.source = source;
+        this.destination = destination;
+        this.algorithm = algorithm;
         this.data = data;
         this.timeStamp = timeStamp;
     }
 
-    double getPackToAntRatio() {
-        return packToAntRatio;
+    int getRatio() {
+        return ratio;
     }
 
-    void setPackToAntRatio(String packToAntRatioStr) {
-        setPackToAntRatio(packToAntRatioStr == null ? 1 : Double.parseDouble(packToAntRatioStr));
+    void setRatio(String ratioStr) {
+        if (ratioStr != null) ratio = Integer.parseInt(ratioStr);
     }
 
-    void setPackToAntRatio(double packToAntRatio) {
-        this.packToAntRatio = packToAntRatio;
+    int getAlpha() {
+        return alpha;
     }
 
-    double getAlphaWeightage() {
-        return alphaWeightage;
+    void setAlpha(String alphaStr) {
+        if (alphaStr != null) alpha = Integer.parseInt(alphaStr);
     }
 
-    void setAlphaWeightage(String alphaWeightageStr) {
-        setAlphaWeightage(alphaWeightageStr == null ? 1 : Double.parseDouble(alphaWeightageStr));
+    int getBeta() {
+        return beta;
     }
 
-    void setAlphaWeightage(double alphaWeightage) {
-        this.alphaWeightage = alphaWeightage;
+    void setBeta(String betaStr) {
+        if (betaStr != null) beta = Integer.parseInt(betaStr);
     }
 
-    double getBetaWeightage() {
-        return betaWeightage;
+    int getTabuSize() {
+        return tabuSize;
     }
 
-    void setBetaWeightage(String betaWeightageStr) {
-        setBetaWeightage(betaWeightageStr == null ? 1 : Double.parseDouble(betaWeightageStr));
+    void setTabuSize(String tabuSizeStr) {
+        if (tabuSizeStr != null) tabuSize = Integer.parseInt(tabuSizeStr);
     }
 
-    void setBetaWeightage(double betaWeightage) {
-        this.betaWeightage = betaWeightage;
+    int getSource() {
+        return source;
     }
 
-    int getTabuListSize() {
-        return tabuListSize;
+    void setSource(int source) {
+        this.source = source;
     }
 
-    void setTabuListSize(String tabuListSizeStr) {
-        setTabuListSize(tabuListSizeStr == null ? 1 : Integer.parseInt(tabuListSizeStr));
+    int getDestination() {
+        return destination;
     }
 
-    void setTabuListSize(int tabuListSize) {
-        tabuListSize = tabuListSize;
+    void setDestination(int destination) {
+        this.destination = destination;
     }
 
-    int getSourceNode() {
-        return sourceNode;
+    int getAlgorithm() {
+        return algorithm;
     }
 
-    void setSourceNode(String sourceNodeStr) {
-        setSourceNode(sourceNodeStr == null ? 1 : Integer.parseInt(sourceNodeStr));
+    void setAlgorithm(int algorithm) {
+        if (isAlgorithmValid(algorithm)) this.algorithm = algorithm;
     }
 
-    void setSourceNode(int sourceNode) {
-        this.sourceNode = sourceNode;
-    }
-
-    int getDestinationNode() {
-        return destinationNode;
-    }
-
-    void setDestinationNode(String destinationNodeStr) {
-        setDestinationNode(destinationNodeStr == null ? 1 : Integer.parseInt(destinationNodeStr));
-    }
-
-    void setDestinationNode(int destinationNode) {
-        this.destinationNode = destinationNode;
+    private boolean isAlgorithmValid(int algorithm) {
+        return algorithm <= ALGO_EACO && algorithm >= ALGO_OSPF;
     }
 
     public long[] getData() {
