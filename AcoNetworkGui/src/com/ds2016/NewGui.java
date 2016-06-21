@@ -106,9 +106,9 @@ public class NewGui {
          */
         mAddBtn = new JButton();
         mAddBtn.addActionListener(actionEvent -> {
-            String from = mFromField.getText();
-            String to = mToField.getText();
-            String distance = mDistanceField.getText();
+            int from = Integer.parseInt(mFromField.getText());
+            int to = Integer.parseInt(mToField.getText());
+            int distance = Integer.parseInt(mDistanceField.getText());
             addNode(from, to, distance);
         });
 
@@ -152,22 +152,23 @@ public class NewGui {
         }
     }
 
-    private void addNode(String from, String to, String distance) {
+    private void addNode(int from, int to, int distance) {
         if (mGraph.getNode(to) != null &&
                 mGraph.getEdge(from + to) != null) {
             return;
         }
         if (mGraph.getNode(to) == null) {
-            mGraph.addNode(to).addAttribute("ui.label", to);
+            mGraph.addNode(String.valueOf(to)).addAttribute("ui.label", to);
         }
         addEdge(from, to, distance);
     }
 
-    private void addEdge(String from, String to, String distance) {
-        if (mGraph.getEdge(from + to) == null) {
-            org.graphstream.graph.Edge edge = mGraph.addEdge(from + to, from, to);
-            edge.addAttribute("ui.label", from + to + " - " + distance);
-            edge.addAttribute("length", distance);
+    private void addEdge(int source, int destination, int cost) {
+        String edgeLabel = source + "-" + destination;
+        if (mGraph.getEdge(edgeLabel) == null) {
+            org.graphstream.graph.Edge edge = mGraph.addEdge(edgeLabel, source, destination);
+            edge.addAttribute("ui.label", edgeLabel);
+            edge.addAttribute("cost", cost);
         }
     }
 }
