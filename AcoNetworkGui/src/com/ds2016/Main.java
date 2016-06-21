@@ -8,22 +8,23 @@ import org.graphstream.graph.Graph;
 public class Main {
     private static final String ALGO_THREAD = "ALGO_THREAD";
 
-    static ParameterStorage mParams = new ParameterStorage(1, 1, 1, 1, 1, 1, 1, null, null);
+    static ParameterStorage mParams = new ParameterStorage(1, 1, 1, 1, 1, 1, 2);
 
-    static AlgorithmBase mAlgo;
-
+    static AlgorithmBase mAlgo = new EACO(1, 1, 1, 1, 1, 1, 2);
     static Graph mGraph;
 
     private static Thread mThread;
     private static Runnable mRunnable;
 
     public static void main(String[] args) {
-        new NewGui().main();
+        new NewGui();
+        NewGui.main();
 
         mRunnable = () -> {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
                     /* Algo stuff */
+
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();

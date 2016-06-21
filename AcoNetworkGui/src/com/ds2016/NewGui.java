@@ -1,6 +1,7 @@
 package com.ds2016;
 
 import org.graphstream.algorithm.DynamicAlgorithm;
+import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 
@@ -17,8 +18,8 @@ public class NewGui {
             "edge.highLoad { fill-color: red; }" +
                     "edge.midLoad { fill-color: orange; }" +
                     "edge.lowLoad { fill-color: black; }" +
-                    "node.source { fill-color: green }" +
-                    "node.destination { fill-color: red }";
+                    "node.source { fill-color: green; }" +
+                    "node.destination { fill-color: red; }";
     private static final String FRAME_TITLE = "EACO";
     private static final String GRAPH_TITLE = "Simulation";
     private static final String GRAPH_THREAD = "GRAPH_THREAD";
@@ -40,10 +41,13 @@ public class NewGui {
     private JRadioButton mEAcoBtn;
     private JTextField mSourceField;
     private JTextField mDestinationField;
+    private JTextField mToggleField;
+    private JButton mToggleBtn;
+    private JTextField mSpeedField;
     private Thread mThread;
     private GraphRunnable mRunnable;
 
-    void main() {
+    static void main() {
         JFrame frame = new JFrame(FRAME_TITLE);
         frame.setContentPane(new NewGui().mainPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -54,8 +58,6 @@ public class NewGui {
     private void initNetworkPanel() {
         mGraph = new SingleGraph(GRAPH_TITLE);
         mGraph.addAttribute("ui.stylesheet", STYLE_SHEET);
-        mGraph.setStrict(false);
-        mGraph.setAutoCreate(true);
         mGraph.addNode("1").addAttribute("ui.label", 1);
 
         mAlgo = new GraphAlgo();
@@ -109,7 +111,8 @@ public class NewGui {
             int from = Integer.parseInt(mFromField.getText());
             int to = Integer.parseInt(mToField.getText());
             int distance = Integer.parseInt(mDistanceField.getText());
-            addNode(from, to, distance);
+            int speed = Integer.parseInt(mSpeedField.getText());
+            addNode(from, to, distance, speed);
         });
 
         /**
@@ -133,14 +136,27 @@ public class NewGui {
 
         mStopBtn = new JButton();
         mStopBtn.addActionListener(actionEvent -> mThread.interrupt());
+
+        /**
+         * Toggle node or edge
+         */
+        mToggleBtn = new JButton();
+        mToggleBtn.addActionListener(actionEvent -> {
+            String itemLabel = mToggleField.getText();
+            if (itemLabel.contains("-")) {
+                toggleEdge(itemLabel);
+            } else {
+                toggleNode(itemLabel);
+            }
+        });
     }
 
     /**
      * Colourise source and destination node
      */
     private void colouriseNodes() {
-        Node source = mGraph.getNode(mParams.getSource());
-        Node destination = mGraph.getNode(mParams.getDestination());
+        Node source = mGraph.getNode(String.valueOf(mParams.getSource()));
+        Node destination = mGraph.getNode(String.valueOf(mParams.getDestination()));
         for (Node n : mGraph) {
             if (n == source) {
                 n.setAttribute("ui.class", "source");
@@ -152,23 +168,47 @@ public class NewGui {
         }
     }
 
-    private void addNode(int from, int to, int distance) {
-        if (mGraph.getNode(to) != null &&
-                mGraph.getEdge(from + to) != null) {
-            return;
+    private void addNode(int source, int destination, int cost, int speed) {
+        if (mGraph.getNode(String.valueOf(destination)) == null) {
+            Node node = mGraph.addNode(String.valueOf(destination));
+            node.addAttribute("ui.label", destination);
+            node.addAttribute("speed", speed);
         }
-        if (mGraph.getNode(to) == null) {
-            mGraph.addNode(String.valueOf(to)).addAttribute("ui.label", to);
+        if (mGraph.getEdge(String.valueOf(source + "-" + destination)) == null) {
+            addEdge(source, destination, cost);
         }
-        addEdge(from, to, distance);
     }
 
     private void addEdge(int source, int destination, int cost) {
         String edgeLabel = source + "-" + destination;
         if (mGraph.getEdge(edgeLabel) == null) {
-            org.graphstream.graph.Edge edge = mGraph.addEdge(edgeLabel, source, destination);
+            org.graphstream.graph.Edge edge = mGraph.addEdge(edgeLabel, String.valueOf(source), String.valueOf(destination));
             edge.addAttribute("ui.label", edgeLabel);
             edge.addAttribute("cost", cost);
+        }
+    }
+
+    private void toggleNode(String label) {
+        Node node = mGraph.getNode(label);
+        if (node.hasAttribute("ui.hide")) {
+            node.removeAttribute("ui.hide");
+            for (Edge edge : node.getEachEdge()) {
+                edge.removeAttribute("ui.hide");
+            }
+        } else {
+            node.addAttribute("ui.hide");
+            for (Edge edge : node.getEachEdge()) {
+                edge.addAttribute("ui.hide");
+            }
+        }
+    }
+
+    private void toggleEdge(String label) {
+        org.graphstream.graph.Edge edge = mGraph.getEdge(label);
+        if (edge.hasAttribute("ui.hide")) {
+            edge.removeAttribute("ui.hide");
+        } else {
+            edge.addAttribute("ui.hide");
         }
     }
 }

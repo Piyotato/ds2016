@@ -15,13 +15,11 @@ class ParameterStorage {
     private int source;
     private int destination;
     private int algorithm;
-    private long data[];
-    private long timeStamp[];
 
     ParameterStorage(int alpha, int beta,
                      int ratio, int tabuSize,
                      int source, int destination,
-                     int algorithm, long[] data, long[] timeStamp) {
+                     int algorithm) {
         this.ratio = ratio;
         this.alpha = alpha;
         this.beta = beta;
@@ -29,8 +27,6 @@ class ParameterStorage {
         this.source = source;
         this.destination = destination;
         this.algorithm = algorithm;
-        this.data = data;
-        this.timeStamp = timeStamp;
     }
 
     int getRatio() {
@@ -91,21 +87,5 @@ class ParameterStorage {
 
     private boolean isAlgorithmValid(int algorithm) {
         return algorithm <= ALGO_EACO && algorithm >= ALGO_OSPF;
-    }
-
-    public long[] getData() {
-        return data;
-    }
-
-    public void setData(long[] data) {
-        this.data = data;
-    }
-
-    public long[] getTimeStamp() {
-        return timeStamp;
-    }
-
-    public void setTimeStamp(long[] timeStamp) {
-        this.timeStamp = timeStamp;
     }
 }
