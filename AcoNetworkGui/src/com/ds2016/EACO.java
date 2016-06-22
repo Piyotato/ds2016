@@ -56,8 +56,8 @@ public class EACO implements AlgorithmBase {
      */
     public ArrayList<Integer> getEdgeStatus() {
         ArrayList<Integer> ret = new ArrayList<>();
-        for (int a = 0; a < edgeList.size() - 1; a += 2) { // They come in pairs
-            ret.add(edgeList.get(a).packets.size() + edgeList.get(a + 1).packets.size());
+        for (Edge_ACO edge: edgeList) {
+            ret.add(edge.packets.size());
         }
         return ret;
     }
