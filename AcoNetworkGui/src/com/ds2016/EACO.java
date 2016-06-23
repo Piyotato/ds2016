@@ -9,11 +9,14 @@ import java.util.ArrayList;
  */
 public class EACO implements AlgorithmBase {
 
-    private final int alpha, beta, ratio, tabuSize, TTL, source, destination;
+    private static final int MAX_ANTS = 4;
+
+    private final int alpha, beta, tabuSize, TTL, source, destination;
     private final ArrayList<Edge_ACO> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat = new HashMap2D<>();
     private final ArrayList<Node_EACO> nodes = new ArrayList<>();
-    private int success, failure, numPackets, numAnts, currentTime;
+    private final ArrayList<Integer> cnt = new ArrayList<>();
+    private int success, failure, currentTime;
 
     /**
      * Initialize EACO
@@ -31,7 +34,6 @@ public class EACO implements AlgorithmBase {
         destination = _destination;
         alpha = _alpha;
         beta = _beta;
-        ratio = _ratio;
         TTL = _TTL;
         tabuSize = _tabuSize;
     }
@@ -69,6 +71,7 @@ public class EACO implements AlgorithmBase {
      */
     public void addNode(int speed) {
         nodes.add(new Node_EACO(speed, nodes, edgeList, adjMat, alpha, beta, tabuSize));
+        cnt.add(0);
     }
 
     /**
@@ -155,13 +158,22 @@ public class EACO implements AlgorithmBase {
                 ant.updateTotalTime();
                 int prev = ant.previousNode();
                 Double P = node.pheromone.get(ant.destination, prev);
-                if (P == null) continue; // This path is no longer viable
+                if (P == null) {
+                    decrementNodeAntCnt(ant.source);
+                    continue; // This path is no longer viable
+                }
                 double R = 1. / ant.totalTime;
                 double change = (P * (1 - R) + R) - P;
                 node.updateHeuristic(prev, ant.destination, change);
-                if (ant.source == node.nodeID) continue; // Reached source
+                if (ant.source == node.nodeID) {
+                    decrementNodeAntCnt(ant.source);
+                    continue; // Reached source
+                }
                 int nxt = ant.nextNode();
-                if (nodes.get(nxt).isOffline) continue; // Drop Ant
+                if (nodes.get(nxt).isOffline || adjMat.get(node.nodeID, nxt).isOffline) {
+                    decrementNodeAntCnt(ant.source);
+                    continue; // Path is gone
+                }
                 adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
             } else { // Forward ant
                 ant.timings.add((double)node.slowQ.size() / node.speed);
@@ -171,10 +183,16 @@ public class EACO implements AlgorithmBase {
                     nxt = ant.nextNode();
                 } else if (ant.decrementTTL()) {
                     nxt = node.nextHop(ant);
-                    if (nxt == null) continue; // Drop Ant
+                    if (nxt == null) {
+                        decrementNodeAntCnt(ant.source);
+                        continue; // Drop Ant
+                    }
                     ant.addNode(nxt);
                     ant.timings.add((double)adjMat.get(node.nodeID, nxt).cost);
-                } else continue;
+                } else { // Ant Expired
+                    decrementNodeAntCnt(ant.source);
+                    continue;
+                }
                 adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
             }
         }
@@ -218,15 +236,37 @@ public class EACO implements AlgorithmBase {
      */
     private void generatePackets() {
         Node_EACO src = nodes.get(source);
-        int amt = src.speed * currentTime;
-        int totPackets = ratio * amt / (ratio + 1);
-        int totAnts = amt / (ratio + 1);
-        for (; numPackets < totPackets; ++numPackets) {
+        // Send packets from source node
+        for (int a = 0; a < src.speed - 1; ++a) {
             src.slowQ.add(new Packet(source, destination, TTL));
         }
-        for (; numAnts < totAnts; ++numAnts) {
-            src.fastQ.add(new Ant(source, destination, TTL));
+        // Send ants from all nodes
+        for (Node_EACO node: nodes) {
+            while (cnt.get(node.nodeID) < MAX_ANTS) { // 1 Ant per tick
+                node.fastQ.add(new Ant(node.nodeID, destination, TTL));
+                incrementNodeAntCnt(node.nodeID);
+            }
         }
+    }
+
+    /**
+     * Decrement record of the number
+     * of ants sent from a node
+     *
+     * @param Node Node ID
+     */
+    private void decrementNodeAntCnt(int Node) {
+        cnt.set(Node, cnt.get(Node) - 1);
+    }
+
+    /**
+     * Increment record of the number
+     * of ants sent from a node
+     *
+     * @param Node Node ID
+     */
+    private void incrementNodeAntCnt(int Node) {
+        cnt.set(Node, cnt.get(Node) + 1);
     }
 
     /**
