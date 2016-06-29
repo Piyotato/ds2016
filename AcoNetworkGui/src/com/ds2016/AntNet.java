@@ -1,6 +1,6 @@
 package com.ds2016;
 
-import javafx.util.*;
+import javafx.util.Pair;
 
 import java.util.ArrayList;
 
@@ -11,7 +11,8 @@ public class AntNet implements AlgorithmBase {
 
     private static final int MAX_ANTS = 4;
 
-    private final int alpha, beta, tabuSize, TTL, source, destination;
+    private final double alpha;
+    private final int tabuSize, TTL, source, destination;
     private final ArrayList<Edge_ACO> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat = new HashMap2D<>();
     private final ArrayList<Node_AntNet> nodes = new ArrayList<>();
@@ -22,17 +23,15 @@ public class AntNet implements AlgorithmBase {
      * Initialize EACO
      *
      * @param _alpha Weightage of pheromone
-     * @param _beta Weightage of cost function
      * @param _TTL Time To Live of packets
      * @param _tabuSize Size of tabu list
      * @param _source Source node
      * @param _destination Destination node
      */
-    public AntNet(int _alpha, int _beta, int _TTL, int _tabuSize, int _source, int _destination) {
+    public AntNet(double _alpha, int _TTL, int _tabuSize, int _source, int _destination) {
         source = _source;
         destination = _destination;
         alpha = _alpha;
-        beta = _beta;
         TTL = _TTL;
         tabuSize = _tabuSize;
     }
@@ -69,7 +68,7 @@ public class AntNet implements AlgorithmBase {
      * @param speed Processing speed
      */
     public void addNode(int speed) {
-        nodes.add(new Node_AntNet(speed, nodes, edgeList, adjMat, alpha, beta, tabuSize));
+        nodes.add(new Node_AntNet(speed, nodes, edgeList, adjMat, alpha, tabuSize));
         cnt.add(0);
     }
 

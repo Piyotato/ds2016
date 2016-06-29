@@ -1,6 +1,6 @@
 package com.ds2016;
 
-import javafx.util.*;
+import javafx.util.Pair;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -15,7 +15,8 @@ class Node_AntNet implements Node_ACO {
     final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node
     final Queue<Ant> fastQ = new ArrayDeque<>();
     final Queue<Packet> slowQ = new ArrayDeque<>();
-    private final int alpha, beta, tabuSize;
+    private final double alpha;
+    private final int tabuSize;
     private final ArrayList<Node_AntNet> nodes;
     private final ArrayList<Edge_ACO> edgeList;
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat;
@@ -29,15 +30,13 @@ class Node_AntNet implements Node_ACO {
      * @param _edgeList ArrayList of Edge_ACO
      * @param _adjMat Adjacency Matrix
      * @param _alpha Weightage of pheromone
-     * @param _beta Weightage of cost function
      * @param _tabuSize Size of tabu list
      */
     Node_AntNet(int _speed, ArrayList<Node_AntNet> _nodes, ArrayList<Edge_ACO> _edgeList,
-             HashMap2D<Integer, Integer, Edge_ACO> _adjMat, int _alpha, int _beta, int _tabuSize) {
+                HashMap2D<Integer, Integer, Edge_ACO> _adjMat, double _alpha, int _tabuSize) {
         speed = _speed;
         nodeID = _nodes.size();
         alpha = _alpha;
-        beta = _beta;
         tabuSize = _tabuSize;
         nodes = _nodes;
         edgeList = _edgeList;
@@ -116,6 +115,7 @@ class Node_AntNet implements Node_ACO {
      */
     public Integer nextHop(Packet packet) {
         double RNG = Math.random(), totVal = .0;
+        double beta = 1 - alpha;
         ArrayList<Pair<Integer, Double>> neighbours = new ArrayList<>(); // Neighbour, Heuristic
         for (Edge_ACO edge: adjMat.get(nodeID).values()) {
             if (edge.isOffline) continue;

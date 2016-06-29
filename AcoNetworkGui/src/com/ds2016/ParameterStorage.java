@@ -8,49 +8,30 @@ class ParameterStorage {
     private static final int ALGO_ANTNET = 2;
     private static final int ALGO_EACO = 3;
 
-    private int alpha;
-    private int beta;
-    private int ratio;
+    private double alpha;
     private int tabuSize;
     private int source;
     private int destination;
     private int algorithm;
 
-    ParameterStorage(int alpha, int beta,
-                     int ratio, int tabuSize,
-                     int source, int destination,
+    ParameterStorage(double alpha,
+                     int tabuSize,
+                     int source,
+                     int destination,
                      int algorithm) {
-        this.ratio = ratio;
         this.alpha = alpha;
-        this.beta = beta;
         this.tabuSize = tabuSize;
         this.source = source;
         this.destination = destination;
         this.algorithm = algorithm;
     }
 
-    int getRatio() {
-        return ratio;
-    }
-
-    void setRatio(String ratioStr) {
-        if (ratioStr != null) ratio = Integer.parseInt(ratioStr);
-    }
-
-    int getAlpha() {
+    double getAlpha() {
         return alpha;
     }
 
     void setAlpha(String alphaStr) {
-        if (alphaStr != null) alpha = Integer.parseInt(alphaStr);
-    }
-
-    int getBeta() {
-        return beta;
-    }
-
-    void setBeta(String betaStr) {
-        if (betaStr != null) beta = Integer.parseInt(betaStr);
+        if (alphaStr != null) alpha = Double.parseDouble(alphaStr);
     }
 
     int getTabuSize() {
@@ -65,16 +46,16 @@ class ParameterStorage {
         return source;
     }
 
-    void setSource(int source) {
-        this.source = source;
+    void setSource(String sourceStr) {
+        if (sourceStr != null) source = Integer.parseInt(sourceStr);
     }
 
     int getDestination() {
         return destination;
     }
 
-    void setDestination(int destination) {
-        this.destination = destination;
+    void setDestination(String destinationStr) {
+        if (destinationStr != null) destination = Integer.parseInt(destinationStr);
     }
 
     int getAlgorithm() {

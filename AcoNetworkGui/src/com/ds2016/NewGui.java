@@ -25,10 +25,8 @@ public class NewGui {
     private static final String GRAPH_THREAD = "GRAPH_THREAD";
     static DynamicAlgorithm mAlgo;
     private JPanel mainPanel;
-    private JTextField mRatioField;
     private JTextField mTabuSizeField;
     private JTextField mAlphaField;
-    private JTextField mBetaField;
     private JTextField mDistanceField;
     private JTextField mFromField;
     private JTextField mToField;
@@ -68,18 +66,14 @@ public class NewGui {
     }
 
     private void updateParams() {
-        mParams.setRatio(mRatioField.getText());
         mParams.setAlpha(mAlphaField.getText());
-        mParams.setBeta(mBetaField.getText());
         mParams.setTabuSize(mTabuSizeField.getText());
-        mParams.setSource(Integer.parseInt(mSourceField.getText()));
-        mParams.setDestination(Integer.parseInt(mDestinationField.getText()));
+        mParams.setSource(mSourceField.getText());
+        mParams.setDestination(mDestinationField.getText());
     }
 
     private void updateTextFields() {
-        mRatioField.setText(String.valueOf(mParams.getRatio()));
         mAlphaField.setText(String.valueOf(mParams.getAlpha()));
-        mBetaField.setText(String.valueOf(mParams.getBeta()));
         mTabuSizeField.setText(String.valueOf(mParams.getTabuSize()));
         mSourceField.setText(String.valueOf(mParams.getSource()));
         mDestinationField.setText(String.valueOf(mParams.getDestination()));

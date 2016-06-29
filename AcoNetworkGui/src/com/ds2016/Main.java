@@ -8,9 +8,9 @@ import org.graphstream.graph.Graph;
 public class Main {
     private static final String ALGO_THREAD = "ALGO_THREAD";
 
-    static ParameterStorage mParams = new ParameterStorage(1, 1, 1, 1, 1, 1, 2);
+    static ParameterStorage mParams = new ParameterStorage(0.4, 1, 1, 1, 2);
 
-    static AlgorithmBase mAlgo = new EACO(1, 1, 1, 1, 1, 1, 2);
+    static AlgorithmBase mAlgo = new OSPF(mParams.getSource(), mParams.getDestination());
     static Graph mGraph;
 
     private static Thread mThread;
