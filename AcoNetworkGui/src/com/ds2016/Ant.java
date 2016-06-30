@@ -11,7 +11,7 @@ import java.util.HashSet;
 class Ant extends Packet {
 
     final ArrayList<Double> timings = new ArrayList<>();
-    final HashMap<Integer, Boolean> tabuList = new HashMap<>();
+    private final HashMap<Integer, Boolean> tabuList = new HashMap<>();
     final ArrayList<Integer> path = new ArrayList<>();
     double totalTime;
     boolean isBackwards;

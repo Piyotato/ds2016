@@ -1,7 +1,5 @@
 package com.ds2016;
 
-import java.util.ArrayList;
-
 /**
  * Created by damian on 16/5/16.
  */
@@ -10,7 +8,7 @@ class Packet {
     final int source, destination;
     private final int creation;
     int timestamp;
-    private int TTL;
+    private final int TTL;
 
     /**
      * Initializes a packet

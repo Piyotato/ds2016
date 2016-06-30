@@ -186,8 +186,6 @@ public class EACO implements AlgorithmBase {
                         nxt = -nxt;
                     }
                     adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
-                } else { // Ant Expired
-                    continue;
                 }
             }
         }
