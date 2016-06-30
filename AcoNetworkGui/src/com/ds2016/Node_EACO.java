@@ -16,7 +16,6 @@ class Node_EACO implements Node_ACO {
     final Queue<Ant> fastQ = new ArrayDeque<>();
     final Queue<Packet> slowQ = new ArrayDeque<>();
     private final double alpha;
-    private final int tabuSize;
     private final ArrayList<Node_EACO> nodes;
     private final ArrayList<Edge_ACO> edgeList;
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat;
@@ -31,14 +30,12 @@ class Node_EACO implements Node_ACO {
      * @param _edgeList ArrayList of Edge_ACO
      * @param _adjMat Adjacency Matrix
      * @param _alpha Weightage of pheromone
-     * @param _tabuSize Size of tabu list
      */
     Node_EACO(int _speed, ArrayList<Node_EACO> _nodes, ArrayList<Edge_ACO> _edgeList,
-              HashMap2D<Integer, Integer, Edge_ACO> _adjMat, double _alpha, int _tabuSize) {
+              HashMap2D<Integer, Integer, Edge_ACO> _adjMat, double _alpha) {
         speed = _speed;
         nodeID = _nodes.size();
         alpha = _alpha;
-        tabuSize = _tabuSize;
         nodes = _nodes;
         edgeList = _edgeList;
         adjMat = _adjMat;
@@ -59,24 +56,58 @@ class Node_EACO implements Node_ACO {
      * Use heuristics to calculate the
      * next best hop, for a given destination
      *
-     * @param packet Packet being processed
+     * @param ant Ant being processed
      * @return Neighbour for next hop, or null if no candidates
      */
-    public Integer nextHop(Packet packet) {
+    public Integer antNextHop(Ant ant) {
+        double RNG = Math.random(), totVal = .0;
+        double beta = 1 - alpha;
+        ArrayList<Pair<Integer, Double>> neighbours = new ArrayList<>(); // Neighbour, Heuristic
+        for (Edge_ACO edge: adjMat.get(ant.source).values()) {
+            if (edge.isOffline) continue; // Link is offline
+            if (nodes.get(edge.destination).isOffline) continue; // Node is offline
+            if (!ant.canVisit(edge.destination)) continue; // Cycle detection
+            Double tau = pheromone.get(ant.destination, edge.destination); // Pheromone
+            if (tau == null) continue; // Not viable
+            Double eta = 1. / edge.cost; // 1 / Distance
+            neighbours.add(new Pair<>(edge.destination, Math.pow(tau, alpha) * Math.pow(eta, beta)));
+            totVal += neighbours.get(neighbours.size() - 1).getValue();
+        }
+        if (neighbours.isEmpty()) {
+            int cycleSize = ant.getCycleSize(adjMat.get(ant.source).values());
+            if (cycleSize * 2 <= ant.path.size()) {
+                return -ant.deleteCycle(adjMat.get(ant.source).values()); // -ve to indicate a cycle
+            } else {
+                return null; // Just give up
+            }
+        }
+        for (Pair<Integer, Double> neighbour: neighbours) {
+            RNG -= neighbour.getValue() / totVal;
+            if (RNG <= EPS) return neighbour.getKey();
+        }
+        return neighbours.get(neighbours.size() - 1).getKey();
+    }
+
+    /**
+     * Use heuristics to calculate the
+     * next best hop, for a given destination
+     *
+     * @param packet Packet being processed
+     * @return Neighbour for next hop
+     */
+    public int packetNextHop(Packet packet) {
         double RNG = Math.random(), totVal = .0;
         double beta = 1 - alpha;
         ArrayList<Pair<Integer, Double>> neighbours = new ArrayList<>(); // Neighbour, Heuristic
         for (Edge_ACO edge: adjMat.get(packet.source).values()) {
             if (edge.isOffline) continue; // Link is offline
             if (nodes.get(edge.destination).isOffline) continue; // Node is offline
-            if (!packet.isValid(edge.destination, tabuSize)) continue; // Cycle detection
             Double tau = pheromone.get(packet.destination, edge.destination); // Pheromone
             if (tau == null) continue; // Not viable
             Double eta = 1. / edge.cost; // 1 / Distance
             neighbours.add(new Pair<>(edge.destination, Math.pow(tau, alpha) * Math.pow(eta, beta)));
             totVal += neighbours.get(neighbours.size() - 1).getValue();
         }
-        if (neighbours.isEmpty()) return null;
         for (Pair<Integer, Double> neighbour: neighbours) {
             RNG -= neighbour.getValue() / totVal;
             if (RNG <= EPS) return neighbour.getKey();

@@ -164,7 +164,7 @@ public class OSPF implements AlgorithmBase {
     private void generatePackets() {
         Node_OSPF src = nodes.get(source);
         for (int a = 0; a < src.speed; ++a) {
-            src.Q.add(new Packet(source, destination, TTL));
+            src.Q.add(new Packet(source, destination, TTL, 0));
         }
     }
 

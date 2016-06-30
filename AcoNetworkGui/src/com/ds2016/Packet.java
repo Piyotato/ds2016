@@ -8,7 +8,7 @@ import java.util.ArrayList;
 class Packet {
 
     final int source, destination;
-    final ArrayList<Integer> path = new ArrayList<>();
+    private final int creation;
     int timestamp;
     private int TTL;
 
@@ -18,47 +18,22 @@ class Packet {
      * @param _source Source node
      * @param _destination Destination node
      * @param _TTL Time to live
+     * @param _creation Time of creation
      */
-    Packet(int _source, int _destination, int _TTL) {
+    Packet(int _source, int _destination, int _TTL, int _creation) {
         source = _source;
         destination = _destination;
         TTL = _TTL;
-        path.add(_source);
+        creation = _creation;
     }
 
     /**
-     * Decrements TTL and checks expiration
+     * Checks expiration
      *
+     * @param _time Current time
      * @return Whether packet is still valid
      */
-    boolean decrementTTL() {
-        return --TTL != 0;
-    }
-
-    /**
-     * Add a node to the path
-     * Assumes that node is valid
-     *
-     * @param node Current node
-     */
-    void addNode(int node) {
-        path.add(node);
-    }
-
-    /**
-     * Check if a node is currently
-     * blacklisted in the Tabu list
-     *
-     * @param node Neighbouring node
-     * @param tabuSize Size of Tabu list
-     * @return Whether node is valid
-     */
-    boolean isValid(int node, int tabuSize) {
-        for (int a = 0; a < Math.min(tabuSize, path.size()); ++a) {
-            if (path.get(path.size() - a - 1) == node) {
-                return false;
-            }
-        }
-        return true;
+    boolean isValid(int _time) {
+        return (_time - creation) <= TTL;
     }
 }

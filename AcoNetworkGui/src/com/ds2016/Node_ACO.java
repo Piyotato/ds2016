@@ -11,5 +11,7 @@ interface Node_ACO {
 
     void toggleEdge(int ID);
 
-    Integer nextHop(Packet packet);
+    Integer antNextHop(Ant ant);
+
+    int packetNextHop(Packet packet);
 }
