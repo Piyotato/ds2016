@@ -157,6 +157,7 @@ public class OSPF implements AlgorithmBase {
                 continue;
             }
             int nxt = node.nextHop(packet);
+            packet.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
             adjMat.get(node.nodeID, nxt).addPacket(packet, currentTime);
         }
     }
@@ -178,7 +179,7 @@ public class OSPF implements AlgorithmBase {
      */
     private void generatePackets() {
         Node_OSPF src = nodes.get(source);
-        for (int a = 0; a < src.speed; ++a) {
+        while (src.Q.size() < src.speed) {
             src.Q.add(new Packet(source, destination, TTL, 0));
         }
     }
@@ -190,11 +191,11 @@ public class OSPF implements AlgorithmBase {
      */
     public Pair<Integer, Integer> tick() {
         ++currentTime;
-        generatePackets();
         for (Edge edge: edgeList) {
             if (edge.isOffline) continue;
             processEdge(edge);
         }
+        generatePackets();
         for (Node_OSPF node: nodes) {
             if (node.isOffline) continue;
             processNode(node);

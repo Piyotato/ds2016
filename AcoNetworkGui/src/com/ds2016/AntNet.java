@@ -213,6 +213,7 @@ public class AntNet implements AlgorithmBase {
                 continue;
             }
             int nxt = node.packetNextHop(packet);
+            packet.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
             adjMat.get(node.nodeID, nxt).addPacket(packet, currentTime);
         }
     }
@@ -237,19 +238,22 @@ public class AntNet implements AlgorithmBase {
      * Generate packets from source
      */
     private void generatePackets() {
-        Node_AntNet src = nodes.get(source);
-        // Send packets from source node
-        for (int a = 0; a < src.speed; ++a) {
-            src.slowQ.add(new Packet(source, destination, TTL, currentTime));
-        }
         // Send ants from all nodes
         if (currentTime % interval == 0) {
             Random rand = new Random();
             for (Node_AntNet node: nodes) {
+                if (node.fastQ.size() + node.slowQ.size() >= node.speed) {
+                    continue; // Throttle
+                }
                 int randomNode;
                 while ((randomNode = rand.nextInt(nodes.size())) == node.nodeID);
                 node.fastQ.add(new Ant(node.nodeID, randomNode, TTL, currentTime));
             }
+        }
+        Node_AntNet src = nodes.get(source);
+        // Send packets from source node
+        while (src.slowQ.size() < src.speed) {
+            src.slowQ.add(new Packet(source, destination, TTL, currentTime));
         }
     }
 
@@ -260,11 +264,11 @@ public class AntNet implements AlgorithmBase {
      */
     public Pair<Integer, Integer> tick() {
         ++currentTime;
-        generatePackets();
         for (Edge_ACO edge: edgeList) {
             if (edge.isOffline) continue;
             processEdge(edge);
         }
+        generatePackets();
         for (Node_AntNet node: nodes) {
             if (node.isOffline) continue;
             processNode(node);
