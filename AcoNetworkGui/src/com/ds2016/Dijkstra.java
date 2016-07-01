@@ -3,6 +3,7 @@ package com.ds2016;
 import javafx.util.*;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.PriorityQueue;
 
 /**
@@ -24,7 +25,9 @@ class Dijkstra {
      */
     Dijkstra(int _source, ArrayList<Node_OSPF> _nodes, HashMap2D<Integer, Integer, Edge> _adjMat) {
         final ArrayList<Integer> D = new ArrayList<>();
-        final PriorityQueue<Pair<Integer, Integer>> PQ = new PriorityQueue<>();
+        final Comparator<Pair<Integer, Integer>> pairCMP =
+                (Pair<Integer, Integer> lhs, Pair<Integer, Integer> rhs)->lhs.getKey().compareTo(rhs.getKey());
+        final PriorityQueue<Pair<Integer, Integer>> PQ = new PriorityQueue<>(_nodes.size(), pairCMP);
         for (int a = 0; a < _nodes.size(); ++a) {
             D.add(INF);
             P.add(-1);
@@ -49,7 +52,7 @@ class Dijkstra {
         }
         for (int a = 0; a < _nodes.size(); ++a) {
             if (a == _source) continue;
-            if (B.get(a) != -1) {
+            if (B.get(a) == -1) {
                 B.set(a, calc(a));
             }
         }

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class OSPF implements AlgorithmBase {
 
     private final static int TTL = 1000;
-    final private int source, destination;
+    private int source, destination;
     private final ArrayList<Node_OSPF> nodes = new ArrayList<>();
     private final ArrayList<Edge> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge> adjMat = new HashMap2D<>();
@@ -42,15 +42,20 @@ public class OSPF implements AlgorithmBase {
         return ret;
     }
 
+    public OSPF() {}
+
     /**
      * Initialize OSPF
      *
      * @param _source Source node
      * @param _destination Destination node
      */
-    public OSPF(int _source, int _destination) {
+    public void init(int _source, int _destination) {
         source = _source;
         destination = _destination;
+        for (Node_OSPF node: nodes) {
+            node.update();
+        }
     }
 
     /**
@@ -194,8 +199,10 @@ public class OSPF implements AlgorithmBase {
      *
      * @param _nodes Node_GUI nodes
      * @param _edgeList SimpleEdge edges
+     * @param _source Source node
+     * @param _destination Destination node
      */
-    public void build(ArrayList<Node_GUI> _nodes, ArrayList<SimpleEdge> _edgeList) {
+    public void build(ArrayList<Node_GUI> _nodes, ArrayList<SimpleEdge> _edgeList, int _source, int _destination) {
         currentTime = 0;
         nodes.clear();
         edgeList.clear();
@@ -220,9 +227,6 @@ public class OSPF implements AlgorithmBase {
             adjMat.put(edge.source, edge.destination, forward);
             adjMat.put(edge.destination, edge.source, backward);
         }
-        // Build SSSP tree
-        for (Node_OSPF node: nodes) {
-            node.update();
-        }
+        init(_source, _destination);
     }
 }

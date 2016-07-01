@@ -11,7 +11,7 @@ import java.util.Queue;
  */
 class Node_AntNet {
 
-    final static double EPS = 1e-5;
+    private final static double EPS = 1e-5;
 
     final int speed, nodeID;
     final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node
@@ -43,11 +43,28 @@ class Node_AntNet {
     }
 
     /**
+     * Build pheromone table
+     */
+    void init() {
+        int numNeighbours = 0; // Number of online neighbours
+        for (Edge_ACO edge: adjMat.get(nodeID).values()) {
+            if (!edge.isOffline && !nodes.get(edge.destination).isOffline)
+                ++numNeighbours;
+        }
+        for (int a = 0; a < nodes.size(); ++a) { // For each destination
+            if (a == nodeID) continue;
+            for (Edge_ACO edge: adjMat.get(nodeID).values()) { // For each neighbour
+                pheromone.put(a, edge.destination, 1. / numNeighbours);
+            }
+        }
+    }
+
+    /**
      * React to toggling of node
      *
      * @param ID Node ID
      */
-    public void toggleNode(int ID) {
+    void toggleNode(int ID) {
         /* Only care about neighbours */
         if (!adjMat.get(nodeID).keySet().contains(ID)) return;
         if (nodes.get(ID).isOffline) {
@@ -69,9 +86,7 @@ class Node_AntNet {
      * @param node1 First Node
      * @param node2 Second Node
      */
-    public void addEdge(int node1, int node2) {
-        /* Todo: Intelligent initialization (See: AntNet 1.1) */
-        /* Todo: Coefficient of memory (See: AntNet 1.1) */
+    void addEdge(int node1, int node2) {
         /* Only care about neighbours */
         if (node1 != nodeID && node2 != nodeID) return;
         int otherNode = (node1 == nodeID ? node2: node1);
@@ -86,7 +101,7 @@ class Node_AntNet {
      *
      * @param ID Edge ID
      */
-    public void toggleEdge(int ID) {
+    void toggleEdge(int ID) {
         /* Only care about neighbours */
         Edge_ACO edge = edgeList.get(ID);
         if (edge.source != nodeID && edge.destination != nodeID) return;
@@ -111,11 +126,11 @@ class Node_AntNet {
      * @param ant Ant being processed
      * @return Neighbour for next hop, or null if no candidates
      */
-    public Integer antNextHop(Ant ant) {
+    Integer antNextHop(Ant ant) {
         double RNG = Math.random(), totVal = .0;
         double beta = 1 - alpha;
         ArrayList<Pair<Integer, Double>> neighbours = new ArrayList<>(); // Neighbour, Heuristic
-        for (Edge_ACO edge: adjMat.get(ant.source).values()) {
+        for (Edge_ACO edge: adjMat.get(nodeID).values()) {
             if (edge.isOffline) continue; // Link is offline
             if (nodes.get(edge.destination).isOffline) continue; // Node is offline
             if (!ant.canVisit(edge.destination)) continue; // Cycle detection
@@ -146,11 +161,11 @@ class Node_AntNet {
      * @param packet Packet being processed
      * @return Neighbour for next hop
      */
-    public int packetNextHop(Packet packet) {
+    int packetNextHop(Packet packet) {
         double RNG = Math.random(), totVal = .0;
         double beta = 1 - alpha;
         ArrayList<Pair<Integer, Double>> neighbours = new ArrayList<>(); // Neighbour, Heuristic
-        for (Edge_ACO edge: adjMat.get(packet.source).values()) {
+        for (Edge_ACO edge: adjMat.get(nodeID).values()) {
             if (edge.isOffline) continue; // Link is offline
             if (nodes.get(edge.destination).isOffline) continue; // Node is offline
             Double tau = pheromone.get(packet.destination, edge.destination); // Pheromone

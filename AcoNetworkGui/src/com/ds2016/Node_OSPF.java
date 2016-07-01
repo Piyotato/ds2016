@@ -27,7 +27,6 @@ class Node_OSPF {
         nodeID = _nodes.size();
         nodes = _nodes;
         adjMat = _adjMat;
-        SSSP = new Dijkstra(nodeID, nodes, adjMat);
     }
 
     /**

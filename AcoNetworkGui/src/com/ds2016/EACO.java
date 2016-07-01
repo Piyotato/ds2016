@@ -3,6 +3,7 @@ package com.ds2016;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by damian on 16/5/16.
@@ -10,7 +11,8 @@ import java.util.ArrayList;
 public class EACO implements AlgorithmBase {
 
     private final double alpha;
-    private final int TTL, source, destination, interval;
+    private final int TTL, interval;
+    private int source, destination;
     private final ArrayList<Edge_ACO> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat = new HashMap2D<>();
     private final ArrayList<Node_EACO> nodes = new ArrayList<>();
@@ -22,15 +24,25 @@ public class EACO implements AlgorithmBase {
      * @param _alpha Weightage of pheromone
      * @param _TTL Time To Live of packets
      * @param _interval Interval of Ant Generation
+     */
+    public EACO(double _alpha, int _TTL, int _interval) {
+        alpha = _alpha;
+        TTL = _TTL;
+        interval = _interval;
+    }
+
+    /**
+     * Initialize EACO
+     *
      * @param _source Source node
      * @param _destination Destination node
      */
-    public EACO(double _alpha, int _TTL, int _interval, int _source, int _destination) {
-        alpha = _alpha;
-        TTL = _TTL;
+    public void init(int _source, int _destination) {
         source = _source;
-        interval = _interval;
         destination = _destination;
+        for (Node_EACO node: nodes) {
+            node.init();
+        }
     }
 
     /**
@@ -230,8 +242,10 @@ public class EACO implements AlgorithmBase {
         }
         // Send ants from all nodes
         if (currentTime % interval == 0) {
+            Random rand = new Random();
             for (Node_EACO node: nodes) {
-                node.fastQ.add(new Ant(node.nodeID, destination, TTL, currentTime));
+                int randomNode = rand.nextInt(nodes.size());
+                node.fastQ.add(new Ant(node.nodeID, randomNode, TTL, currentTime));
             }
         }
     }
@@ -262,8 +276,10 @@ public class EACO implements AlgorithmBase {
      *
      * @param _nodes Node_GUI nodes
      * @param _edgeList SimpleEdge edges
+     * @param _source Source node
+     * @param _destination Destination node
      */
-    public void build(ArrayList<Node_GUI> _nodes, ArrayList<SimpleEdge> _edgeList) {
+    public void build(ArrayList<Node_GUI> _nodes, ArrayList<SimpleEdge> _edgeList, int _source, int _destination) {
         currentTime = 0;
         nodes.clear();
         edgeList.clear();
@@ -273,30 +289,21 @@ public class EACO implements AlgorithmBase {
             nodes.add(new Node_EACO(node.speed, nodes, edgeList, adjMat, alpha));
             if (node.isOffline) {
                 nodes.get(nodes.size() - 1).isOffline = true;
-                for (Node_EACO _node: nodes) {
-                    _node.toggleNode(nodes.size() - 1);
-                }
             }
         }
         // Edges
         for (SimpleEdge edge: _edgeList) {
             Edge_ACO forward = new Edge_ACO(edge.source, edge.destination, edge.cost);
             Edge_ACO backward = new Edge_ACO(edge.destination, edge.cost, edge.cost);
-            edgeList.add(forward);
-            edgeList.add(backward);
             if (edge.isOffline) {
                 forward.isOffline = true;
                 backward.isOffline = true;
             }
+            edgeList.add(forward);
+            edgeList.add(backward);
             adjMat.put(edge.source, edge.destination, forward);
             adjMat.put(edge.destination, edge.source, backward);
-            for (Node_EACO node: nodes) {
-                node.addEdge(edge.source, edge.destination);
-                if (edge.isOffline) {
-                    node.toggleEdge(2 * edgeList.size());
-                    node.toggleEdge(2 * edgeList.size() + 1);
-                }
-            }
         }
+        init(_source, _destination);
     }
 }

@@ -23,5 +23,7 @@ interface AlgorithmBase {
 
     Pair<Integer, Integer> tick();
 
-    void build(ArrayList<Node_GUI> _nodes, ArrayList<SimpleEdge> _edgeList);
+    void build(ArrayList<Node_GUI> nodes, ArrayList<SimpleEdge> edgeList, int source, int destination);
+
+    void init(int source, int destination);
 }
