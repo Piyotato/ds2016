@@ -22,4 +22,6 @@ interface AlgorithmBase {
     void toggleEdge(int ID);
 
     Pair<Integer, Integer> tick();
+
+    void build(ArrayList<Node_GUI> _nodes, ArrayList<SimpleEdge> _edgeList);
 }

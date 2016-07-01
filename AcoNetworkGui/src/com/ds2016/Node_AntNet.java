@@ -9,7 +9,9 @@ import java.util.Queue;
 /**
  * Created by damian on 27/5/16.
  */
-class Node_AntNet implements Node_ACO {
+class Node_AntNet {
+
+    final static double EPS = 1e-5;
 
     final int speed, nodeID;
     final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node

@@ -188,4 +188,41 @@ public class OSPF implements AlgorithmBase {
         success = 0;
         return ret;
     }
+
+    /**
+     * Build graph from supplied information
+     *
+     * @param _nodes Node_GUI nodes
+     * @param _edgeList SimpleEdge edges
+     */
+    public void build(ArrayList<Node_GUI> _nodes, ArrayList<SimpleEdge> _edgeList) {
+        currentTime = 0;
+        nodes.clear();
+        edgeList.clear();
+        adjMat.clear();
+        // Node
+        for (Node_GUI node: _nodes) {
+            nodes.add(new Node_OSPF(node.speed, nodes, adjMat));
+            if (node.isOffline) {
+                nodes.get(nodes.size() - 1).isOffline = true;
+            }
+        }
+        // Edge
+        for (SimpleEdge edge: _edgeList) {
+            Edge forward = new Edge(edge.source, edge.destination, edge.cost);
+            Edge backward = new Edge(edge.destination, edge.source, edge.cost);
+            edgeList.add(forward);
+            edgeList.add(backward);
+            if (edge.isOffline) {
+                forward.isOffline = true;
+                backward.isOffline = true;
+            }
+            adjMat.put(edge.source, edge.destination, forward);
+            adjMat.put(edge.destination, edge.source, backward);
+        }
+        // Build SSSP tree
+        for (Node_OSPF node: nodes) {
+            node.update();
+        }
+    }
 }

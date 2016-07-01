@@ -112,7 +112,7 @@ public class EACO implements AlgorithmBase {
         edgeList.add(backward);
         adjMat.put(node1, node2, forward);
         adjMat.put(node2, node1, backward);
-        for (Node_ACO node: nodes) {
+        for (Node_EACO node: nodes) {
             node.addEdge(node1, node2);
         }
     }
@@ -133,7 +133,7 @@ public class EACO implements AlgorithmBase {
             backward.packets.clear();
             backward.ants.clear();
         }
-        for (Node_ACO node: nodes) {
+        for (Node_EACO node: nodes) {
             node.toggleEdge(ID * 2);
             node.toggleEdge(ID * 2 + 1);
         }
@@ -255,5 +255,48 @@ public class EACO implements AlgorithmBase {
         Pair<Integer, Integer> ret = new Pair<>(success, failure);
         success = failure = 0;
         return ret;
+    }
+
+    /**
+     * Build graph from supplied information
+     *
+     * @param _nodes Node_GUI nodes
+     * @param _edgeList SimpleEdge edges
+     */
+    public void build(ArrayList<Node_GUI> _nodes, ArrayList<SimpleEdge> _edgeList) {
+        currentTime = 0;
+        nodes.clear();
+        edgeList.clear();
+        adjMat.clear();
+        // Node
+        for (Node_GUI node: _nodes) {
+            nodes.add(new Node_EACO(node.speed, nodes, edgeList, adjMat, alpha));
+            if (node.isOffline) {
+                nodes.get(nodes.size() - 1).isOffline = true;
+                for (Node_EACO _node: nodes) {
+                    _node.toggleNode(nodes.size() - 1);
+                }
+            }
+        }
+        // Edges
+        for (SimpleEdge edge: _edgeList) {
+            Edge_ACO forward = new Edge_ACO(edge.source, edge.destination, edge.cost);
+            Edge_ACO backward = new Edge_ACO(edge.destination, edge.cost, edge.cost);
+            edgeList.add(forward);
+            edgeList.add(backward);
+            if (edge.isOffline) {
+                forward.isOffline = true;
+                backward.isOffline = true;
+            }
+            adjMat.put(edge.source, edge.destination, forward);
+            adjMat.put(edge.destination, edge.source, backward);
+            for (Node_EACO node: nodes) {
+                node.addEdge(edge.source, edge.destination);
+                if (edge.isOffline) {
+                    node.toggleEdge(2 * edgeList.size());
+                    node.toggleEdge(2 * edgeList.size() + 1);
+                }
+            }
+        }
     }
 }

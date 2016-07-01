@@ -54,6 +54,13 @@ class HashMap2D<K1, K2, V> {
     }
 
     /**
+     * Clear 2D HashMap
+     */
+    public void clear() {
+        M.clear();
+    }
+
+    /**
      * Checks if a mapping exists for the specified key
      *
      * @param key1 First Key
