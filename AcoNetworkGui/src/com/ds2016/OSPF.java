@@ -9,12 +9,11 @@ import java.util.ArrayList;
  */
 public class OSPF implements AlgorithmBase {
 
-    private final static int TTL = 1000;
-    private int source, destination;
+    private int source, destination, TTL;
     private final ArrayList<Node_OSPF> nodes = new ArrayList<>();
     private final ArrayList<Edge> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge> adjMat = new HashMap2D<>();
-    private int success, currentTime;
+    private int success, failure, currentTime;
 
     /**
      * Retrieve the current load of the network's nodes
@@ -42,7 +41,14 @@ public class OSPF implements AlgorithmBase {
         return ret;
     }
 
-    public OSPF() {}
+    /**
+     * Initialize OSPF
+     *
+     * @param _TTL Time To Live of packets
+     */
+    public OSPF(int _TTL) {
+        TTL = _TTL;
+    }
 
     /**
      * Initialize OSPF
@@ -145,6 +151,10 @@ public class OSPF implements AlgorithmBase {
             if (packet.destination == node.nodeID) {
                 ++success;
                 continue;
+            } else if (!packet.isValid(currentTime)) {
+                ++failure;
+                ++left; // "Skip" this packet
+                continue;
             }
             int nxt = node.nextHop(packet);
             adjMat.get(node.nodeID, nxt).addPacket(packet, currentTime);
@@ -189,8 +199,8 @@ public class OSPF implements AlgorithmBase {
             if (node.isOffline) continue;
             processNode(node);
         }
-        Pair<Integer, Integer> ret = new Pair<>(success, 0);
-        success = 0;
+        Pair<Integer, Integer> ret = new Pair<>(success, failure);
+        success = failure = 0;
         return ret;
     }
 

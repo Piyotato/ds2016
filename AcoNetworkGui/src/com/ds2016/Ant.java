@@ -56,7 +56,7 @@ class Ant extends Packet {
      * @return The next node
      */
     int nextNode() {
-        return path.get(path.size() - 2);
+        return path.get(path.size() - 1);
     }
 
     /**

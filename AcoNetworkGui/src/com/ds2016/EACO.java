@@ -198,6 +198,8 @@ public class EACO implements AlgorithmBase {
                         nxt = -nxt;
                     }
                     adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
+                } else {
+                    ++left; // "Skip" this packet
                 }
             }
         }
@@ -237,14 +239,15 @@ public class EACO implements AlgorithmBase {
     private void generatePackets() {
         Node_EACO src = nodes.get(source);
         // Send packets from source node
-        for (int a = 0; a < src.speed - 1; ++a) {
+        for (int a = 0; a < src.speed; ++a) {
             src.slowQ.add(new Packet(source, destination, TTL, currentTime));
         }
         // Send ants from all nodes
         if (currentTime % interval == 0) {
             Random rand = new Random();
             for (Node_EACO node: nodes) {
-                int randomNode = rand.nextInt(nodes.size());
+                int randomNode;
+                while ((randomNode = rand.nextInt(nodes.size())) == node.nodeID);
                 node.fastQ.add(new Ant(node.nodeID, randomNode, TTL, currentTime));
             }
         }
@@ -294,7 +297,7 @@ public class EACO implements AlgorithmBase {
         // Edges
         for (SimpleEdge edge: _edgeList) {
             Edge_ACO forward = new Edge_ACO(edge.source, edge.destination, edge.cost);
-            Edge_ACO backward = new Edge_ACO(edge.destination, edge.cost, edge.cost);
+            Edge_ACO backward = new Edge_ACO(edge.destination, edge.source, edge.cost);
             if (edge.isOffline) {
                 forward.isOffline = true;
                 backward.isOffline = true;
