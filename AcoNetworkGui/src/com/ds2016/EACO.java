@@ -185,6 +185,7 @@ class EACO implements AlgorithmBase {
                 ant.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
                 adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
             } else { // Forward ant
+                ant.tabuList.add(node.nodeID);
                 Integer nxt;
                 if (ant.destination == node.nodeID) {
                     ant.isBackwards = true;
@@ -192,9 +193,9 @@ class EACO implements AlgorithmBase {
                     ant.timings.add((double) (node.slowQ.size() + node.fastQ.size()) / node.speed); // Depletion time
                     adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
                 } else if (ant.isValid(currentTime)) {
-                    nxt = node.antNextHop(ant);
+                    nxt = node.nextHop(ant);
                     if (nxt == null) {
-                        continue; // Too large a cycle
+                        continue;
                     }
                     ant.addNode(node.nodeID); // Add current node to path
                     if (nxt >= 0) { // If there was no cycle
@@ -219,6 +220,7 @@ class EACO implements AlgorithmBase {
         }
         while (!node.slowQ.isEmpty() && left-- > 0) {
             Packet packet = node.slowQ.poll();
+            packet.tabuList.add(node.nodeID);
             if (packet.destination == node.nodeID) {
                 ++success;
                 --packetCnt;
@@ -229,7 +231,12 @@ class EACO implements AlgorithmBase {
                 ++left;
                 continue;
             }
-            int nxt = node.packetNextHop(packet);
+            Integer nxt = node.nextHop(packet);
+            if (nxt == null) {
+                ++failure;
+                --packetCnt;
+                continue;
+            }
             packet.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
             if (!packet.isValid(packet.timestamp) && nxt != packet.destination) {
                 ++failure;
@@ -264,11 +271,14 @@ class EACO implements AlgorithmBase {
         if (currentTime % interval == 0) {
             Random rand = new Random();
             for (Node_EACO node: nodes) {
+                if (node.isOffline) continue;
                 if (node.fastQ.size() + node.slowQ.size() >= node.speed) {
                     continue; // Throttle
                 }
-                int randomNode;
-                while ((randomNode = rand.nextInt(nodes.size())) == node.nodeID);
+                int randomNode = rand.nextInt(nodes.size());
+                while (randomNode == node.nodeID || nodes.get(randomNode).isOffline) {
+                    randomNode = rand.nextInt(nodes.size());
+                }
                 node.fastQ.add(new Ant(node.nodeID, randomNode, TTL, currentTime));
             }
         }
@@ -308,7 +318,7 @@ class EACO implements AlgorithmBase {
      * @return Number of packets
      */
     public Pair<Integer, Integer> terminate() {
-        while(packetCnt > 0) {
+        while (packetCnt > 0) {
             ++currentTime;
             for (Edge_ACO edge: edgeList) {
                 if (edge.isOffline) continue;

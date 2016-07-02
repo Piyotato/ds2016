@@ -227,7 +227,7 @@ class OSPF implements AlgorithmBase {
      * @return Number of packets
      */
     public Pair<Integer, Integer> terminate() {
-        while(packetCnt > 0) {
+        while (packetCnt > 0) {
             ++currentTime;
             for (Edge edge: edgeList) {
                 if (edge.isOffline) continue;

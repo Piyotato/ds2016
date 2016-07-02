@@ -75,57 +75,25 @@ class Node_EACO {
      * Use heuristics to calculate the
      * next best hop, for a given destination
      *
-     * @param ant Ant being processed
+     * @param packet Packet being processed
      * @return Neighbour for next hop, or null if no candidates
      */
-    Integer antNextHop(Ant ant) {
+    Integer nextHop(Packet packet) {
         double RNG = Math.random(), totVal = .0;
         double beta = 1 - alpha;
         ArrayList<Pair<Integer, Double>> neighbours = new ArrayList<>(); // Neighbour, Heuristic
         for (Edge_ACO edge: adjMat.get(nodeID).values()) {
             if (edge.isOffline) continue; // Link is offline
             if (nodes.get(edge.destination).isOffline) continue; // Node is offline
-            if (!ant.canVisit(edge.destination)) continue; // Cycle detection
-            Double tau = pheromone.get(ant.destination, edge.destination); // Pheromone
+            if (!packet.canVisit(edge.destination)) continue; // Cycle detection
+            Double tau = pheromone.get(packet.destination, edge.destination); // Pheromone
             if (tau == null) continue; // Not viable
             Double eta = 1. / edge.cost; // 1 / Distance
             neighbours.add(new Pair<>(edge.destination, Math.pow(tau, alpha) * Math.pow(eta, beta)));
             totVal += neighbours.get(neighbours.size() - 1).getValue();
         }
         if (neighbours.isEmpty()) {
-            int cycleSize = ant.getCycleSize(adjMat.get(ant.source).values());
-            if (cycleSize * 2 <= ant.path.size()) {
-                return -ant.deleteCycle(adjMat.get(ant.source).values()); // -ve to indicate a cycle
-            } else {
-                return null; // Just give up
-            }
-        }
-        for (Pair<Integer, Double> neighbour: neighbours) {
-            RNG -= neighbour.getValue() / totVal;
-            if (RNG <= EPS) return neighbour.getKey();
-        }
-        return neighbours.get(neighbours.size() - 1).getKey();
-    }
-
-    /**
-     * Use heuristics to calculate the
-     * next best hop, for a given destination
-     *
-     * @param packet Packet being processed
-     * @return Neighbour for next hop
-     */
-    int packetNextHop(Packet packet) {
-        double RNG = Math.random(), totVal = .0;
-        double beta = 1 - alpha;
-        ArrayList<Pair<Integer, Double>> neighbours = new ArrayList<>(); // Neighbour, Heuristic
-        for (Edge_ACO edge: adjMat.get(nodeID).values()) {
-            if (edge.isOffline) continue; // Link is offline
-            if (nodes.get(edge.destination).isOffline) continue; // Node is offline
-            Double tau = pheromone.get(packet.destination, edge.destination); // Pheromone
-            if (tau == null) continue; // Not viable
-            Double eta = 1. / edge.cost; // 1 / Distance
-            neighbours.add(new Pair<>(edge.destination, Math.pow(tau, alpha) * Math.pow(eta, beta)));
-            totVal += neighbours.get(neighbours.size() - 1).getValue();
+            return null;
         }
         for (Pair<Integer, Double> neighbour: neighbours) {
             RNG -= neighbour.getValue() / totVal;
