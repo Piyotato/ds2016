@@ -96,11 +96,11 @@ public class EACO implements AlgorithmBase {
         Node_EACO node = nodes.get(ID);
         node.isOffline ^= true;
         if (node.isOffline) {
-            failure += countInvalid(node);
+            packetCnt -= node.slowQ.size();
             node.fastQ.clear();
             node.slowQ.clear();
-            for (Edge_ACO edge: edgeList) {
-                if (edge.source != ID && edge.destination != ID) continue;
+            for (Edge_ACO edge: adjMat.get(ID).values()) {
+                packetCnt -= edge.packets.size();
                 edge.packets.clear();
                 edge.ants.clear();
             }
@@ -144,6 +144,8 @@ public class EACO implements AlgorithmBase {
         forward.isOffline ^= true;
         backward.isOffline ^= true;
         if (forward.isOffline) {
+            packetCnt -= forward.packets.size();
+            packetCnt -= backward.packets.size();
             forward.packets.clear();
             forward.ants.clear();
             backward.packets.clear();
@@ -272,27 +274,6 @@ public class EACO implements AlgorithmBase {
         while (src.slowQ.size() < src.speed) {
             src.slowQ.add(new Packet(source, destination, TTL, currentTime));
         }
-    }
-
-    /**
-     * Counts how many packets would expire in Node
-     * @param node Node being processed
-     *
-     * @return Number of packets
-     */
-    private int countInvalid(Node_EACO node) {
-        int cnt = 0, numInFront = node.fastQ.size();
-        ArrayDeque<Packet> dupe = node.slowQ;
-        while (!dupe.isEmpty()) { // Go through packets
-            int timeTaken = numInFront / node.speed;
-            Packet cur = dupe.poll();
-            if (!cur.isValid(currentTime + timeTaken)) {
-                ++cnt;
-            } else {
-                ++numInFront;
-            }
-        }
-        return cnt;
     }
 
     /**

@@ -89,10 +89,10 @@ public class OSPF implements AlgorithmBase {
         Node_OSPF node = nodes.get(ID);
         node.isOffline ^= true;
         if (node.isOffline) {
-            failure += countInvalid(node);
+            packetCnt -= node.Q.size();
             node.Q.clear();
-            for (Edge edge: edgeList) {
-                if (edge.source != ID || edge.destination != ID) continue;
+            for (Edge edge: adjMat.get(ID).values()) {
+                packetCnt -= edge.packets.size();
                 edge.packets.clear();
             }
         }
@@ -135,6 +135,8 @@ public class OSPF implements AlgorithmBase {
         forward.isOffline ^= true;
         backward.isOffline ^= true;
         if (forward.isOffline) {
+            packetCnt -= forward.packets.size();
+            packetCnt -= backward.packets.size();
             forward.packets.clear();
             backward.packets.clear();
         }
@@ -194,27 +196,6 @@ public class OSPF implements AlgorithmBase {
         while (src.Q.size() < src.speed) {
             src.Q.add(new Packet(source, destination, TTL, currentTime));
         }
-    }
-
-    /**
-     * Counts how many packets would expire in Node
-     * @param node Node being processed
-     *
-     * @return Number of packets
-     */
-    private int countInvalid(Node_OSPF node) {
-        int cnt = 0, numInFront = 0;
-        ArrayDeque<Packet> dupe = node.Q;
-        while (!dupe.isEmpty()) { // Go through packets
-            int timeTaken = numInFront / node.speed;
-            Packet cur = dupe.poll();
-            if (!cur.isValid(currentTime + timeTaken)) {
-                ++cnt;
-            } else {
-                ++numInFront;
-            }
-        }
-        return cnt;
     }
 
     /**
