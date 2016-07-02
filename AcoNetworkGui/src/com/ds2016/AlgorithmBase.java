@@ -27,5 +27,5 @@ interface AlgorithmBase {
 
     void init(int source, int destination);
 
-    int terminate();
+    Pair<Integer, Integer> terminate();
 }

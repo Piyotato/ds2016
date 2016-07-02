@@ -245,7 +245,7 @@ public class OSPF implements AlgorithmBase {
      *
      * @return Number of packets
      */
-    public int terminate() {
+    public Pair<Integer, Integer> terminate() {
         while(packetCnt > 0) {
             for (Edge edge: edgeList) {
                 if (edge.isOffline) continue;
@@ -256,7 +256,7 @@ public class OSPF implements AlgorithmBase {
                 processNode(node);
             }
         }
-        return failure;
+        return new Pair<>(success, failure);
     }
 
     /**

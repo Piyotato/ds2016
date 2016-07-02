@@ -322,7 +322,7 @@ public class EACO implements AlgorithmBase {
      *
      * @return Number of packets
      */
-    public int terminate() {
+    public Pair<Integer, Integer> terminate() {
         while(packetCnt > 0) {
             for (Edge_ACO edge: edgeList) {
                 if (edge.isOffline) continue;
@@ -333,7 +333,7 @@ public class EACO implements AlgorithmBase {
                 processNode(node);
             }
         }
-        return failure;
+        return new Pair<>(success, failure);
     }
 
     /**
