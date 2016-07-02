@@ -2,6 +2,7 @@ package com.ds2016;
 
 import javafx.util.Pair;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -16,7 +17,7 @@ public class AntNet implements AlgorithmBase {
     private final ArrayList<Edge_ACO> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat = new HashMap2D<>();
     private final ArrayList<Node_AntNet> nodes = new ArrayList<>();
-    private int success, failure, currentTime;
+    private int success, failure, currentTime, packetCnt;
 
     /**
      * Initialize EACO
@@ -38,6 +39,8 @@ public class AntNet implements AlgorithmBase {
      * @param _destination Destination node
      */
     public void init(int _source, int _destination) {
+        currentTime = 0;
+        packetCnt = 0;
         source = _source;
         destination = _destination;
         for (Node_AntNet node: nodes) {
@@ -93,6 +96,7 @@ public class AntNet implements AlgorithmBase {
         Node_AntNet node = nodes.get(ID);
         node.isOffline ^= true;
         if (node.isOffline) {
+            failure += countInvalid(node);
             node.fastQ.clear();
             node.slowQ.clear();
             for (Edge_ACO edge: edgeList) {
@@ -183,7 +187,7 @@ public class AntNet implements AlgorithmBase {
                 if (ant.destination == node.nodeID) {
                     ant.isBackwards = true;
                     nxt = ant.nextNode();
-                    ant.timings.add((double)node.slowQ.size() / node.speed); // Time spent on this node
+                    ant.timings.add((double) (node.slowQ.size() + node.fastQ.size()) / node.speed); // Depletion time
                     adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
                 } else if (ant.isValid(currentTime)) {
                     nxt = node.antNextHop(ant);
@@ -192,7 +196,7 @@ public class AntNet implements AlgorithmBase {
                     }
                     ant.addNode(node.nodeID); // Add current node to path
                     if (nxt >= 0) { // If there was no cycle
-                        ant.timings.add((double) node.slowQ.size() / node.speed); // Time spent on this node
+                        ant.timings.add((double) (node.slowQ.size() + node.fastQ.size()) / node.speed); // Depletion time
                         ant.timings.add((double) adjMat.get(node.nodeID, nxt).cost);
                     } else {
                         nxt = -nxt;
@@ -207,13 +211,21 @@ public class AntNet implements AlgorithmBase {
             Packet packet = node.slowQ.poll();
             if (packet.destination == node.nodeID) {
                 ++success;
+                --packetCnt;
                 continue;
             } else if (!packet.isValid(currentTime)) {
                 ++failure;
+                --packetCnt;
+                ++left;
                 continue;
             }
             int nxt = node.packetNextHop(packet);
             packet.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
+            if (!packet.isValid(packet.timestamp)) {
+                ++failure;
+                --packetCnt;
+                continue; // Would expire before reaching
+            }
             adjMat.get(node.nodeID, nxt).addPacket(packet, currentTime);
         }
     }
@@ -252,9 +264,31 @@ public class AntNet implements AlgorithmBase {
         }
         Node_AntNet src = nodes.get(source);
         // Send packets from source node
+        packetCnt += Math.max(src.speed - src.slowQ.size(), 0);
         while (src.slowQ.size() < src.speed) {
             src.slowQ.add(new Packet(source, destination, TTL, currentTime));
         }
+    }
+
+    /**
+     * Counts how many packets would expire in Node
+     * @param node Node being processed
+     *
+     * @return Number of packets
+     */
+    private int countInvalid(Node_AntNet node) {
+        int cnt = 0, numInFront = node.fastQ.size();
+        ArrayDeque<Packet> dupe = node.slowQ;
+        while (!dupe.isEmpty()) { // Go through packets
+            int timeTaken = numInFront / node.speed;
+            Packet cur = dupe.poll();
+            if (!cur.isValid(currentTime + timeTaken)) {
+                ++cnt;
+            } else {
+                ++numInFront;
+            }
+        }
+        return cnt;
     }
 
     /**
@@ -276,6 +310,26 @@ public class AntNet implements AlgorithmBase {
         Pair<Integer, Integer> ret = new Pair<>(success, failure);
         success = failure = 0;
         return ret;
+    }
+
+    /**
+     * Count the number of packets
+     * that will eventually expire
+     *
+     * @return Number of packets
+     */
+    public int terminate() {
+        while(packetCnt > 0) {
+            for (Edge_ACO edge: edgeList) {
+                if (edge.isOffline) continue;
+                processEdge(edge);
+            }
+            for (Node_AntNet node: nodes) {
+                if (node.isOffline) continue;
+                processNode(node);
+            }
+        }
+        return failure;
     }
 
     /**

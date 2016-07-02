@@ -3,6 +3,7 @@ package com.ds2016;
 import javafx.util.*;
 
 import java.util.ArrayList;
+import java.util.ArrayDeque;
 
 /**
  * Created by damian on 28/5/16.
@@ -13,7 +14,32 @@ public class OSPF implements AlgorithmBase {
     private final ArrayList<Node_OSPF> nodes = new ArrayList<>();
     private final ArrayList<Edge> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge> adjMat = new HashMap2D<>();
-    private int success, failure, currentTime;
+    private int success, failure, currentTime, packetCnt;
+
+    /**
+     * Initialize OSPF
+     *
+     * @param _TTL Time To Live of packets
+     */
+    public OSPF(int _TTL) {
+        TTL = _TTL;
+    }
+
+    /**
+     * Initialize OSPF
+     *
+     * @param _source Source node
+     * @param _destination Destination node
+     */
+    public void init(int _source, int _destination) {
+        currentTime = 0;
+        packetCnt = 0;
+        source = _source;
+        destination = _destination;
+        for (Node_OSPF node: nodes) {
+            node.update();
+        }
+    }
 
     /**
      * Retrieve the current load of the network's nodes
@@ -42,29 +68,6 @@ public class OSPF implements AlgorithmBase {
     }
 
     /**
-     * Initialize OSPF
-     *
-     * @param _TTL Time To Live of packets
-     */
-    public OSPF(int _TTL) {
-        TTL = _TTL;
-    }
-
-    /**
-     * Initialize OSPF
-     *
-     * @param _source Source node
-     * @param _destination Destination node
-     */
-    public void init(int _source, int _destination) {
-        source = _source;
-        destination = _destination;
-        for (Node_OSPF node: nodes) {
-            node.update();
-        }
-    }
-
-    /**
      * Add a new node
      *
      * @param speed Processing speed
@@ -86,6 +89,7 @@ public class OSPF implements AlgorithmBase {
         Node_OSPF node = nodes.get(ID);
         node.isOffline ^= true;
         if (node.isOffline) {
+            failure += countInvalid(node);
             node.Q.clear();
             for (Edge edge: edgeList) {
                 if (edge.source != ID || edge.destination != ID) continue;
@@ -150,14 +154,21 @@ public class OSPF implements AlgorithmBase {
             Packet packet = node.Q.poll();
             if (packet.destination == node.nodeID) {
                 ++success;
+                --packetCnt;
                 continue;
             } else if (!packet.isValid(currentTime)) {
                 ++failure;
+                --packetCnt;
                 ++left; // "Skip" this packet
                 continue;
             }
             int nxt = node.nextHop(packet);
             packet.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
+            if (!packet.isValid(packet.timestamp)) {
+                ++failure;
+                --packetCnt;
+                continue; // Would expire before reaching
+            }
             adjMat.get(node.nodeID, nxt).addPacket(packet, currentTime);
         }
     }
@@ -179,9 +190,31 @@ public class OSPF implements AlgorithmBase {
      */
     private void generatePackets() {
         Node_OSPF src = nodes.get(source);
+        packetCnt += Math.max(src.speed - src.Q.size(), 0);
         while (src.Q.size() < src.speed) {
-            src.Q.add(new Packet(source, destination, TTL, 0));
+            src.Q.add(new Packet(source, destination, TTL, currentTime));
         }
+    }
+
+    /**
+     * Counts how many packets would expire in Node
+     * @param node Node being processed
+     *
+     * @return Number of packets
+     */
+    private int countInvalid(Node_OSPF node) {
+        int cnt = 0, numInFront = 0;
+        ArrayDeque<Packet> dupe = node.Q;
+        while (!dupe.isEmpty()) { // Go through packets
+            int timeTaken = numInFront / node.speed;
+            Packet cur = dupe.poll();
+            if (!cur.isValid(currentTime + timeTaken)) {
+                ++cnt;
+            } else {
+                ++numInFront;
+            }
+        }
+        return cnt;
     }
 
     /**
@@ -203,6 +236,27 @@ public class OSPF implements AlgorithmBase {
         Pair<Integer, Integer> ret = new Pair<>(success, failure);
         success = failure = 0;
         return ret;
+    }
+
+
+    /**
+     * Count the number of packets
+     * that will eventually expire
+     *
+     * @return Number of packets
+     */
+    public int terminate() {
+        while(packetCnt > 0) {
+            for (Edge edge: edgeList) {
+                if (edge.isOffline) continue;
+                processEdge(edge);
+            }
+            for (Node_OSPF node: nodes) {
+                if (node.isOffline) continue;
+                processNode(node);
+            }
+        }
+        return failure;
     }
 
     /**

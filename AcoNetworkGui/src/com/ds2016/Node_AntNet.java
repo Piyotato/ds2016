@@ -4,7 +4,6 @@ import javafx.util.Pair;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Queue;
 
 /**
  * Created by damian on 27/5/16.
@@ -15,8 +14,8 @@ class Node_AntNet {
 
     final int speed, nodeID;
     final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node
-    final Queue<Ant> fastQ = new ArrayDeque<>();
-    final Queue<Packet> slowQ = new ArrayDeque<>();
+    final ArrayDeque<Ant> fastQ = new ArrayDeque<>();
+    final ArrayDeque<Packet> slowQ = new ArrayDeque<>();
     private final double alpha;
     private final ArrayList<Node_AntNet> nodes;
     private final ArrayList<Edge_ACO> edgeList;

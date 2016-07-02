@@ -28,7 +28,6 @@ class Edge_ACO extends Edge {
      */
     void addAnt(Ant ant, int currentTime) {
         ant.timestamp = currentTime + cost;
-        ant.totalTime += cost;
         ants.add(ant);
     }
 }
