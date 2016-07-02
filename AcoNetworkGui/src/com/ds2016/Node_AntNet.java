@@ -168,7 +168,7 @@ class Node_AntNet {
             if (a == neighbour) continue;
             Double val = pheromone.get(destination, a);
             if (val != null) {
-                pheromone.put(destination, a, val * (1 + change / tot));
+                pheromone.put(destination, a, val * (1 - change / tot));
             }
         }
     }
