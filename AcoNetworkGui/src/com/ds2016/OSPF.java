@@ -32,8 +32,6 @@ class OSPF implements AlgorithmBase {
      * @param _destination Destination node
      */
     public void init(int _source, int _destination) {
-        currentTime = 0;
-        packetCnt = 0;
         source = _source;
         destination = _destination;
         for (Node_OSPF node: nodes) {

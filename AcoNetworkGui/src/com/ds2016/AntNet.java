@@ -38,8 +38,6 @@ class AntNet implements AlgorithmBase {
      * @param _destination Destination node
      */
     public void init(int _source, int _destination) {
-        currentTime = 0;
-        packetCnt = 0;
         source = _source;
         destination = _destination;
         for (Node_AntNet node: nodes) {
@@ -185,7 +183,7 @@ class AntNet implements AlgorithmBase {
                 ant.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
                 adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
             } else { // Forward ant
-                ant.tabuList.add(node.nodeID);
+                ant.addNode(node.nodeID);
                 Integer nxt;
                 if (ant.destination == node.nodeID) {
                     ant.isBackwards = true;
@@ -197,7 +195,6 @@ class AntNet implements AlgorithmBase {
                     if (nxt == null) {
                         continue;
                     }
-                    ant.addNode(node.nodeID); // Add current node to path
                     if (nxt >= 0) { // If there was no cycle
                         ant.timings.add((double) (node.slowQ.size() + node.fastQ.size()) / node.speed); // Depletion time
                         ant.timings.add((double) adjMat.get(node.nodeID, nxt).cost);

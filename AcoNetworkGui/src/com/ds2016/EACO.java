@@ -38,8 +38,6 @@ class EACO implements AlgorithmBase {
      * @param _destination Destination node
      */
     public void init(int _source, int _destination) {
-        currentTime = 0;
-        packetCnt = 0;
         source = _source;
         destination = _destination;
         for (Node_EACO node: nodes) {
@@ -105,7 +103,7 @@ class EACO implements AlgorithmBase {
             }
         }
         for (Node_EACO _node: nodes) {
-            _node.toggleNode(ID);
+            _node.rebuild();
         }
     }
 
@@ -128,7 +126,7 @@ class EACO implements AlgorithmBase {
         adjMat.put(node1, node2, forward);
         adjMat.put(node2, node1, backward);
         for (Node_EACO node: nodes) {
-            node.addEdge(node1, node2);
+            node.rebuild();
         }
     }
 
@@ -151,8 +149,7 @@ class EACO implements AlgorithmBase {
             backward.ants.clear();
         }
         for (Node_EACO node: nodes) {
-            node.toggleEdge(ID * 2);
-            node.toggleEdge(ID * 2 + 1);
+            node.rebuild();
         }
     }
 
@@ -185,7 +182,7 @@ class EACO implements AlgorithmBase {
                 ant.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
                 adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
             } else { // Forward ant
-                ant.tabuList.add(node.nodeID);
+                ant.addNode(node.nodeID);
                 Integer nxt;
                 if (ant.destination == node.nodeID) {
                     ant.isBackwards = true;
@@ -197,7 +194,6 @@ class EACO implements AlgorithmBase {
                     if (nxt == null) {
                         continue;
                     }
-                    ant.addNode(node.nodeID); // Add current node to path
                     if (nxt >= 0) { // If there was no cycle
                         ant.timings.add((double) (node.slowQ.size() + node.fastQ.size()) / node.speed); // Depletion time
                         ant.timings.add((double) adjMat.get(node.nodeID, nxt).cost);

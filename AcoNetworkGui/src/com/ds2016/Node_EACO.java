@@ -67,6 +67,7 @@ class Node_EACO {
         DSU = new UFDS(nodes.size());
         for (SimpleEdge edge: edgeList) {
             if (edge.source == nodeID || edge.destination == nodeID) continue;
+            if (edge.isOffline) continue;
             DSU.unionSet(edge.source, edge.destination);
         }
     }
@@ -103,90 +104,33 @@ class Node_EACO {
     }
 
     /**
-     * React to toggling of a node
-     *
-     * @param ID Node ID
+     * Rebuild DSU
+     * Update heuristic
      */
-    void toggleNode(int ID) {
-        if (nodes.get(ID).isOffline) {
-            update(null);
-        } else {
-            for (Edge_ACO edge: adjMat.get(ID).values()) {
-                if (!edge.isOffline) {
-                    DSU.unionSet(ID, edge.destination);
-                }
-            }
-            update(ID);
-        }
-    }
-
-    /**
-     * React to addition of an edge
-     *
-     * @param node1 First Node
-     * @param node2 Second Node
-     */
-    void addEdge(int node1, int node2) {
-        DSU.unionSet(node1, node2);
-        update(node2); // OR: node1
-    }
-
-    /**
-     * React to toggling of an edge
-     *
-     * @param ID Edge ID
-     */
-    void toggleEdge(int ID) {
-        Edge_ACO edge = edgeList.get(ID);
-        if (edge.isOffline) {
-            update(null);
-        } else {
-            DSU.unionSet(edge.source, edge.destination);
-            update(edge.destination); // OR edge.source
-        }
-    }
-
-    /**
-     * Update DSU and heuristic
-     *
-     * @param node Updated node, or null if full rebuild
-     */
-    private void update(Integer node) {
-        ArrayList<Edge_ACO> neighbours = new ArrayList<>();
+    void rebuild() {
+        ArrayList<Integer> neighbours = new ArrayList<>();
         ArrayList<Integer> destinations = new ArrayList<>();
-        if (node == null) {
-            initDSU();
-            neighbours = new ArrayList<>(adjMat.get(nodeID).values());
-            for (int a = 0; a < nodes.size(); ++a) {
-                if (a == nodeID) continue;
-                destinations.add(a);
-            }
-        } else {
-            for (Edge_ACO edge: adjMat.get(nodeID).values()) { // Affected neighbours
-                if (DSU.sameSet(edge.destination, node)) {
-                    neighbours.add(edge);
-                }
-            }
-            for (int a = 0; a < nodes.size(); ++a) { // Affected destinations
-                if (a == nodeID) continue;
-                if (DSU.sameSet(a, node)) {
-                    destinations.add(a);
-                }
-            }
+        initDSU();
+        for (Edge_ACO edge: adjMat.get(nodeID).values()) {
+            neighbours.add(edge.destination);
         }
-        for (Edge_ACO edge: neighbours) {
+        for (int a = 0; a < nodes.size(); ++a) {
+            if (a == nodeID) continue;
+            destinations.add(a);
+        }
+        for (Integer neighbour: neighbours) {
             for (Integer dest: destinations) {
-                Double prev = pheromone.get(dest, edge.destination);
+                Double prev = pheromone.get(dest, neighbour);
                 if (prev == null) { // Previously not viable
-                    if (DSU.sameSet(edge.destination, dest) &&
-                            !edge.isOffline &&
-                            !nodes.get(edge.destination).isOffline) // Now viable
-                        addHeuristic(edge.destination, dest);
+                    if (DSU.sameSet(neighbour, dest) &&
+                            !adjMat.get(nodeID, neighbour).isOffline &&
+                            !nodes.get(neighbour).isOffline) // Now viable
+                        addHeuristic(neighbour, dest);
                 } else { // Previously viable
-                    if (!DSU.sameSet(edge.destination, dest) ||
-                            edge.isOffline ||
-                            nodes.get(edge.destination).isOffline) // Now not viable
-                        removeHeuristic(edge.destination, dest);
+                    if (!DSU.sameSet(neighbour, dest) ||
+                            adjMat.get(nodeID, neighbour).isOffline ||
+                            nodes.get(neighbour).isOffline) // Now not viable
+                        removeHeuristic(neighbour, dest);
                 }
             }
         }
@@ -219,7 +163,7 @@ class Node_EACO {
             if (a == neighbour) continue;
             Double val = pheromone.get(destination, a);
             if (val != null) {
-                pheromone.put(destination, a, val * (1 + change / tot));
+                pheromone.put(destination, a, val * (1 - change / tot));
             }
         }
     }

@@ -22,7 +22,6 @@ class Ant extends Packet {
      */
     Ant(int _source, int _destination, int _TTL, int _creation) {
         super(_source, _destination, _TTL, _creation);
-        path.add(_source);
     }
 
     /**
@@ -33,6 +32,7 @@ class Ant extends Packet {
      */
     void addNode(int node) {
         path.add(node);
+        tabuList.add(node);
     }
 
     /**
@@ -52,7 +52,7 @@ class Ant extends Packet {
      * @return The next node
      */
     int nextNode() {
-        return path.get(path.size() - 1);
+        return path.get(path.size() - 2);
     }
 
     /**
