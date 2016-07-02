@@ -301,6 +301,7 @@ public class AntNet implements AlgorithmBase {
      */
     public Pair<Integer, Integer> terminate() {
         while(packetCnt > 0) {
+            ++currentTime;
             for (Edge_ACO edge: edgeList) {
                 if (edge.isOffline) continue;
                 processEdge(edge);
