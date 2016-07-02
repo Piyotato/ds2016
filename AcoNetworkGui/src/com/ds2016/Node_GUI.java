@@ -3,7 +3,7 @@ package com.ds2016;
 /**
  * Created by damian on 1/7/16.
  */
-public class Node_GUI {
+class Node_GUI {
 
     final int speed;
     boolean isOffline;

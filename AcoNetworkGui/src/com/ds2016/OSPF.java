@@ -3,14 +3,14 @@ package com.ds2016;
 import javafx.util.*;
 
 import java.util.ArrayList;
-import java.util.ArrayDeque;
 
 /**
  * Created by damian on 28/5/16.
  */
-public class OSPF implements AlgorithmBase {
+class OSPF implements AlgorithmBase {
 
-    private int source, destination, TTL;
+    private int source, destination;
+    private final int TTL;
     private final ArrayList<Node_OSPF> nodes = new ArrayList<>();
     private final ArrayList<Edge> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge> adjMat = new HashMap2D<>();
@@ -166,7 +166,7 @@ public class OSPF implements AlgorithmBase {
             }
             int nxt = node.nextHop(packet);
             packet.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
-            if (!packet.isValid(packet.timestamp)) {
+            if (!packet.isValid(packet.timestamp) && nxt != packet.destination) {
                 ++failure;
                 --packetCnt;
                 continue; // Would expire before reaching

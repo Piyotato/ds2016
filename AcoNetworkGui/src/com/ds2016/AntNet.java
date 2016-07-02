@@ -2,14 +2,13 @@ package com.ds2016;
 
 import javafx.util.Pair;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Random;
 
 /**
  * Created by damian on 28/5/16.
  */
-public class AntNet implements AlgorithmBase {
+class AntNet implements AlgorithmBase {
 
     private final double alpha;
     private final int TTL, interval;
@@ -183,6 +182,7 @@ public class AntNet implements AlgorithmBase {
                 if (nodes.get(nxt).isOffline || adjMat.get(node.nodeID, nxt).isOffline) {
                     continue; // Path is gone
                 }
+                ant.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
                 adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
             } else { // Forward ant
                 Integer nxt;
@@ -200,8 +200,16 @@ public class AntNet implements AlgorithmBase {
                     if (nxt >= 0) { // If there was no cycle
                         ant.timings.add((double) (node.slowQ.size() + node.fastQ.size()) / node.speed); // Depletion time
                         ant.timings.add((double) adjMat.get(node.nodeID, nxt).cost);
+                        ant.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
+                        if (!ant.isValid(ant.timestamp) && nxt != ant.destination) {
+                            continue; // Would expire before reaching
+                        }
                     } else {
                         nxt = -nxt;
+                        ant.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
+                        if (!ant.isValid(ant.timestamp)) { // nxt can't be destination
+                            continue;
+                        }
                     }
                     adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
                 } else {
@@ -223,7 +231,7 @@ public class AntNet implements AlgorithmBase {
             }
             int nxt = node.packetNextHop(packet);
             packet.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
-            if (!packet.isValid(packet.timestamp)) {
+            if (!packet.isValid(packet.timestamp) && nxt != packet.destination) {
                 ++failure;
                 --packetCnt;
                 continue; // Would expire before reaching
