@@ -176,11 +176,12 @@ class Node_EACO {
      * @param destination Destination ID
      */
     private void addHeuristic(int neighbour, int destination) {
-        int cnt = 0;
+        int numNeighbours = 0;
         for (Edge_ACO edge: adjMat.get(nodeID).values()) {
-            if (DSU.sameSet(edge.destination, destination)) ++cnt;
+            if (edge.isOffline || nodes.get(edge.destination).isOffline) continue;
+            if (DSU.sameSet(edge.destination, destination)) ++numNeighbours;
         }
-        updateHeuristic(neighbour, destination, 1. / cnt);
+        updateHeuristic(neighbour, destination, 1. / numNeighbours);
     }
 
     /**

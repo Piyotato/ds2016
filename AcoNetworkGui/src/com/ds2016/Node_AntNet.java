@@ -180,7 +180,12 @@ class Node_AntNet {
      * @param destination Destination ID
      */
     private void addHeuristic(int neighbour, int destination) {
-        updateHeuristic(neighbour, destination, 1. / adjMat.get(nodeID).size());
+        int numNeighbours = 0; // Number of online neighbours
+        for (Edge_ACO edge: adjMat.get(nodeID).values()) {
+            if (!edge.isOffline && !nodes.get(edge.destination).isOffline)
+                ++numNeighbours;
+        }
+        updateHeuristic(neighbour, destination, 1. / numNeighbours);
     }
 
     /**
