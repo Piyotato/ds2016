@@ -82,38 +82,30 @@ class Node_AntNet {
     /**
      * React to addition of an edge
      *
-     * @param node1 First Node
-     * @param node2 Second Node
+     * @param node Other Node
      */
-    void addEdge(int node1, int node2) {
-        /* Only care about neighbours */
-        if (node1 != nodeID && node2 != nodeID) return;
-        int otherNode = (node1 == nodeID ? node2: node1);
+    void addEdge(int node) {
         for (int a = 0; a < nodes.size(); ++a) {
             if (a == nodeID) continue;
-            addHeuristic(otherNode, a);
+            addHeuristic(node, a);
         }
     }
 
     /**
      * React to toggling of an edge
      *
-     * @param ID Edge ID
+     * @param node Other Node
      */
-    void toggleEdge(int ID) {
-        /* Only care about neighbours */
-        Edge_ACO edge = edgeList.get(ID * 2);
-        if (edge.source != nodeID && edge.destination != nodeID) return;
-        int otherNode = (edge.source == nodeID ? edge.destination : edge.source);
-        if (edge.isOffline) {
+    void toggleEdge(int node) {
+        if (adjMat.get(nodeID, node).isOffline) {
             for (int a = 0; a < nodes.size(); ++a) {
                 if (a == nodeID) continue;
-                removeHeuristic(otherNode, a);
+                removeHeuristic(node, a);
             }
         } else {
             for (int a = 0; a < nodes.size(); ++a) {
                 if (a == nodeID) continue;
-                addHeuristic(otherNode, a);
+                addHeuristic(node, a);
             }
         }
     }

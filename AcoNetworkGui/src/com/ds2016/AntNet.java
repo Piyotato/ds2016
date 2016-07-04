@@ -125,9 +125,8 @@ class AntNet implements AlgorithmBase {
         edgeList.add(backward);
         adjMat.put(node1, node2, forward);
         adjMat.put(node2, node1, backward);
-        for (Node_AntNet node: nodes) {
-            node.addEdge(node1, node2);
-        }
+        nodes.get(node1).addEdge(node2);
+        nodes.get(node2).addEdge(node1);
     }
 
     /**
@@ -148,9 +147,8 @@ class AntNet implements AlgorithmBase {
             backward.packets.clear();
             backward.ants.clear();
         }
-        for (Node_AntNet node: nodes) {
-            node.toggleEdge(ID);
-        }
+        nodes.get(forward.source).toggleEdge(forward.destination);
+        nodes.get(forward.destination).toggleEdge(forward.source);
     }
 
     /**
