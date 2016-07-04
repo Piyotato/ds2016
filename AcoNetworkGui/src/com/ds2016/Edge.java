@@ -12,9 +12,9 @@ class Edge extends SimpleEdge {
     /**
      * Initializes an edge
      *
-     * @param _source Start node
+     * @param _source      Start node
      * @param _destination End node
-     * @param _cost Time taken to traverse
+     * @param _cost        Time taken to traverse
      */
     Edge(int _source, int _destination, int _cost) {
         super(_source, _destination, _cost);
@@ -23,7 +23,7 @@ class Edge extends SimpleEdge {
     /**
      * Transmit a packet
      *
-     * @param packet Packet
+     * @param packet      Packet
      * @param currentTime Timestamp
      */
     void addPacket(Packet packet, int currentTime) {

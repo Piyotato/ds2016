@@ -8,6 +8,8 @@ import org.jfree.data.category.DefaultCategoryDataset;
 
 /**
  * Created by zwliew on 14/6/16.
+ *
+ * TODO: Unused currently; will be revisited in the future
  */
 public class LineGraph {
     private String title;

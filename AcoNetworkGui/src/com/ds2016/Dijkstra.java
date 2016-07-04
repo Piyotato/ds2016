@@ -1,6 +1,6 @@
 package com.ds2016;
 
-import javafx.util.*;
+import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -20,13 +20,13 @@ class Dijkstra {
      * Initialize Dijkstra data structure
      *
      * @param _source Source node
-     * @param _nodes ArrayList of Node_OSPF
+     * @param _nodes  ArrayList of Node_OSPF
      * @param _adjMat Adjacency Matrix
      */
     Dijkstra(int _source, ArrayList<Node_OSPF> _nodes, HashMap2D<Integer, Integer, Edge> _adjMat) {
         final ArrayList<Integer> D = new ArrayList<>();
         final Comparator<Pair<Integer, Integer>> pairCMP =
-                (Pair<Integer, Integer> lhs, Pair<Integer, Integer> rhs)->lhs.getKey().compareTo(rhs.getKey());
+                (Pair<Integer, Integer> lhs, Pair<Integer, Integer> rhs) -> lhs.getKey().compareTo(rhs.getKey());
         final PriorityQueue<Pair<Integer, Integer>> PQ = new PriorityQueue<>(_nodes.size(), pairCMP);
         for (int a = 0; a < _nodes.size(); ++a) {
             D.add(INF);
@@ -39,7 +39,7 @@ class Dijkstra {
         while (!PQ.isEmpty()) {
             Pair<Integer, Integer> top = PQ.poll();
             if (!D.get(top.getValue()).equals(top.getKey())) continue;
-            for (Edge edge: _adjMat.get(top.getValue()).values()) {
+            for (Edge edge : _adjMat.get(top.getValue()).values()) {
                 if (edge.isOffline) continue;
                 if (_nodes.get(edge.destination).isOffline) continue;
                 int nc = top.getKey() + edge.cost;

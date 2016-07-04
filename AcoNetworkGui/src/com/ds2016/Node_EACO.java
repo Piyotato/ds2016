@@ -26,11 +26,11 @@ class Node_EACO {
     /**
      * Initialize a node
      *
-     * @param _speed Processing speed
-     * @param _nodes ArrayList of Node_EACO
+     * @param _speed    Processing speed
+     * @param _nodes    ArrayList of Node_EACO
      * @param _edgeList ArrayList of Edge_ACO
-     * @param _adjMat Adjacency Matrix
-     * @param _alpha Weightage of pheromone
+     * @param _adjMat   Adjacency Matrix
+     * @param _alpha    Weightage of pheromone
      */
     Node_EACO(int _speed, ArrayList<Node_EACO> _nodes, ArrayList<Edge_ACO> _edgeList,
               HashMap2D<Integer, Integer, Edge_ACO> _adjMat, double _alpha) {
@@ -50,11 +50,11 @@ class Node_EACO {
         for (int a = 0; a < nodes.size(); ++a) { // For each destination
             if (a == nodeID) continue;
             int numNeighbours = 0; // Number of viable neighbours
-            for (Edge_ACO edge: adjMat.get(nodeID).values()) {
+            for (Edge_ACO edge : adjMat.get(nodeID).values()) {
                 if (edge.isOffline || nodes.get(edge.destination).isOffline) continue;
                 if (DSU.sameSet(edge.destination, a)) ++numNeighbours;
             }
-            for (Edge_ACO edge: adjMat.get(nodeID).values()) { // For each neighbour
+            for (Edge_ACO edge : adjMat.get(nodeID).values()) { // For each neighbour
                 pheromone.put(a, edge.destination, 1. / numNeighbours);
             }
         }
@@ -65,7 +65,7 @@ class Node_EACO {
      */
     private void initDSU() {
         DSU = new UFDS(nodes.size());
-        for (SimpleEdge edge: edgeList) {
+        for (SimpleEdge edge : edgeList) {
             if (edge.source == nodeID || edge.destination == nodeID) continue;
             if (edge.isOffline) continue;
             DSU.unionSet(edge.source, edge.destination);
@@ -83,7 +83,7 @@ class Node_EACO {
         double RNG = Math.random(), totVal = .0;
         double beta = 1 - alpha;
         ArrayList<Pair<Integer, Double>> neighbours = new ArrayList<>(); // Neighbour, Heuristic
-        for (Edge_ACO edge: adjMat.get(nodeID).values()) {
+        for (Edge_ACO edge : adjMat.get(nodeID).values()) {
             if (edge.isOffline) continue; // Link is offline
             if (nodes.get(edge.destination).isOffline) continue; // Node is offline
             if (!packet.canVisit(edge.destination)) continue; // Cycle detection
@@ -96,7 +96,7 @@ class Node_EACO {
         if (neighbours.isEmpty()) {
             return null;
         }
-        for (Pair<Integer, Double> neighbour: neighbours) {
+        for (Pair<Integer, Double> neighbour : neighbours) {
             RNG -= neighbour.getValue() / totVal;
             if (RNG <= EPS) return neighbour.getKey();
         }
@@ -111,15 +111,15 @@ class Node_EACO {
         ArrayList<Integer> neighbours = new ArrayList<>();
         ArrayList<Integer> destinations = new ArrayList<>();
         initDSU();
-        for (Edge_ACO edge: adjMat.get(nodeID).values()) {
+        for (Edge_ACO edge : adjMat.get(nodeID).values()) {
             neighbours.add(edge.destination);
         }
         for (int a = 0; a < nodes.size(); ++a) {
             if (a == nodeID) continue;
             destinations.add(a);
         }
-        for (Integer neighbour: neighbours) {
-            for (Integer dest: destinations) {
+        for (Integer neighbour : neighbours) {
+            for (Integer dest : destinations) {
                 Double prev = pheromone.get(dest, neighbour);
                 if (prev == null) { // Previously not viable
                     if (DSU.sameSet(neighbour, dest) &&
@@ -141,9 +141,9 @@ class Node_EACO {
      * Modifies other values proportionally to
      * achieve a sum of one
      *
-     * @param neighbour ID of neighbour
+     * @param neighbour   ID of neighbour
      * @param destination ID of destination
-     * @param change Pheromone change
+     * @param change      Pheromone change
      * @throws IllegalArgumentException
      */
     void updateHeuristic(int neighbour, int destination, double change) throws IllegalArgumentException {
@@ -172,12 +172,12 @@ class Node_EACO {
      * Add a neighbour to consideration
      * as it is viable now
      *
-     * @param neighbour Node ID
+     * @param neighbour   Node ID
      * @param destination Destination ID
      */
     private void addHeuristic(int neighbour, int destination) {
         int numNeighbours = 0;
-        for (Edge_ACO edge: adjMat.get(nodeID).values()) {
+        for (Edge_ACO edge : adjMat.get(nodeID).values()) {
             if (edge.isOffline || nodes.get(edge.destination).isOffline) continue;
             if (DSU.sameSet(edge.destination, destination)) ++numNeighbours;
         }
@@ -188,7 +188,7 @@ class Node_EACO {
      * Remove a neighbour from consideration
      * as it is not viable now
      *
-     * @param neighbour Node ID
+     * @param neighbour   Node ID
      * @param destination Destination ID
      */
     private void removeHeuristic(int neighbour, int destination) {

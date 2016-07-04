@@ -1,6 +1,6 @@
 package com.ds2016;
 
-import javafx.util.*;
+import javafx.util.Pair;
 
 import java.util.ArrayList;
 

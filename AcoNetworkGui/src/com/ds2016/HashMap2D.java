@@ -6,14 +6,14 @@ import java.util.HashMap;
  * Created by damian on 23/5/16.
  */
 class HashMap2D<K1, K2, V> {
-    
+
     private final HashMap<K1, HashMap<K2, V>> M = new HashMap<>();
 
     /**
      * Allocates a value to an entry
      *
-     * @param key1 First Key
-     * @param key2 Second Key
+     * @param key1  First Key
+     * @param key2  Second Key
      * @param value Value to be set
      * @return The previous value associated with key, or null if there was no mapping for key.
      */

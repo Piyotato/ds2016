@@ -1,6 +1,6 @@
 package com.ds2016;
 
-import javafx.util.*;
+import javafx.util.Pair;
 
 import java.util.ArrayList;
 
@@ -9,11 +9,11 @@ import java.util.ArrayList;
  */
 class OSPF implements AlgorithmBase {
 
-    private int source, destination;
     private final int TTL;
     private final ArrayList<Node_OSPF> nodes = new ArrayList<>();
     private final ArrayList<Edge> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge> adjMat = new HashMap2D<>();
+    private int source, destination;
     private int success, failure, currentTime, packetCnt;
 
     /**
@@ -28,13 +28,13 @@ class OSPF implements AlgorithmBase {
     /**
      * Initialize OSPF
      *
-     * @param _source Source node
+     * @param _source      Source node
      * @param _destination Destination node
      */
     public void init(int _source, int _destination) {
         source = _source;
         destination = _destination;
-        for (Node_OSPF node: nodes) {
+        for (Node_OSPF node : nodes) {
             node.update();
         }
     }
@@ -46,7 +46,7 @@ class OSPF implements AlgorithmBase {
      */
     public ArrayList<Integer> getNodeStatus() {
         ArrayList<Integer> ret = new ArrayList<>();
-        for (Node_OSPF node: nodes) {
+        for (Node_OSPF node : nodes) {
             ret.add(node.Q.size());
         }
         return ret;
@@ -59,7 +59,7 @@ class OSPF implements AlgorithmBase {
      */
     public ArrayList<Integer> getEdgeStatus() {
         ArrayList<Integer> ret = new ArrayList<>();
-        for (Edge edge: edgeList) {
+        for (Edge edge : edgeList) {
             ret.add(edge.packets.size());
         }
         return ret;
@@ -89,12 +89,12 @@ class OSPF implements AlgorithmBase {
         if (node.isOffline) {
             packetCnt -= node.Q.size();
             node.Q.clear();
-            for (Edge edge: adjMat.get(ID).values()) {
+            for (Edge edge : adjMat.get(ID).values()) {
                 packetCnt -= edge.packets.size();
                 edge.packets.clear();
             }
         }
-        for (Node_OSPF _node: nodes) {
+        for (Node_OSPF _node : nodes) {
             _node.update();
         }
     }
@@ -104,7 +104,7 @@ class OSPF implements AlgorithmBase {
      *
      * @param node1 First node
      * @param node2 Second node
-     * @param cost Time taken
+     * @param cost  Time taken
      * @throws IllegalArgumentException
      */
     public void addEdge(int node1, int node2, int cost) throws IllegalArgumentException {
@@ -117,7 +117,7 @@ class OSPF implements AlgorithmBase {
         edgeList.add(backward);
         adjMat.put(node1, node2, forward);
         adjMat.put(node2, node1, backward);
-        for (Node_OSPF node: nodes) {
+        for (Node_OSPF node : nodes) {
             node.update();
         }
     }
@@ -138,7 +138,7 @@ class OSPF implements AlgorithmBase {
             forward.packets.clear();
             backward.packets.clear();
         }
-        for (Node_OSPF node: nodes) {
+        for (Node_OSPF node : nodes) {
             node.update();
         }
     }
@@ -203,12 +203,12 @@ class OSPF implements AlgorithmBase {
      */
     public Pair<Integer, Integer> tick() {
         ++currentTime;
-        for (Edge edge: edgeList) {
+        for (Edge edge : edgeList) {
             if (edge.isOffline) continue;
             processEdge(edge);
         }
         generatePackets();
-        for (Node_OSPF node: nodes) {
+        for (Node_OSPF node : nodes) {
             if (node.isOffline) continue;
             processNode(node);
         }
@@ -227,11 +227,11 @@ class OSPF implements AlgorithmBase {
     public Pair<Integer, Integer> terminate() {
         while (packetCnt > 0) {
             ++currentTime;
-            for (Edge edge: edgeList) {
+            for (Edge edge : edgeList) {
                 if (edge.isOffline) continue;
                 processEdge(edge);
             }
-            for (Node_OSPF node: nodes) {
+            for (Node_OSPF node : nodes) {
                 if (node.isOffline) continue;
                 processNode(node);
             }
@@ -240,11 +240,11 @@ class OSPF implements AlgorithmBase {
     }
 
     /**
-     * Build graph from supplied information
+     * Build sGraph from supplied information
      *
-     * @param _nodes Node_GUI nodes
-     * @param _edgeList SimpleEdge edges
-     * @param _source Source node
+     * @param _nodes       Node_GUI nodes
+     * @param _edgeList    SimpleEdge edges
+     * @param _source      Source node
      * @param _destination Destination node
      */
     public void build(ArrayList<Node_GUI> _nodes, ArrayList<SimpleEdge> _edgeList, int _source, int _destination) {
@@ -253,14 +253,14 @@ class OSPF implements AlgorithmBase {
         edgeList.clear();
         adjMat.clear();
         // Node
-        for (Node_GUI node: _nodes) {
+        for (Node_GUI node : _nodes) {
             nodes.add(new Node_OSPF(node.speed, nodes, adjMat));
             if (node.isOffline) {
                 nodes.get(nodes.size() - 1).isOffline = true;
             }
         }
         // Edge
-        for (SimpleEdge edge: _edgeList) {
+        for (SimpleEdge edge : _edgeList) {
             Edge forward = new Edge(edge.source, edge.destination, edge.cost);
             Edge backward = new Edge(edge.destination, edge.source, edge.cost);
             edgeList.add(forward);

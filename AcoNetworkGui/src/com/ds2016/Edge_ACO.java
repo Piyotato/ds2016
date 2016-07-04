@@ -12,9 +12,9 @@ class Edge_ACO extends Edge {
     /**
      * Initializes an edge
      *
-     * @param _source Start node
+     * @param _source      Start node
      * @param _destination End node
-     * @param _cost Time taken to traverse
+     * @param _cost        Time taken to traverse
      */
     Edge_ACO(int _source, int _destination, int _cost) {
         super(_source, _destination, _cost);
@@ -23,7 +23,7 @@ class Edge_ACO extends Edge {
     /**
      * Transmit an ant
      *
-     * @param ant Ant
+     * @param ant         Ant
      * @param currentTime Timestamp
      */
     void addAnt(Ant ant, int currentTime) {

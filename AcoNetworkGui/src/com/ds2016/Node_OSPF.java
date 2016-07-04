@@ -18,8 +18,8 @@ class Node_OSPF {
     /**
      * Initialize a node
      *
-     * @param _speed Processing speed
-     * @param _nodes ArrayList of Node_OSPF
+     * @param _speed  Processing speed
+     * @param _nodes  ArrayList of Node_OSPF
      * @param _adjMat Adjacency Matrix
      */
     Node_OSPF(int _speed, ArrayList<Node_OSPF> _nodes, HashMap2D<Integer, Integer, Edge> _adjMat) {

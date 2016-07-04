@@ -12,17 +12,17 @@ class EACO implements AlgorithmBase {
 
     private final double alpha;
     private final int TTL, interval;
-    private int source, destination;
     private final ArrayList<Edge_ACO> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat = new HashMap2D<>();
     private final ArrayList<Node_EACO> nodes = new ArrayList<>();
+    private int source, destination;
     private int success, failure, currentTime, packetCnt;
 
     /**
      * Initialize EACO
      *
-     * @param _alpha Weightage of pheromone
-     * @param _TTL Time To Live of packets
+     * @param _alpha    Weightage of pheromone
+     * @param _TTL      Time To Live of packets
      * @param _interval Interval of Ant Generation
      */
     public EACO(double _alpha, int _TTL, int _interval) {
@@ -34,13 +34,13 @@ class EACO implements AlgorithmBase {
     /**
      * Initialize EACO
      *
-     * @param _source Source node
+     * @param _source      Source node
      * @param _destination Destination node
      */
     public void init(int _source, int _destination) {
         source = _source;
         destination = _destination;
-        for (Node_EACO node: nodes) {
+        for (Node_EACO node : nodes) {
             node.init();
         }
     }
@@ -52,7 +52,7 @@ class EACO implements AlgorithmBase {
      */
     public ArrayList<Integer> getNodeStatus() {
         ArrayList<Integer> ret = new ArrayList<>();
-        for (Node_EACO node: nodes) {
+        for (Node_EACO node : nodes) {
             ret.add(node.slowQ.size());
         }
         return ret;
@@ -65,7 +65,7 @@ class EACO implements AlgorithmBase {
      */
     public ArrayList<Integer> getEdgeStatus() {
         ArrayList<Integer> ret = new ArrayList<>();
-        for (Edge_ACO edge: edgeList) {
+        for (Edge_ACO edge : edgeList) {
             ret.add(edge.packets.size());
         }
         return ret;
@@ -96,13 +96,13 @@ class EACO implements AlgorithmBase {
             packetCnt -= node.slowQ.size();
             node.fastQ.clear();
             node.slowQ.clear();
-            for (Edge_ACO edge: adjMat.get(ID).values()) {
+            for (Edge_ACO edge : adjMat.get(ID).values()) {
                 packetCnt -= edge.packets.size();
                 edge.packets.clear();
                 edge.ants.clear();
             }
         }
-        for (Node_EACO _node: nodes) {
+        for (Node_EACO _node : nodes) {
             _node.rebuild();
         }
     }
@@ -112,7 +112,7 @@ class EACO implements AlgorithmBase {
      *
      * @param node1 First node
      * @param node2 Second node
-     * @param cost Time taken
+     * @param cost  Time taken
      * @throws IllegalArgumentException
      */
     public void addEdge(int node1, int node2, int cost) throws IllegalArgumentException {
@@ -125,7 +125,7 @@ class EACO implements AlgorithmBase {
         edgeList.add(backward);
         adjMat.put(node1, node2, forward);
         adjMat.put(node2, node1, backward);
-        for (Node_EACO node: nodes) {
+        for (Node_EACO node : nodes) {
             node.rebuild();
         }
     }
@@ -148,7 +148,7 @@ class EACO implements AlgorithmBase {
             backward.packets.clear();
             backward.ants.clear();
         }
-        for (Node_EACO node: nodes) {
+        for (Node_EACO node : nodes) {
             node.rebuild();
         }
     }
@@ -266,7 +266,7 @@ class EACO implements AlgorithmBase {
         // Send ants from all nodes
         if (currentTime % interval == 0) {
             Random rand = new Random();
-            for (Node_EACO node: nodes) {
+            for (Node_EACO node : nodes) {
                 if (node.isOffline) continue;
                 if (node.fastQ.size() + node.slowQ.size() >= node.speed) {
                     continue; // Throttle
@@ -293,12 +293,12 @@ class EACO implements AlgorithmBase {
      */
     public Pair<Integer, Integer> tick() {
         ++currentTime;
-        for (Edge_ACO edge: edgeList) {
+        for (Edge_ACO edge : edgeList) {
             if (edge.isOffline) continue;
             processEdge(edge);
         }
         generatePackets();
-        for (Node_EACO node: nodes) {
+        for (Node_EACO node : nodes) {
             if (node.isOffline) continue;
             processNode(node);
         }
@@ -316,11 +316,11 @@ class EACO implements AlgorithmBase {
     public Pair<Integer, Integer> terminate() {
         while (packetCnt > 0) {
             ++currentTime;
-            for (Edge_ACO edge: edgeList) {
+            for (Edge_ACO edge : edgeList) {
                 if (edge.isOffline) continue;
                 processEdge(edge);
             }
-            for (Node_EACO node: nodes) {
+            for (Node_EACO node : nodes) {
                 if (node.isOffline) continue;
                 processNode(node);
             }
@@ -329,11 +329,11 @@ class EACO implements AlgorithmBase {
     }
 
     /**
-     * Build graph from supplied information
+     * Build sGraph from supplied information
      *
-     * @param _nodes Node_GUI nodes
-     * @param _edgeList SimpleEdge edges
-     * @param _source Source node
+     * @param _nodes       Node_GUI nodes
+     * @param _edgeList    SimpleEdge edges
+     * @param _source      Source node
      * @param _destination Destination node
      */
     public void build(ArrayList<Node_GUI> _nodes, ArrayList<SimpleEdge> _edgeList, int _source, int _destination) {
@@ -342,14 +342,14 @@ class EACO implements AlgorithmBase {
         edgeList.clear();
         adjMat.clear();
         // Node
-        for (Node_GUI node: _nodes) {
+        for (Node_GUI node : _nodes) {
             nodes.add(new Node_EACO(node.speed, nodes, edgeList, adjMat, alpha));
             if (node.isOffline) {
                 nodes.get(nodes.size() - 1).isOffline = true;
             }
         }
         // Edges
-        for (SimpleEdge edge: _edgeList) {
+        for (SimpleEdge edge : _edgeList) {
             Edge_ACO forward = new Edge_ACO(edge.source, edge.destination, edge.cost);
             Edge_ACO backward = new Edge_ACO(edge.destination, edge.source, edge.cost);
             if (edge.isOffline) {

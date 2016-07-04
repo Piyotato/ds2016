@@ -15,10 +15,10 @@ class Ant extends Packet {
     /**
      * Initializes an ant
      *
-     * @param _source Source node
+     * @param _source      Source node
      * @param _destination Destination node
-     * @param _TTL Time to live
-     * @param _creation Time of creation
+     * @param _TTL         Time to live
+     * @param _creation    Time of creation
      */
     Ant(int _source, int _destination, int _TTL, int _creation) {
         super(_source, _destination, _TTL, _creation);

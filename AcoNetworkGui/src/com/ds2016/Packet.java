@@ -8,18 +8,18 @@ import java.util.HashSet;
 class Packet {
 
     final int source, destination;
-    private final int creation;
     final HashSet<Integer> tabuList = new HashSet<>();
-    int timestamp;
+    private final int creation;
     private final int TTL;
+    int timestamp;
 
     /**
      * Initializes a packet
      *
-     * @param _source Source node
+     * @param _source      Source node
      * @param _destination Destination node
-     * @param _TTL Time to live
-     * @param _creation Time of creation
+     * @param _TTL         Time to live
+     * @param _creation    Time of creation
      */
     Packet(int _source, int _destination, int _TTL, int _creation) {
         source = _source;

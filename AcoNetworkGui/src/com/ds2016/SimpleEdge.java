@@ -11,9 +11,9 @@ class SimpleEdge {
     /**
      * Initializes an edge
      *
-     * @param _source Start node
+     * @param _source      Start node
      * @param _destination End node
-     * @param _cost Time taken to traverse
+     * @param _cost        Time taken to traverse
      */
     SimpleEdge(int _source, int _destination, int _cost) {
         source = _source;
