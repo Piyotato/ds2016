@@ -154,7 +154,7 @@ class Node_EACO {
         } else if (Math.abs(old + change) < EPS) {
             pheromone.put(destination, neighbour, null);
         } else {
-            if (old + change < 0 || old + change > 1) throw new IllegalArgumentException();
+            if ((old + change) < -EPS || (old + change - 1) > EPS) throw new IllegalArgumentException();
             pheromone.put(destination, neighbour, old + change);
         }
         double tot = 1 - old;

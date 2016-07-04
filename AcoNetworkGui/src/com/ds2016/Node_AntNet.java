@@ -102,7 +102,7 @@ class Node_AntNet {
      */
     void toggleEdge(int ID) {
         /* Only care about neighbours */
-        Edge_ACO edge = edgeList.get(ID);
+        Edge_ACO edge = edgeList.get(ID * 2);
         if (edge.source != nodeID && edge.destination != nodeID) return;
         int otherNode = (edge.source == nodeID ? edge.destination : edge.source);
         if (edge.isOffline) {
@@ -161,7 +161,7 @@ class Node_AntNet {
     void updateHeuristic(int neighbour, int destination, double change) throws IllegalArgumentException {
         Double old = pheromone.get(destination, neighbour);
         if (old == null) old = .0;
-        if (old + change < 0 || old + change > 1) throw new IllegalArgumentException();
+        if ((old + change) < -EPS || (old + change - 1) > EPS) throw new IllegalArgumentException();
         pheromone.put(destination, neighbour, old + change);
         double tot = 1 - old;
         for (int a = 0; a < nodes.size(); ++a) {

@@ -149,8 +149,7 @@ class AntNet implements AlgorithmBase {
             backward.ants.clear();
         }
         for (Node_AntNet node: nodes) {
-            node.toggleEdge(ID * 2);
-            node.toggleEdge(ID * 2 + 1);
+            node.toggleEdge(ID);
         }
     }
 
