@@ -40,7 +40,8 @@ public class Main {
                     }
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    // This exception is expected, swallow it.
+                    //e.printStackTrace();
                     Thread.currentThread().interrupt();
                 }
             }

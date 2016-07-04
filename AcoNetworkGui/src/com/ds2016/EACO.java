@@ -329,7 +329,7 @@ class EACO implements AlgorithmBase {
     }
 
     /**
-     * Build sGraph from supplied information
+     * Build graph from supplied information
      *
      * @param _nodes       Node_GUI nodes
      * @param _edgeList    SimpleEdge edges
