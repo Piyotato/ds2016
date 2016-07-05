@@ -148,10 +148,8 @@ class Node_EACO {
      */
     void updateHeuristic(int neighbour, int destination, double change) throws IllegalArgumentException {
         Double old = pheromone.get(destination, neighbour);
-        if (old == null) {
-            old = .0;
-            pheromone.put(destination, neighbour, change);
-        } else if (Math.abs(old + change) < EPS) {
+        if (old == null) old = .0;
+        if (Math.abs(old + change) < EPS) {
             pheromone.put(destination, neighbour, null);
         } else {
             if ((old + change) < -EPS || (old + change - 1) > EPS) throw new IllegalArgumentException();

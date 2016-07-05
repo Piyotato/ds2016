@@ -153,8 +153,12 @@ class Node_AntNet {
     void updateHeuristic(int neighbour, int destination, double change) throws IllegalArgumentException {
         Double old = pheromone.get(destination, neighbour);
         if (old == null) old = .0;
-        if ((old + change) < -EPS || (old + change - 1) > EPS) throw new IllegalArgumentException();
-        pheromone.put(destination, neighbour, old + change);
+        if (Math.abs(old + change) < EPS) {
+            pheromone.put(destination, neighbour, null);
+        } else {
+            if ((old + change) < -EPS || (old + change - 1) > EPS) throw new IllegalArgumentException();
+            pheromone.put(destination, neighbour, old + change);
+        }
         double tot = 1 - old;
         for (int a = 0; a < nodes.size(); ++a) {
             if (a == neighbour) continue;
