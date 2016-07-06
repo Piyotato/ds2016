@@ -1,5 +1,7 @@
 package com.ds2016;
 
+import com.sun.corba.se.impl.orbutil.concurrent.Mutex;
+
 import static com.ds2016.Main.*;
 import static com.ds2016.NewGui.sGraphAlgo;
 
@@ -16,23 +18,63 @@ class Link {
     }
 
     static void addNode(int speed) {
-        sGui.addNode(speed);
-        sAlgo.addNode(speed);
+        Mutex mutex = new Mutex();
+        try {
+            mutex.acquire();
+            try {
+                sGui.addNode(speed);
+                sAlgo.addNode(speed);
+            } finally {
+                mutex.release();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     static void toggleNode(int ID) {
-        sGui.toggleNode(ID);
-        sAlgo.toggleNode(ID);
+        Mutex mutex = new Mutex();
+        try {
+            mutex.acquire();
+            try {
+                sGui.toggleNode(ID);
+                sAlgo.toggleNode(ID);
+            } finally {
+                mutex.release();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     static void addEdge(int node1, int node2, int cost) {
-        sGui.addEdge(node1, node2, cost);
-        sAlgo.addEdge(node1, node2, cost);
+        Mutex mutex = new Mutex();
+        try {
+            mutex.acquire();
+            try {
+                sGui.addEdge(node1, node2, cost);
+                sAlgo.addEdge(node1, node2, cost);
+            } finally {
+                mutex.release();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     static void toggleEdge(int ID) {
-        sGui.toggleEdge(ID);
-        sAlgo.toggleEdge(ID);
+        Mutex mutex = new Mutex();
+        try {
+            mutex.acquire();
+            try {
+                sGui.toggleEdge(ID);
+                sAlgo.toggleEdge(ID);
+            } finally {
+                mutex.release();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     static void start() {
@@ -47,7 +89,8 @@ class Link {
 
     static void update() {
         sGui.update();
-        Main.updateAlgo();
+        Main.initAlgo();
+        sAlgo.build(sGui.mNodeList, sGui.mEdgeList, sParams.getSource(), sParams.getDestination());
 
     }
 

@@ -17,8 +17,8 @@ import static com.ds2016.Main.sGraph;
 class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
 
     private static final int LOAD_HIST_SIZE = 3;
-    private static final double HIGH_LOAD_FACTOR = 0.7;
-    private static final double MED_LOAD_FACTOR = 0.3;
+    private static final double HIGH_LOAD_FACTOR = 0.33; // 33% of the total load
+    private static final double MED_LOAD_FACTOR = 0.12; // 12% of the total load
 
     private HashMap<Edge, Integer> mEdgeLoads = new HashMap<>();
     private int mLoads[] = new int[LOAD_HIST_SIZE];
@@ -38,6 +38,7 @@ class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
 
     @Override
     public void compute() {
+        // TODO: mTotalLoad should be the total average load of all the edges
         ArrayList<Integer> edgeLoadList = sAlgo.getEdgeStatus();
         int temp = 0;
         for (int edgeLoad : edgeLoadList) {
@@ -46,13 +47,13 @@ class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
         mTotalLoad = temp;
         if (Main.DEBUG) System.out.println("compute: mTotalLoad = " + mTotalLoad);
 
-        int edgeStatusSize = sAlgo.getEdgeStatus().size();
+        int edgeStatusSize = edgeLoadList.size();
         if (Main.DEBUG) System.out.println("compute: val = " + edgeStatusSize);
 
-        for (int i = 0; i < edgeLoadList.size() - 1; i++) {
+        for (int i = 0; i < edgeStatusSize - 1; i++) {
             Edge edge = sGraph.getEdge(i);
             if (Main.DEBUG) System.out.println("compute: edgeId = " + edge.getId());
-            mEdgeLoads.put(edge, sAlgo.getEdgeStatus().get(i));
+            mEdgeLoads.put(edge, edgeLoadList.get(i));
             setEdgeColor(edge);
         }
     }

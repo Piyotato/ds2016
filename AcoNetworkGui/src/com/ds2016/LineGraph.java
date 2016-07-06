@@ -8,7 +8,7 @@ import org.jfree.data.category.DefaultCategoryDataset;
 
 /**
  * Created by zwliew on 14/6/16.
- *
+ * <p>
  * TODO: Unused currently; will be revisited in the future
  */
 public class LineGraph {
@@ -20,7 +20,7 @@ public class LineGraph {
         this.title = title;
     }
 
-    public DefaultCategoryDataset createDataSet(long[] data, long[] timeStamp) {
+    private DefaultCategoryDataset createDataSet(long[] data, long[] timeStamp) {
         DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
 
         if (data != null && timeStamp != null) {

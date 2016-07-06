@@ -9,19 +9,18 @@ class ParameterStorage {
     static final int ALGO_EACO = 3;
 
     private double alpha;
-    private int tabuSize;
     private int source;
     private int destination;
     private int algorithm;
-    private int interval;
+    private double interval;
 
     ParameterStorage(double alpha,
-                     int tabuSize,
+                     double interval,
                      int source,
                      int destination,
                      int algorithm) {
         this.alpha = alpha;
-        this.tabuSize = tabuSize;
+        this.interval = interval;
         this.source = source;
         this.destination = destination;
         this.algorithm = algorithm;
@@ -33,14 +32,6 @@ class ParameterStorage {
 
     void setAlpha(String alphaStr) {
         if (alphaStr != null) alpha = Double.parseDouble(alphaStr);
-    }
-
-    int getTabuSize() {
-        return tabuSize;
-    }
-
-    void setTabuSize(String tabuSizeStr) {
-        if (tabuSizeStr != null) tabuSize = Integer.parseInt(tabuSizeStr);
     }
 
     int getSource() {
@@ -71,11 +62,11 @@ class ParameterStorage {
         return algorithm <= ALGO_EACO && algorithm >= ALGO_OSPF;
     }
 
-    int getInterval() {
+    double getInterval() {
         return interval;
     }
 
     void setInterval(String intervalStr) {
-        if (intervalStr != null) interval = Integer.parseInt(intervalStr);
+        if (intervalStr != null) interval = Double.parseDouble(intervalStr);
     }
 }

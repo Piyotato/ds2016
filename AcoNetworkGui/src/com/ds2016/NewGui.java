@@ -28,7 +28,6 @@ public class NewGui {
     ArrayList<Node_GUI> mNodeList = new ArrayList<>();
     ArrayList<SimpleEdge> mEdgeList = new ArrayList<>();
     private JPanel mainPanel;
-    private JTextField mTabuSizeField;
     private JTextField mAlphaField;
     private JTextField mDistanceField;
     private JTextField mFromField;
@@ -63,7 +62,7 @@ public class NewGui {
 
     private void initNetworkPanel() {
         // Disabled again since it makes the graph wonky
-        //System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+        System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
 
         sGraph = new SingleGraph(GRAPH_TITLE);
         sGraph.setStrict(false);
@@ -169,7 +168,6 @@ public class NewGui {
      */
     private void updateParams() {
         sParams.setAlpha(mAlphaField.getText());
-        sParams.setTabuSize(mTabuSizeField.getText());
         sParams.setSource(mSourceField.getText());
         sParams.setDestination(mDestinationField.getText());
         sParams.setInterval(mIntervalField.getText());
@@ -181,7 +179,6 @@ public class NewGui {
      */
     private void updateTextFields() {
         mAlphaField.setText(String.valueOf(sParams.getAlpha()));
-        mTabuSizeField.setText(String.valueOf(sParams.getTabuSize()));
         mSourceField.setText(String.valueOf(sParams.getSource()));
         mDestinationField.setText(String.valueOf(sParams.getDestination()));
         mIntervalField.setText(String.valueOf(sParams.getInterval()));
@@ -264,7 +261,8 @@ public class NewGui {
 
         // Add forward edge
         int edgeCount = sGraph.getEdgeCount() / 2;
-        System.out.println("addEdge: edgeCount = " + nodeCount);
+        if (Main.DEBUG) System.out.println("addEdge: edgeCount = " + nodeCount);
+
         Edge forward = sGraph.addEdge(String.valueOf(edgeCount + "f"), node1, node2, true);
         forward.addAttribute("ui.label", String.valueOf(edgeCount));
         forward.addAttribute("edge.cluster", String.valueOf(edgeCount));
@@ -285,8 +283,11 @@ public class NewGui {
      * @param ID Edge ID
      */
     void toggleEdge(int ID) {
-        Edge forward = sGraph.getEdge(ID * 2 + "f");
-        Edge backward = sGraph.getEdge(ID * 2 + "b");
+        String forwardId = ID + "f";
+        String backwardId = ID + "b";
+        Edge forward = sGraph.getEdge(forwardId);
+        Edge backward = sGraph.getEdge(backwardId);
+        if (Main.DEBUG) System.out.println("toggleEdge: forwardId = " + forwardId + " backwardId = " + backwardId);
 
         // Toggle forward edge visibility
         if (forward.hasAttribute("ui.hide")) {

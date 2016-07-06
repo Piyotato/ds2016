@@ -11,9 +11,8 @@ public class Main {
     static final boolean DEBUG = true;
 
     private static final String ALGO_THREAD = "ALGO_THREAD";
-    private static final int POLL_MS = 1000;
-    private static final int TTL = 15; // Used by ACO
-    private static final int INTERVAL = 1; // Used by ACO
+    private static final int POLL_MS = 100; // Algorithm tick delay in ms
+    private static final int TTL_MS = 15000 / POLL_MS; // Time to live of ants in ms, relative to POLL_MS
 
     static ParameterStorage sParams;
     static AlgorithmBase sAlgo;
@@ -24,9 +23,9 @@ public class Main {
     private static Runnable mRunnable;
 
     public static void main(String[] args) {
-        sParams = new ParameterStorage(0.4, 15, 0, 2, ParameterStorage.ALGO_OSPF);
+        sParams = new ParameterStorage(0.4, 2.0, 0, 2, ParameterStorage.ALGO_OSPF);
         sGui = new NewGui();
-        sAlgo = new OSPF(TTL);
+        initAlgo();
 
         sGui.init();
 
@@ -44,7 +43,7 @@ public class Main {
                     } finally {
                         mutex.release();
                     }
-                    Thread.sleep(1000);
+                    Thread.sleep(POLL_MS);
                 } catch (InterruptedException e) {
                     // This exception is expected, swallow it.
                     //e.printStackTrace();
@@ -65,23 +64,22 @@ public class Main {
         }
     }
 
-    static void updateAlgo() {
+    static void initAlgo() {
         // Start a new algorithm
         int algo = sParams.getAlgorithm();
         if (DEBUG) System.out.println("updateAlgo: algo = " + algo);
         switch (algo) {
             case ParameterStorage.ALGO_OSPF:
-                sAlgo = new OSPF(TTL);
+                sAlgo = new OSPF(TTL_MS);
                 break;
             case ParameterStorage.ALGO_ANTNET:
-                sAlgo = new AntNet(sParams.getAlpha(), TTL, sParams.getInterval());
+                sAlgo = new AntNet(sParams.getAlpha(), TTL_MS, sParams.getInterval());
                 break;
             case ParameterStorage.ALGO_EACO:
-                sAlgo = new EACO(sParams.getAlpha(), TTL, sParams.getInterval());
+                sAlgo = new EACO(sParams.getAlpha(), TTL_MS, sParams.getInterval());
                 break;
             default:
                 break;
         }
-        sAlgo.build(sGui.mNodeList, sGui.mEdgeList, sParams.getSource(), sParams.getDestination());
     }
 }
