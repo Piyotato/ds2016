@@ -21,11 +21,14 @@ public class Main {
     private static Runnable mRunnable;
 
     public static void main(String[] args) {
-        sParams = new ParameterStorage(0.4, 15, 0, 1, ParameterStorage.ALGO_OSPF);
+        sParams = new ParameterStorage(0.4, 15, 0, 2, ParameterStorage.ALGO_OSPF);
         sGui = new NewGui();
         sAlgo = new OSPF(TTL);
 
-        NewGui.main();
+        sGui.init();
+
+        // Build demo graph
+        Link.buildDemoGraph1();
 
         Mutex mutex = new Mutex();
 
@@ -57,5 +60,24 @@ public class Main {
         if (mThread != null) {
             mThread.interrupt();
         }
+    }
+
+    static void updateAlgo() {
+        // Start a new algorithm
+        int algo = sParams.getAlgorithm();
+        switch (algo) {
+            case ParameterStorage.ALGO_OSPF:
+                sAlgo = new OSPF(TTL);
+                break;
+            case ParameterStorage.ALGO_ANTNET:
+                sAlgo = new AntNet(sParams.getAlpha(), TTL, sParams.getInterval());
+                break;
+            case ParameterStorage.ALGO_EACO:
+                sAlgo = new EACO(sParams.getAlpha(), TTL, sParams.getInterval());
+                break;
+            default:
+                break;
+        }
+        sAlgo.build(sGui.mNodeList, sGui.mEdgeList, sParams.getSource(), sParams.getDestination());
     }
 }

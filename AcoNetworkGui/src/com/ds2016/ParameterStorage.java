@@ -13,6 +13,7 @@ class ParameterStorage {
     private int source;
     private int destination;
     private int algorithm;
+    private int interval;
 
     ParameterStorage(double alpha,
                      int tabuSize,
@@ -68,5 +69,13 @@ class ParameterStorage {
 
     private boolean isAlgorithmValid(int algorithm) {
         return algorithm <= ALGO_EACO && algorithm >= ALGO_OSPF;
+    }
+
+    int getInterval() {
+        return interval;
+    }
+
+    void setInterval(String intervalStr) {
+        if (intervalStr != null) interval = Integer.parseInt(intervalStr);
     }
 }

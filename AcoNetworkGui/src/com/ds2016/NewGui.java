@@ -49,20 +49,21 @@ public class NewGui {
     private JButton mUpdateBtn;
     private JButton mToggleNodeBtn;
     private JTextField mToggleNodeField;
+    private JTextField mIntervalField;
     private Thread mThread;
     private GraphRunnable mRunnable;
 
-    static void main() {
+    void init() {
         JFrame frame = new JFrame(FRAME_TITLE);
-        frame.setContentPane(new NewGui().mainPanel);
+        frame.setContentPane(mainPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
     }
 
     private void initNetworkPanel() {
-        // Don't overlap edges
-        System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+        // Disabled again since it makes the graph wonky
+        //System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
 
         sGraph = new SingleGraph(GRAPH_TITLE);
         sGraph.setStrict(false);
@@ -121,42 +122,31 @@ public class NewGui {
          * Toggle edge
          */
         mToggleEdgeBtn = new JButton();
-        mToggleEdgeBtn.addActionListener(actionEvent -> {
-            Link.toggleEdge(Integer.parseInt(mToggleEdgeField.getText()));
-        });
+        mToggleEdgeBtn.addActionListener(actionEvent -> Link.toggleEdge(Integer.parseInt(mToggleEdgeField.getText())));
 
         /**
          * Save parameters
          */
         mUpdateBtn = new JButton();
-        mUpdateBtn.addActionListener(actionEvent -> {
-            Link.update();
-        });
+        mUpdateBtn.addActionListener(actionEvent -> Link.update());
 
         /**
          * Start the sGraph algorithm thread
          */
         mStartBtn = new JButton();
-        mStartBtn.addActionListener(actionEvent -> {
-
-            Link.start();
-        });
+        mStartBtn.addActionListener(actionEvent -> Link.start());
 
         /**
          * Stop the sGraph algorithm thread
          */
         mStopBtn = new JButton();
-        mStopBtn.addActionListener(actionEvent -> {
-            Link.stop();
-        });
+        mStopBtn.addActionListener(actionEvent -> Link.stop());
 
         /**
          * Undergo one tick of the entire program (sGraph + algorithm)
          */
         mTickBtn = new JButton();
-        mTickBtn.addActionListener(actionEvent -> {
-            Link.tick();
-        });
+        mTickBtn.addActionListener(actionEvent -> Link.tick());
     }
 
     void startThread() {
@@ -182,16 +172,19 @@ public class NewGui {
         sParams.setTabuSize(mTabuSizeField.getText());
         sParams.setSource(mSourceField.getText());
         sParams.setDestination(mDestinationField.getText());
+        sParams.setInterval(mIntervalField.getText());
     }
 
     /**
      * Update text in text fields
+     * Mainly to verify that the params were stored correctly
      */
     private void updateTextFields() {
         mAlphaField.setText(String.valueOf(sParams.getAlpha()));
         mTabuSizeField.setText(String.valueOf(sParams.getTabuSize()));
         mSourceField.setText(String.valueOf(sParams.getSource()));
         mDestinationField.setText(String.valueOf(sParams.getDestination()));
+        mIntervalField.setText(String.valueOf(sParams.getInterval()));
     }
 
     /**

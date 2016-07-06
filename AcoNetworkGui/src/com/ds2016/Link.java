@@ -48,7 +48,7 @@ class Link {
     static void update() {
         stop();
         sGui.update();
-        sAlgo.build(sGui.mNodeList, sGui.mEdgeList, sParams.getSource(), sParams.getDestination());
+        Main.updateAlgo();
 
     }
 
@@ -56,5 +56,21 @@ class Link {
         stop();
         sParams.setAlgorithm(algo);
         sAlgo.build(sGui.mNodeList, sGui.mEdgeList, sParams.getSource(), sParams.getDestination());
+    }
+
+    /**
+     * Construct a simple diamond graph
+     * for demonstration purposes
+     */
+    static void buildDemoGraph1() {
+        addNode(80); // Node 0
+        addNode(40); // Node 1
+        addNode(80); // Node 2
+        addNode(40); // Node 3
+
+        addEdge(0, 1, 40);
+        addEdge(1, 2, 40);
+        addEdge(0, 3, 40);
+        addEdge(3, 2, 40);
     }
 }
