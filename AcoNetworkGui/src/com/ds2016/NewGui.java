@@ -6,6 +6,7 @@ import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 
 import static com.ds2016.Main.sGraph;
@@ -54,6 +55,12 @@ public class NewGui {
 
     void init() {
         JFrame frame = new JFrame(FRAME_TITLE);
+
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        double width = screenSize.getWidth() / 2.2;
+        double height = screenSize.getHeight() / 3;
+        frame.setPreferredSize(new Dimension((int) width, (int) height));
+
         frame.setContentPane(mainPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
