@@ -15,6 +15,7 @@ class OSPF implements AlgorithmBase {
     private final HashMap2D<Integer, Integer, Edge> adjMat = new HashMap2D<>();
     private int source, destination;
     private int success, failure, currentTime, packetCnt;
+    private boolean hasInit;
 
     /**
      * Initialize OSPF
@@ -37,6 +38,7 @@ class OSPF implements AlgorithmBase {
         for (Node_OSPF node : nodes) {
             node.update();
         }
+        hasInit = true;
     }
 
     /**
@@ -94,9 +96,10 @@ class OSPF implements AlgorithmBase {
                 edge.packets.clear();
             }
         }
-        for (Node_OSPF _node : nodes) {
-            _node.update();
-        }
+        if (hasInit)
+            for (Node_OSPF _node : nodes) {
+                _node.update();
+            }
     }
 
     /**
@@ -117,9 +120,10 @@ class OSPF implements AlgorithmBase {
         edgeList.add(backward);
         adjMat.put(node1, node2, forward);
         adjMat.put(node2, node1, backward);
-        for (Node_OSPF node : nodes) {
-            node.update();
-        }
+        if (hasInit)
+            for (Node_OSPF node : nodes) {
+                node.update();
+            }
     }
 
     /**
@@ -138,9 +142,10 @@ class OSPF implements AlgorithmBase {
             forward.packets.clear();
             backward.packets.clear();
         }
-        for (Node_OSPF node : nodes) {
-            node.update();
-        }
+        if (hasInit)
+            for (Node_OSPF node : nodes) {
+                node.update();
+            }
     }
 
     /**

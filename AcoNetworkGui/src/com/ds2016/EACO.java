@@ -17,6 +17,7 @@ class EACO implements AlgorithmBase {
     private final ArrayList<Node_EACO> nodes = new ArrayList<>();
     private int source, destination;
     private int success, failure, currentTime, packetCnt;
+    private boolean hasInit;
 
     /**
      * Initialize EACO
@@ -43,6 +44,7 @@ class EACO implements AlgorithmBase {
         for (Node_EACO node : nodes) {
             node.init();
         }
+        hasInit = true;
     }
 
     /**
@@ -102,9 +104,10 @@ class EACO implements AlgorithmBase {
                 edge.ants.clear();
             }
         }
-        for (Node_EACO _node : nodes) {
-            _node.rebuild();
-        }
+        if (hasInit)
+            for (Node_EACO _node : nodes) {
+                _node.rebuild();
+            }
     }
 
     /**
@@ -125,9 +128,10 @@ class EACO implements AlgorithmBase {
         edgeList.add(backward);
         adjMat.put(node1, node2, forward);
         adjMat.put(node2, node1, backward);
-        for (Node_EACO node : nodes) {
-            node.rebuild();
-        }
+        if (hasInit)
+            for (Node_EACO node : nodes) {
+                node.rebuild();
+            }
     }
 
     /**
@@ -148,9 +152,10 @@ class EACO implements AlgorithmBase {
             backward.packets.clear();
             backward.ants.clear();
         }
-        for (Node_EACO node : nodes) {
-            node.rebuild();
-        }
+        if (hasInit)
+            for (Node_EACO node : nodes) {
+                node.rebuild();
+            }
     }
 
     /**

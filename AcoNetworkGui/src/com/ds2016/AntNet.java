@@ -17,6 +17,7 @@ class AntNet implements AlgorithmBase {
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat = new HashMap2D<>();
     private final ArrayList<Node_AntNet> nodes = new ArrayList<>();
     private int success, failure, currentTime, packetCnt;
+    private boolean hasInit;
 
     /**
      * Initialize EACO
@@ -43,6 +44,7 @@ class AntNet implements AlgorithmBase {
         for (Node_AntNet node: nodes) {
             node.init();
         }
+        hasInit = true;
     }
 
     /**
@@ -102,9 +104,10 @@ class AntNet implements AlgorithmBase {
                 edge.ants.clear();
             }
         }
-        for (Node_AntNet _node: nodes) {
-            _node.toggleNode(ID);
-        }
+        if (hasInit)
+            for (Node_AntNet _node: nodes) {
+                _node.toggleNode(ID);
+            }
     }
 
     /**
@@ -125,8 +128,10 @@ class AntNet implements AlgorithmBase {
         edgeList.add(backward);
         adjMat.put(node1, node2, forward);
         adjMat.put(node2, node1, backward);
-        nodes.get(node1).addEdge(node2);
-        nodes.get(node2).addEdge(node1);
+        if (hasInit) {
+            nodes.get(node1).addEdge(node2);
+            nodes.get(node2).addEdge(node1);
+        }
     }
 
     /**
@@ -147,8 +152,10 @@ class AntNet implements AlgorithmBase {
             backward.packets.clear();
             backward.ants.clear();
         }
-        nodes.get(forward.source).toggleEdge(forward.destination);
-        nodes.get(forward.destination).toggleEdge(forward.source);
+        if (hasInit) {
+            nodes.get(forward.source).toggleEdge(forward.destination);
+            nodes.get(forward.destination).toggleEdge(forward.source);
+        }
     }
 
     /**
