@@ -10,13 +10,13 @@ import java.util.Random;
  */
 class AntNet implements AlgorithmBase {
 
-    private final double alpha;
-    private final int TTL, interval;
+    private final double alpha, interval;
+    private final int TTL;
     private int source, destination;
     private final ArrayList<Edge_ACO> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat = new HashMap2D<>();
     private final ArrayList<Node_AntNet> nodes = new ArrayList<>();
-    private int success, failure, currentTime, packetCnt;
+    private int success, failure, currentTime, packetCnt, numAntsGen;
     private boolean hasInit;
 
     /**
@@ -26,7 +26,7 @@ class AntNet implements AlgorithmBase {
      * @param _TTL Time To Live of packets
      * @param _interval Interval of Ant Generation
      */
-    public AntNet(double _alpha, int _TTL, int _interval) {
+    public AntNet(double _alpha, int _TTL, double _interval) {
         alpha = _alpha;
         TTL = _TTL;
         interval = _interval;
@@ -174,7 +174,7 @@ class AntNet implements AlgorithmBase {
                 if (P == null) {
                     continue; // This path is no longer viable
                 }
-                double R = 1. / ant.totalTime;
+                double R = 1. / (ant.totalTime * 10);
                 double change = (P * (1 - R) + R) - P;
                 node.updateHeuristic(prev, ant.destination, change);
                 if (ant.source == node.nodeID) {
@@ -269,12 +269,11 @@ class AntNet implements AlgorithmBase {
      */
     private void generatePackets() {
         // Send ants from all nodes
-        if (currentTime % interval == 0) {
-            Random rand = new Random();
-            for (Node_AntNet node: nodes) {
-                if (node.fastQ.size() + node.slowQ.size() >= node.speed) {
-                    continue; // Throttle
-                }
+        int curNumAnts = (int)((currentTime * 100) / (interval * 1000));
+        Random rand = new Random();
+        for (Node_AntNet node: nodes) {
+            if (node.isOffline) continue;
+            for (int cnt = 0; numAntsGen + cnt < curNumAnts; ++cnt) {
                 int randomNode = rand.nextInt(nodes.size());
                 while (randomNode == node.nodeID || nodes.get(randomNode).isOffline) {
                     randomNode = rand.nextInt(nodes.size());
@@ -282,6 +281,7 @@ class AntNet implements AlgorithmBase {
                 node.fastQ.add(new Ant(node.nodeID, randomNode, TTL, currentTime));
             }
         }
+        numAntsGen = curNumAnts;
         Node_AntNet src = nodes.get(source);
         // Send packets from source node
         packetCnt += Math.max(src.speed - src.slowQ.size(), 0);

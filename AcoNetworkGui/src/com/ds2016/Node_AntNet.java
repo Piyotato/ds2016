@@ -10,7 +10,7 @@ import java.util.ArrayList;
  */
 class Node_AntNet {
 
-    private final static double EPS = 1e-5;
+    private final static double EPS = 1e-9;
 
     final int speed, nodeID;
     final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node
@@ -152,6 +152,13 @@ class Node_AntNet {
      */
     void updateHeuristic(int neighbour, int destination, double change) throws IllegalArgumentException {
         Double old = pheromone.get(destination, neighbour);
+        double tot = 0;
+        for (int a = 0; a < nodes.size(); ++a) {
+            Double val = pheromone.get(destination, a);
+            if (val != null) {
+                tot += val;
+            }
+        }
         if (old == null) old = .0;
         if (Math.abs(old + change) < EPS) {
             pheromone.put(destination, neighbour, null);
@@ -159,7 +166,8 @@ class Node_AntNet {
             if ((old + change) < -EPS || (old + change - 1) > EPS) throw new IllegalArgumentException();
             pheromone.put(destination, neighbour, old + change);
         }
-        double tot = 1 - old;
+        change += (tot - 1);
+        tot -= old;
         for (int a = 0; a < nodes.size(); ++a) {
             if (a == neighbour) continue;
             Double val = pheromone.get(destination, a);
