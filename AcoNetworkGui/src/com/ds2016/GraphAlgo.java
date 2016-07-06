@@ -22,7 +22,7 @@ class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
 
     private HashMap<Edge, Integer> mEdgeLoads = new HashMap<>();
     private int mLoads[] = new int[LOAD_HIST_SIZE];
-    private int mTotalLoad;
+    private int mTotalLoad = 0;
 
     @Override
     public void terminate() {
@@ -44,16 +44,23 @@ class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
             temp += edgeLoad;
         }
         mTotalLoad = temp;
+        if (Main.DEBUG) System.out.println("compute: mTotalLoad = " + mTotalLoad);
 
-        for (int i = 0; i < sAlgo.getEdgeStatus().size() - 1; i++) {
-            mEdgeLoads.put(sGraph.getEdge(i), sAlgo.getEdgeStatus().get(i));
-            setEdgeColor(sGraph.getEdge(i));
+        int edgeStatusSize = sAlgo.getEdgeStatus().size();
+        if (Main.DEBUG) System.out.println("compute: val = " + edgeStatusSize);
+
+        for (int i = 0; i < edgeLoadList.size() - 1; i++) {
+            Edge edge = sGraph.getEdge(i);
+            if (Main.DEBUG) System.out.println("compute: edgeId = " + edge.getId());
+            mEdgeLoads.put(edge, sAlgo.getEdgeStatus().get(i));
+            setEdgeColor(edge);
         }
     }
 
     private void setEdgeColor(Edge edge) {
         int curLoad = mEdgeLoads.get(edge);
         int avgLoad = calcLoadAvg(curLoad);
+        if (Main.DEBUG) System.out.println("setEdgeColor: curLoad = " + curLoad + " avgLoad = " + avgLoad);
 
         String loadLv;
         if (avgLoad > HIGH_LOAD_FACTOR * mTotalLoad) {
@@ -64,7 +71,6 @@ class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
             loadLv = "lowLoad";
         }
         edge.setAttribute("ui.class", loadLv);
-
     }
 
     private int calcLoadAvg(int curLoad) {

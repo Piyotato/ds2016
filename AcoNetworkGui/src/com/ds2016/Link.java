@@ -46,7 +46,6 @@ class Link {
     }
 
     static void update() {
-        stop();
         sGui.update();
         Main.updateAlgo();
 

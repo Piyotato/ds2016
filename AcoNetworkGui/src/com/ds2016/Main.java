@@ -7,6 +7,9 @@ import org.graphstream.graph.Graph;
  * Created by zwliew on 13/6/16.
  */
 public class Main {
+
+    static final boolean DEBUG = true;
+
     private static final String ALGO_THREAD = "ALGO_THREAD";
     private static final int POLL_MS = 1000;
     private static final int TTL = 15; // Used by ACO
@@ -65,6 +68,7 @@ public class Main {
     static void updateAlgo() {
         // Start a new algorithm
         int algo = sParams.getAlgorithm();
+        if (DEBUG) System.out.println("updateAlgo: algo = " + algo);
         switch (algo) {
             case ParameterStorage.ALGO_OSPF:
                 sAlgo = new OSPF(TTL);

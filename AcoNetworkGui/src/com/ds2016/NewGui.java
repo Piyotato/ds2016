@@ -212,6 +212,7 @@ public class NewGui {
     void addNode(int speed) {
         // Add GUI node
         int nodeCount = sGraph.getNodeCount();
+        if (Main.DEBUG) System.out.println("addNode: nodeCount = " + nodeCount);
         Node node = sGraph.addNode(String.valueOf(nodeCount));
         node.addAttribute("ui.label", nodeCount);
         node.addAttribute("speed", speed);
@@ -254,14 +255,16 @@ public class NewGui {
      * @throws IllegalArgumentException
      */
     void addEdge(int node1, int node2, int cost) throws IllegalArgumentException {
-        // We can't add edges between non-existent nodes...or can we?
+        // We can't add edges between non-existent nodes
         int nodeCount = sGraph.getNodeCount();
+        if (Main.DEBUG) System.out.println("addEdge: nodeCount = " + nodeCount);
         if (node1 >= nodeCount || node2 >= nodeCount) {
             throw new IllegalArgumentException();
         }
 
         // Add forward edge
         int edgeCount = sGraph.getEdgeCount() / 2;
+        System.out.println("addEdge: edgeCount = " + nodeCount);
         Edge forward = sGraph.addEdge(String.valueOf(edgeCount + "f"), node1, node2, true);
         forward.addAttribute("ui.label", String.valueOf(edgeCount));
         forward.addAttribute("edge.cluster", String.valueOf(edgeCount));
@@ -272,9 +275,8 @@ public class NewGui {
         backward.addAttribute("edge.cluster", String.valueOf(edgeCount));
         backward.addAttribute("cost", cost);
 
-        // Add edges to the SimpleEdge list
+        // Add edge to the SimpleEdge list
         mEdgeList.add(new SimpleEdge(node1, node2, cost));
-        mEdgeList.add(new SimpleEdge(node2, node1, cost));
     }
 
     /**
