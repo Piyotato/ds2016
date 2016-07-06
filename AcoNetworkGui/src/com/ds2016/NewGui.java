@@ -61,9 +61,12 @@ public class NewGui {
     }
 
     private void initNetworkPanel() {
+        // Don't overlap edges
+        System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+
         sGraph = new SingleGraph(GRAPH_TITLE);
-        //sGraph.setStrict(false);
-        //sGraph.setAutoCreate(true);
+        sGraph.setStrict(false);
+        sGraph.setAutoCreate(true);
         sGraph.addAttribute("ui.stylesheet", STYLE_SHEET);
 
         sGraphAlgo = new GraphAlgo();
