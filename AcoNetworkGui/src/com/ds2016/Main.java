@@ -21,7 +21,7 @@ public class Main {
     private static Runnable mRunnable;
 
     public static void main(String[] args) {
-        sParams = new ParameterStorage(0.4, 1, 1, 1, 2);
+        sParams = new ParameterStorage(0.4, 15, 0, 1, ParameterStorage.ALGO_OSPF);
         sGui = new NewGui();
         sAlgo = new OSPF(TTL);
 

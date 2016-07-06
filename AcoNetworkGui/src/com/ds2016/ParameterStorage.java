@@ -4,9 +4,9 @@ package com.ds2016;
  * Created by ds2016 on 13/6/16.
  */
 class ParameterStorage {
-    private static final int ALGO_OSPF = 1;
-    private static final int ALGO_ANTNET = 2;
-    private static final int ALGO_EACO = 3;
+    static final int ALGO_OSPF = 1;
+    static final int ALGO_ANTNET = 2;
+    static final int ALGO_EACO = 3;
 
     private double alpha;
     private int tabuSize;
