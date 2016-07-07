@@ -94,12 +94,6 @@ class Link {
 
     }
 
-    static void setAlgorithm(int algo) {
-        stop();
-        sParams.setAlgorithm(algo);
-        sAlgo.build(sGui.mNodeList, sGui.mEdgeList, sParams.getSource(), sParams.getDestination());
-    }
-
     /**
      * OSPF chokes; others ok
      */

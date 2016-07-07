@@ -94,13 +94,13 @@ public class NewGui {
          * Set the current algorithm
          */
         mOspfBtn = new JRadioButton();
-        mOspfBtn.addActionListener(actionEvent -> Link.setAlgorithm(1));
+        mOspfBtn.addActionListener(actionEvent -> sParams.setAlgorithm(1));
 
         mAntNetBtn = new JRadioButton();
-        mAntNetBtn.addActionListener(actionEvent -> Link.setAlgorithm(2));
+        mAntNetBtn.addActionListener(actionEvent -> sParams.setAlgorithm(2));
 
         mEAcoBtn = new JRadioButton();
-        mEAcoBtn.addActionListener(actionEvent -> Link.setAlgorithm(3));
+        mEAcoBtn.addActionListener(actionEvent -> sParams.setAlgorithm(3));
 
         /**
          * Add a new node
