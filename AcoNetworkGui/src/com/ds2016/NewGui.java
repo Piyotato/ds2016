@@ -20,7 +20,8 @@ public class NewGui {
     private static final String STYLE_SHEET =
             "edge.highLoad { fill-color: red; }" +
                     "edge.midLoad { fill-color: orange; }" +
-                    "edge.lowLoad { fill-color: black; }" +
+                    "edge.lowLoad { fill-color: green; }" +
+                    "edge.noLoad { fill-color: black; }" +
                     "node.source { fill-color: green; }" +
                     "node.destination { fill-color: red; }";
     private static final String FRAME_TITLE = "EACO";

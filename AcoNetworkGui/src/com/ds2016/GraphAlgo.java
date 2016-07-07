@@ -6,23 +6,21 @@ import org.graphstream.graph.Graph;
 import org.graphstream.stream.SinkAdapter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import static com.ds2016.Main.sAlgo;
 import static com.ds2016.Main.sGraph;
 
 /**
  * Created by zwliew on 19/6/16.
+ * TODO: Add load averaging
  */
 class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
 
-    private static final int LOAD_HIST_SIZE = 3;
-    private static final double HIGH_LOAD_FACTOR = 0.33; // 33% of the total load
-    private static final double MED_LOAD_FACTOR = 0.12; // 12% of the total load
+    private static final double HIGH_LOAD_FACTOR = 3;
+    private static final double MED_LOAD_FACTOR = 1.5;
+    private static final double LOW_LOAD_FACTOR = 0.5;
 
-    private HashMap<Edge, Integer> mEdgeLoads = new HashMap<>();
-    private int mLoads[] = new int[LOAD_HIST_SIZE];
-    private int mTotalLoad = 0;
+    private int mLoadMean;
 
     @Override
     public void terminate() {
@@ -31,57 +29,43 @@ class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
 
     @Override
     public void init(Graph graph) {
-        for (int i = 0; i < mLoads.length; i++) {
-            mLoads[i] = 0;
-        }
     }
 
     @Override
     public void compute() {
-        // TODO: mTotalLoad should be the total average load of all the edges
-        ArrayList<Integer> edgeLoadList = sAlgo.getEdgeStatus();
         int temp = 0;
+        ArrayList<Integer> edgeLoadList = sAlgo.getEdgeStatus();
         for (int edgeLoad : edgeLoadList) {
             temp += edgeLoad;
         }
-        mTotalLoad = temp;
-        if (Main.DEBUG) System.out.println("compute: mTotalLoad = " + mTotalLoad);
+        int loadTotal = temp;
+        if (Main.DEBUG) System.out.println("compute: loadTotal = " + loadTotal);
+        int edgeCount = edgeLoadList.size();
+        if (Main.DEBUG) System.out.println("compute: edgeCount = " + edgeCount);
+        mLoadMean = loadTotal / edgeCount;
 
-        int edgeStatusSize = edgeLoadList.size();
-        if (Main.DEBUG) System.out.println("compute: val = " + edgeStatusSize);
-
-        for (int i = 0; i < edgeStatusSize; i++) {
+        for (int i = 0; i < edgeCount; i++) {
             Edge edge = sGraph.getEdge(i);
             if (Main.DEBUG) System.out.println("compute: edgeId = " + edge.getId());
-            mEdgeLoads.put(edge, edgeLoadList.get(i));
-            setEdgeColor(edge);
+            setEdgeColor(edge, edgeLoadList.get(i));
         }
     }
 
-    private void setEdgeColor(Edge edge) {
-        int curLoad = mEdgeLoads.get(edge);
-        int avgLoad = calcLoadAvg(curLoad);
-        if (Main.DEBUG) System.out.println("setEdgeColor: curLoad = " + curLoad + " avgLoad = " + avgLoad);
+    private void setEdgeColor(Edge edge, int curLoad) {
+        //int avgLoad = calcLoadAvg(curLoad);
+        if (Main.DEBUG) System.out.println("setEdgeColor: curLoad = " + curLoad);
 
         String loadLv;
-        if (avgLoad > HIGH_LOAD_FACTOR * mTotalLoad) {
+        if (curLoad >= HIGH_LOAD_FACTOR * mLoadMean) {
             loadLv = "highLoad";
-        } else if (avgLoad > MED_LOAD_FACTOR * mTotalLoad) {
+        } else if (curLoad >= MED_LOAD_FACTOR * mLoadMean) {
             loadLv = "midLoad";
-        } else {
+        } else if (curLoad >= LOW_LOAD_FACTOR * mLoadMean) {
             loadLv = "lowLoad";
+        } else {
+            loadLv = "noLoad";
         }
-        edge.setAttribute("ui.class", loadLv);
-    }
 
-    private int calcLoadAvg(int curLoad) {
-        int totalLoad = 0;
-        for (int i = 0; i < mLoads.length - 1; i++) {
-            mLoads[i] = mLoads[i + 1];
-            totalLoad += mLoads[i];
-        }
-        mLoads[mLoads.length - 1] = curLoad;
-        totalLoad += mLoads[mLoads.length - 1];
-        return totalLoad / mLoads.length;
+        edge.setAttribute("ui.class", loadLv);
     }
 }
