@@ -23,14 +23,15 @@ public class Main {
     private static Runnable mRunnable;
 
     public static void main(String[] args) {
-        sParams = new ParameterStorage(0.4, 2.0, 0, 2, ParameterStorage.ALGO_OSPF);
+        sParams = new ParameterStorage(0.4, 0.3, 0, 2, ParameterStorage.ALGO_OSPF);
         sGui = new NewGui();
         initAlgo();
 
         sGui.init();
 
         // Build demo graph
-        Link.buildDemoGraph1();
+        //Link.buildDemoGraph1();
+        Link.buildDemoGraph2();
 
         Mutex mutex = new Mutex();
 

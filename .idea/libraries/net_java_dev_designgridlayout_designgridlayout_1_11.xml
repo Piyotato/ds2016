@@ -3,6 +3,7 @@
     <properties maven-id="net.java.dev.designgridlayout:designgridlayout:1.11" />
     <CLASSES>
       <root url="jar://$MAVEN_REPOSITORY$/net/java/dev/designgridlayout/designgridlayout/1.11/designgridlayout-1.11.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/net/java/dev/designgridlayout/designgridlayout/1.11/designgridlayout-1.11.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

@@ -101,18 +101,32 @@ class Link {
     }
 
     /**
-     * Construct a simple diamond graph
-     * for demonstration purposes
+     * OSPF chokes; others ok
      */
     static void buildDemoGraph1() {
-        addNode(80); // Node 0
-        addNode(40); // Node 1
-        addNode(80); // Node 2
-        addNode(40); // Node 3
+        addNode(8); // Node 0
+        addNode(4); // Node 1
+        addNode(8); // Node 2
+        addNode(4); // Node 3
 
-        addEdge(0, 1, 40);
-        addEdge(1, 2, 40);
-        addEdge(0, 3, 40);
-        addEdge(3, 2, 40);
+        addEdge(0, 1, 4);
+        addEdge(1, 2, 4);
+        addEdge(0, 3, 4);
+        addEdge(3, 2, 4);
+    }
+
+    /**
+     * AntNet not ok; others ok
+     */
+    static void buildDemoGraph2() {
+        addNode(8); // Node 0
+        addNode(8); // Node 1
+        addNode(8); // Node 2
+        addNode(8); // Node 3
+
+        addEdge(0, 1, 4);
+        addEdge(1, 2, 4);
+        addEdge(0, 3, 4);
+        addEdge(3, 2, 4);
     }
 }
