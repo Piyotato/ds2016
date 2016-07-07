@@ -50,7 +50,7 @@ class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
         int edgeStatusSize = edgeLoadList.size();
         if (Main.DEBUG) System.out.println("compute: val = " + edgeStatusSize);
 
-        for (int i = 0; i < edgeStatusSize - 1; i++) {
+        for (int i = 0; i < edgeStatusSize; i++) {
             Edge edge = sGraph.getEdge(i);
             if (Main.DEBUG) System.out.println("compute: edgeId = " + edge.getId());
             mEdgeLoads.put(edge, edgeLoadList.get(i));
