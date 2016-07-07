@@ -12,10 +12,10 @@ class AntNet implements AlgorithmBase {
 
     private final double alpha, interval;
     private final int TTL;
-    private int source, destination;
     private final ArrayList<Edge_ACO> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat = new HashMap2D<>();
     private final ArrayList<Node_AntNet> nodes = new ArrayList<>();
+    private int source, destination;
     private int success, failure, currentTime, packetCnt, numAntsGen;
     private boolean hasInit;
 
@@ -199,19 +199,11 @@ class AntNet implements AlgorithmBase {
                     if (nxt == null) {
                         continue;
                     }
-                    if (nxt >= 0) { // If there was no cycle
-                        ant.timings.add((double) (node.slowQ.size() + node.fastQ.size()) / node.speed); // Depletion time
-                        ant.timings.add((double) adjMat.get(node.nodeID, nxt).cost);
-                        ant.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
-                        if (!ant.isValid(ant.timestamp) && nxt != ant.destination) {
-                            continue; // Would expire before reaching
-                        }
-                    } else {
-                        nxt = -nxt;
-                        ant.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
-                        if (!ant.isValid(ant.timestamp)) { // nxt can't be destination
-                            continue;
-                        }
+                    ant.timings.add((double) (node.slowQ.size() + node.fastQ.size()) / node.speed); // Depletion time
+                    ant.timings.add((double) adjMat.get(node.nodeID, nxt).cost);
+                    ant.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
+                    if (!ant.isValid(ant.timestamp) && nxt != ant.destination) {
+                        continue; // Would expire before reaching
                     }
                     adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
                 } else {

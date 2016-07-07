@@ -199,19 +199,11 @@ class EACO implements AlgorithmBase {
                     if (nxt == null) {
                         continue;
                     }
-                    if (nxt >= 0) { // If there was no cycle
-                        ant.timings.add((double) (node.slowQ.size() + node.fastQ.size()) / node.speed); // Depletion time
-                        ant.timings.add((double) adjMat.get(node.nodeID, nxt).cost);
-                        ant.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
-                        if (!ant.isValid(ant.timestamp) && nxt != ant.destination) {
-                            continue; // Would expire before reaching
-                        }
-                    } else {
-                        nxt = -nxt;
-                        ant.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
-                        if (!ant.isValid(ant.timestamp)) { // nxt can't be destination
-                            continue;
-                        }
+                    ant.timings.add((double) (node.slowQ.size() + node.fastQ.size()) / node.speed); // Depletion time
+                    ant.timings.add((double) adjMat.get(node.nodeID, nxt).cost);
+                    ant.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
+                    if (!ant.isValid(ant.timestamp) && nxt != ant.destination) {
+                        continue; // Would expire before reaching
                     }
                     adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
                 } else {
