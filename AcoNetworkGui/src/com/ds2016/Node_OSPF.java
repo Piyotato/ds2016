@@ -44,6 +44,6 @@ class Node_OSPF {
      * @return Neighbour for next hop
      */
     int nextHop(Packet packet) {
-        return SSSP.B.get(packet.destination);
+        return SSSP.next(packet.destination);
     }
 }
