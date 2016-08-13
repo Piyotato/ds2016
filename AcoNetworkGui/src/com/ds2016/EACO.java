@@ -165,7 +165,7 @@ class EACO implements AlgorithmBase {
      */
     private void processNode(Node_EACO node) {
         int left = node.speed;
-        while (!node.fastQ.isEmpty() && left-- > 0) {
+        while (!node.fastQ.isEmpty()) {
             Ant ant = node.fastQ.poll();
             if (ant.isBackwards) { // Backward ant
                 ant.updateTotalTime();
@@ -217,6 +217,7 @@ class EACO implements AlgorithmBase {
             if (packet.destination == node.nodeID) {
                 ++success;
                 --packetCnt;
+                ++left;
                 continue;
             } else if (!packet.isValid(currentTime)) {
                 ++failure;

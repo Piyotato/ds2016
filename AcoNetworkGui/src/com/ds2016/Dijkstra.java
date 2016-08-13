@@ -34,7 +34,7 @@ class Dijkstra {
         }
         D.set(_source, 0);
         // Add neighbours
-        for (Edge edge: _adjMat.get(_source).values()) {
+        for (Edge edge : _adjMat.get(_source).values()) {
             D.set(edge.destination, edge.cost);
             P.get(edge.destination).add(edge.destination);
             PQ.add(new Pair<>(edge.destination, edge.cost));
@@ -51,13 +51,13 @@ class Dijkstra {
                     D.set(edge.destination, nc);
                     // Add parents
                     P.get(edge.destination).clear();
-                    for (Integer parent: P.get(top.getKey())) {
+                    for (Integer parent : P.get(top.getKey())) {
                         P.get(edge.destination).add(parent);
                     }
                     PQ.add(new Pair<>(edge.destination, nc));
                 } else if (nc == D.get(edge.destination)) {
                     // Add parents
-                    for (Integer parent: P.get(top.getKey())) {
+                    for (Integer parent : P.get(top.getKey())) {
                         if (P.get(edge.destination).size() == K) break;
                         P.get(edge.destination).add(parent);
                     }

@@ -11,9 +11,11 @@ import java.util.ArrayList;
 class Node_EACO {
 
     private final static double EPS = 1e-9;
+    private final double EXP = 1.4;
 
     final int speed, nodeID;
     final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node
+    final HashMap2D<Integer, Integer, Double> routing = new HashMap2D<>();
     final ArrayDeque<Ant> fastQ = new ArrayDeque<>();
     final ArrayDeque<Packet> slowQ = new ArrayDeque<>();
     private final double alpha;
@@ -56,6 +58,7 @@ class Node_EACO {
             }
             for (Edge_ACO edge : adjMat.get(nodeID).values()) { // For each neighbour
                 pheromone.put(a, edge.destination, 1. / numNeighbours);
+                routing.put(a, edge.destination, 1. / numNeighbours);
             }
         }
     }
@@ -87,7 +90,7 @@ class Node_EACO {
             if (edge.isOffline) continue; // Link is offline
             if (nodes.get(edge.destination).isOffline) continue; // Node is offline
             if (!packet.canVisit(edge.destination)) continue; // Cycle detection
-            Double tau = pheromone.get(packet.destination, edge.destination); // Pheromone
+            Double tau = routing.get(packet.destination, edge.destination); // Pheromone
             if (tau == null) continue; // Not viable
             Double eta = 1. / edge.cost; // 1 / Distance
             neighbours.add(new Pair<>(edge.destination, Math.pow(tau, alpha) * Math.pow(eta, beta)));
@@ -170,6 +173,28 @@ class Node_EACO {
             Double val = pheromone.get(destination, a);
             if (val != null) {
                 pheromone.put(destination, a, val * (1 - change / tot));
+            }
+        }
+        updateRouting(destination);
+    }
+
+    /**
+     * Updating routing tables
+     *
+     * @param destination ID of destination
+     */
+    void updateRouting(int destination) {
+        double tot = 0;
+        for (int a = 0; a < nodes.size(); ++a) {
+            Double val = pheromone.get(destination, a);
+            if (val != null) {
+                tot += Math.pow(val, EXP);
+                routing.put(destination, a, Math.pow(val, EXP));
+            }
+        }
+        for (int a = 0; a < nodes.size(); ++a) {
+            if (pheromone.get(destination, a) != null) {
+                routing.put(destination, a, routing.get(destination, a) / tot);
             }
         }
     }

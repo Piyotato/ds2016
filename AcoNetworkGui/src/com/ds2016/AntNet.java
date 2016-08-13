@@ -165,7 +165,7 @@ class AntNet implements AlgorithmBase {
      */
     private void processNode(Node_AntNet node) {
         int left = node.speed;
-        while (!node.fastQ.isEmpty() && left-- > 0) {
+        while (!node.fastQ.isEmpty()) {
             Ant ant = node.fastQ.poll();
             if (ant.isBackwards) { // Backward ant
                 ant.updateTotalTime();
@@ -217,6 +217,7 @@ class AntNet implements AlgorithmBase {
             if (packet.destination == node.nodeID) {
                 ++success;
                 --packetCnt;
+                ++left;
                 continue;
             } else if (!packet.isValid(currentTime)) {
                 ++failure;
@@ -263,7 +264,7 @@ class AntNet implements AlgorithmBase {
         // Send ants from all nodes
         int curNumAnts = (int)((currentTime * 100) / (interval * 1000));
         Random rand = new Random();
-        for (Node_AntNet node: nodes) {
+        for (Node_AntNet node : nodes) {
             if (node.isOffline) continue;
             for (int cnt = 0; numAntsGen + cnt < curNumAnts; ++cnt) {
                 int randomNode = rand.nextInt(nodes.size());
@@ -289,12 +290,12 @@ class AntNet implements AlgorithmBase {
      */
     public Pair<Integer, Integer> tick() {
         ++currentTime;
-        for (Edge_ACO edge: edgeList) {
+        for (Edge_ACO edge : edgeList) {
             if (edge.isOffline) continue;
             processEdge(edge);
         }
         generatePackets();
-        for (Node_AntNet node: nodes) {
+        for (Node_AntNet node : nodes) {
             if (node.isOffline) continue;
             processNode(node);
         }
@@ -312,11 +313,11 @@ class AntNet implements AlgorithmBase {
     public Pair<Integer, Integer> terminate() {
         while (packetCnt > 0) {
             ++currentTime;
-            for (Edge_ACO edge: edgeList) {
+            for (Edge_ACO edge : edgeList) {
                 if (edge.isOffline) continue;
                 processEdge(edge);
             }
-            for (Node_AntNet node: nodes) {
+            for (Node_AntNet node : nodes) {
                 if (node.isOffline) continue;
                 processNode(node);
             }
@@ -338,14 +339,14 @@ class AntNet implements AlgorithmBase {
         edgeList.clear();
         adjMat.clear();
         // Node
-        for (Node_GUI node: _nodes) {
+        for (Node_GUI node : _nodes) {
             nodes.add(new Node_AntNet(node.speed, nodes, edgeList, adjMat, alpha));
             if (node.isOffline) {
                 nodes.get(nodes.size() - 1).isOffline = true;
             }
         }
         // Edges
-        for (SimpleEdge edge: _edgeList) {
+        for (SimpleEdge edge : _edgeList) {
             Edge_ACO forward = new Edge_ACO(edge.source, edge.destination, edge.cost);
             Edge_ACO backward = new Edge_ACO(edge.destination, edge.source, edge.cost);
             if (edge.isOffline) {
