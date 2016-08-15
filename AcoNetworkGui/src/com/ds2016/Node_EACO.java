@@ -16,6 +16,7 @@ class Node_EACO {
     final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node
     final ArrayDeque<Ant> fastQ = new ArrayDeque<>();
     final ArrayDeque<Packet> slowQ = new ArrayDeque<>();
+    private ArrayList<Integer> numViableNeighbours = new ArrayList<>();
     private final double alpha;
     private final ArrayList<Node_EACO> nodes;
     private final ArrayList<Edge_ACO> edgeList;
@@ -59,6 +60,7 @@ class Node_EACO {
                 pheromone.put(a, edge.destination, 1. / numNeighbours);
                 routing.put(a, edge.destination, 1. / numNeighbours);
             }
+            numViableNeighbours.add(numNeighbours);
         }
     }
 
@@ -72,6 +74,59 @@ class Node_EACO {
             if (edge.isOffline) continue;
             DSU.unionSet(edge.source, edge.destination);
         }
+    }
+
+    /**
+     * React to toggling of node
+     *
+     * @param ID Node ID
+     */
+    void toggleNode(int ID) {
+        if (nodes.get(nodeID).isOffline) {
+            initDSU();
+        } else {
+            // Merge edges
+            for (Edge_ACO edge : adjMat.get(ID).values()) {
+                if (!edge.isOffline) {
+                    // Don't merge self
+                    if (edge.source == nodeID || edge.destination == nodeID) continue;
+                    DSU.unionSet(edge.source, edge.destination);
+                }
+            }
+        }
+        update();
+    }
+
+    /**
+     * React to addition of an edge
+     *
+     * @param node1 First node
+     * @param node2 Second node
+     */
+    void addEdge(int node1, int node2) {
+        // Don't merge self
+        if (node1 == nodeID || node2 == nodeID) return;
+        DSU.unionSet(node1, node2);
+        update();
+    }
+
+    /**
+     * React to toggling of an edge
+     *
+     * @param ID Edge ID
+     */
+    void toggleEdge(int ID) {
+        // If self is involved, it doesn't affect viability
+        int src = edgeList.get(ID).source;
+        int dst = edgeList.get(ID).destination;
+        if (src == nodeID || dst == nodeID)
+            return;
+        if (edgeList.get(ID).isOffline) {
+            initDSU();
+        } else {
+            DSU.unionSet(src, dst);
+        }
+        update();
     }
 
     /**
@@ -106,13 +161,15 @@ class Node_EACO {
     }
 
     /**
-     * Rebuild DSU
      * Update heuristic
      */
-    void rebuild() {
+    private void update() {
+        // Resize just in case
+        while (numViableNeighbours.size() < nodes.size()) {
+            numViableNeighbours.add(0);
+        }
         ArrayList<Integer> neighbours = new ArrayList<>();
         ArrayList<Integer> destinations = new ArrayList<>();
-        initDSU();
         for (Edge_ACO edge : adjMat.get(nodeID).values()) {
             neighbours.add(edge.destination);
         }
@@ -127,11 +184,13 @@ class Node_EACO {
                     if (DSU.sameSet(neighbour, dest) &&
                             !adjMat.get(nodeID, neighbour).isOffline &&
                             !nodes.get(neighbour).isOffline) // Now viable
+                        numViableNeighbours.set(dest, numViableNeighbours.get(dest) + 1);
                         addHeuristic(neighbour, dest);
                 } else { // Previously viable
                     if (!DSU.sameSet(neighbour, dest) ||
                             adjMat.get(nodeID, neighbour).isOffline ||
                             nodes.get(neighbour).isOffline) // Now not viable
+                        numViableNeighbours.set(dest, numViableNeighbours.get(dest) - 1);
                         removeHeuristic(neighbour, dest);
                 }
             }
@@ -146,7 +205,7 @@ class Node_EACO {
      * @param neighbour   ID of neighbour
      * @param destination ID of destination
      * @param change      Pheromone change
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException if pheromone lies out of range [0, 1]
      */
     void updateHeuristic(int neighbour, int destination, double change) throws IllegalArgumentException {
         Double old = pheromone.get(destination, neighbour);
@@ -206,12 +265,7 @@ class Node_EACO {
      * @param destination Destination ID
      */
     private void addHeuristic(int neighbour, int destination) {
-        int numNeighbours = 0;
-        for (Edge_ACO edge : adjMat.get(nodeID).values()) {
-            if (edge.isOffline || nodes.get(edge.destination).isOffline) continue;
-            if (DSU.sameSet(edge.destination, destination)) ++numNeighbours;
-        }
-        updateHeuristic(neighbour, destination, 1. / numNeighbours);
+        updateHeuristic(neighbour, destination, 1. / numViableNeighbours.get(destination));
     }
 
     /**

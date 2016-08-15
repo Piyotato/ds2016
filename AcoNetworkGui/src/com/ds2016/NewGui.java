@@ -231,7 +231,7 @@ public class NewGui {
      * Toggle state of a node
      *
      * @param ID Node ID
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException if ID is out of bounds
      */
     void toggleNode(int ID) throws IllegalArgumentException {
         if (ID == sParams.getSource() || ID == sParams.getDestination()) {
@@ -257,7 +257,7 @@ public class NewGui {
      * @param node1 First node
      * @param node2 Second node
      * @param cost  Time taken
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException if ID is out of bounds
      */
     void addEdge(int node1, int node2, int cost) throws IllegalArgumentException {
         // We can't add edges between non-existent nodes

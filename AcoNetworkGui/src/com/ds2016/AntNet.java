@@ -17,7 +17,7 @@ class AntNet implements AlgorithmBase {
     private final ArrayList<Node_AntNet> nodes = new ArrayList<>();
     private int source, destination;
     private int success, failure, currentTime, packetCnt, numAntsGen;
-    private boolean hasInit;
+    private boolean didInit;
 
     /**
      * Initialize EACO
@@ -44,7 +44,7 @@ class AntNet implements AlgorithmBase {
         for (Node_AntNet node: nodes) {
             node.init();
         }
-        hasInit = true;
+        didInit = true;
     }
 
     /**
@@ -86,7 +86,7 @@ class AntNet implements AlgorithmBase {
      * Toggle state of a node
      *
      * @param ID Node ID
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException if ID is out of bounds
      */
     public void toggleNode(int ID) throws IllegalArgumentException {
         if (ID == source || ID == destination) {
@@ -104,7 +104,7 @@ class AntNet implements AlgorithmBase {
                 edge.ants.clear();
             }
         }
-        if (hasInit)
+        if (didInit)
             for (Edge_ACO edge: adjMat.get(ID).values()) {
                 nodes.get(edge.destination).toggleNode(ID);
             }
@@ -116,7 +116,7 @@ class AntNet implements AlgorithmBase {
      * @param node1 First node
      * @param node2 Second node
      * @param cost Time taken
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException if ID is out of bounds
      */
     public void addEdge(int node1, int node2, int cost) throws IllegalArgumentException {
         if (node1 >= nodes.size() || node2 >= nodes.size()) {
@@ -128,7 +128,7 @@ class AntNet implements AlgorithmBase {
         edgeList.add(backward);
         adjMat.put(node1, node2, forward);
         adjMat.put(node2, node1, backward);
-        if (hasInit) {
+        if (didInit) {
             nodes.get(node1).addEdge(node2);
             nodes.get(node2).addEdge(node1);
         }
@@ -152,7 +152,7 @@ class AntNet implements AlgorithmBase {
             backward.packets.clear();
             backward.ants.clear();
         }
-        if (hasInit) {
+        if (didInit) {
             nodes.get(forward.source).toggleEdge(forward.destination);
             nodes.get(forward.destination).toggleEdge(forward.source);
         }

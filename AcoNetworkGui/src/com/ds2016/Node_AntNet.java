@@ -150,7 +150,7 @@ class Node_AntNet {
      * @param neighbour ID of neighbour
      * @param destination ID of destination
      * @param change Pheromone change
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException if pheromone lies out of range [0, 1]
      */
     void updateHeuristic(int neighbour, int destination, double change) throws IllegalArgumentException {
         Double old = pheromone.get(destination, neighbour);

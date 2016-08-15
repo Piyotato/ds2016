@@ -80,7 +80,7 @@ class OSPF implements AlgorithmBase {
      * Toggle state of anode
      *
      * @param ID Node ID
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException if ID is out of bounds
      */
     public void toggleNode(int ID) throws IllegalArgumentException {
         if (ID == source || ID == destination) {
