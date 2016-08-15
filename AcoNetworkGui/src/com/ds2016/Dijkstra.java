@@ -21,20 +21,20 @@ class Dijkstra {
     /**
      * Initialize Dijkstra data structure
      *
-     * @param _source Source node
-     * @param _nodes  ArrayList of Node_OSPF
-     * @param _adjMat Adjacency Matrix
+     * @param source Source node
+     * @param nodes  ArrayList of Node_OSPF
+     * @param adjMat Adjacency Matrix
      */
-    Dijkstra(int _source, ArrayList<Node_OSPF> _nodes, HashMap2D<Integer, Integer, Edge> _adjMat) {
-        final PriorityQueue<Pair<Integer, Integer>> PQ = new PriorityQueue<>(_nodes.size(), pairCMP);
-        for (int a = 0; a < _nodes.size(); ++a) {
+    Dijkstra(int source, ArrayList<Node_OSPF> nodes, HashMap2D<Integer, Integer, Edge> adjMat) {
+        final PriorityQueue<Pair<Integer, Integer>> PQ = new PriorityQueue<>(nodes.size(), pairCMP);
+        for (int a = 0; a < nodes.size(); ++a) {
             D.add(INF);
             P.add(new ArrayList<>());
             CNT.add(0);
         }
-        D.set(_source, 0);
+        D.set(source, 0);
         // Add neighbours
-        for (Edge edge : _adjMat.get(_source).values()) {
+        for (Edge edge : adjMat.get(source).values()) {
             D.set(edge.destination, edge.cost);
             P.get(edge.destination).add(edge.destination);
             PQ.add(new Pair<>(edge.destination, edge.cost));
@@ -43,9 +43,9 @@ class Dijkstra {
         while (!PQ.isEmpty()) {
             Pair<Integer, Integer> top = PQ.poll();
             if (!D.get(top.getKey()).equals(top.getValue())) continue;
-            for (Edge edge : _adjMat.get(top.getKey()).values()) {
+            for (Edge edge : adjMat.get(top.getKey()).values()) {
                 if (edge.isOffline) continue;
-                if (_nodes.get(edge.destination).isOffline) continue;
+                if (nodes.get(edge.destination).isOffline) continue;
                 int nc = top.getValue() + edge.cost;
                 if (nc < D.get(edge.destination)) {
                     D.set(edge.destination, nc);

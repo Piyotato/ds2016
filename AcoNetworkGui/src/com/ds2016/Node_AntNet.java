@@ -10,18 +10,17 @@ import java.util.ArrayList;
  */
 class Node_AntNet {
 
-    private final static double EPS = 1e-9;
-    private final double EXP = 1.4;
+    private final static double EPS = 1e-9, EXP = 1.4;
 
     final int speed, nodeID;
     final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node
-    final HashMap2D<Integer, Integer, Double> routing = new HashMap2D<>();
     final ArrayDeque<Ant> fastQ = new ArrayDeque<>();
     final ArrayDeque<Packet> slowQ = new ArrayDeque<>();
+    private int numNeighbours;
     private final double alpha;
     private final ArrayList<Node_AntNet> nodes;
-    private final ArrayList<Edge_ACO> edgeList;
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat;
+    private final HashMap2D<Integer, Integer, Double> routing = new HashMap2D<>();
     boolean isOffline;
 
     /**
@@ -29,17 +28,15 @@ class Node_AntNet {
      *
      * @param _speed Processing speed
      * @param _nodes ArrayList of Node_AntNet
-     * @param _edgeList ArrayList of Edge_ACO
      * @param _adjMat Adjacency Matrix
      * @param _alpha Weightage of pheromone
      */
-    Node_AntNet(int _speed, ArrayList<Node_AntNet> _nodes, ArrayList<Edge_ACO> _edgeList,
+    Node_AntNet(int _speed, ArrayList<Node_AntNet> _nodes,
                 HashMap2D<Integer, Integer, Edge_ACO> _adjMat, double _alpha) {
         speed = _speed;
         nodeID = _nodes.size();
         alpha = _alpha;
         nodes = _nodes;
-        edgeList = _edgeList;
         adjMat = _adjMat;
     }
 
@@ -47,7 +44,6 @@ class Node_AntNet {
      * Build pheromone table
      */
     void init() {
-        int numNeighbours = 0; // Number of online neighbours
         for (Edge_ACO edge : adjMat.get(nodeID).values()) {
             if (!edge.isOffline && !nodes.get(edge.destination).isOffline)
                 ++numNeighbours;
@@ -67,14 +63,14 @@ class Node_AntNet {
      * @param ID Node ID
      */
     void toggleNode(int ID) {
-        /* Only care about neighbours */
-        if (!adjMat.get(nodeID).keySet().contains(ID)) return;
         if (nodes.get(ID).isOffline) {
+            --numNeighbours;
             for (int a = 0; a < nodes.size(); ++a) {
                 if (a == nodeID) continue;
                 removeHeuristic(ID, a);
             }
         } else {
+            ++numNeighbours;
             for (int a = 0; a < nodes.size(); ++a) {
                 if (a == nodeID) continue;
                 addHeuristic(ID, a);
@@ -88,6 +84,7 @@ class Node_AntNet {
      * @param node Other Node
      */
     void addEdge(int node) {
+        ++numNeighbours;
         for (int a = 0; a < nodes.size(); ++a) {
             if (a == nodeID) continue;
             addHeuristic(node, a);
@@ -101,11 +98,13 @@ class Node_AntNet {
      */
     void toggleEdge(int node) {
         if (adjMat.get(nodeID, node).isOffline) {
+            --numNeighbours;
             for (int a = 0; a < nodes.size(); ++a) {
                 if (a == nodeID) continue;
                 removeHeuristic(node, a);
             }
         } else {
+            ++numNeighbours;
             for (int a = 0; a < nodes.size(); ++a) {
                 if (a == nodeID) continue;
                 addHeuristic(node, a);
@@ -121,7 +120,7 @@ class Node_AntNet {
      * @return Neighbour for next hop, or null if no candidates
      */
     Integer nextHop(Packet packet) {
-        double RNG = Math.random(), totVal = .0;
+        double RNG = Math.random(), totVal = 0;
         double beta = 1 - alpha;
         ArrayList<Pair<Integer, Double>> neighbours = new ArrayList<>(); // Neighbour, Heuristic
         for (Edge_ACO edge : adjMat.get(nodeID).values()) {
@@ -186,7 +185,7 @@ class Node_AntNet {
      *
      * @param destination ID of destination
      */
-    void updateRouting(int destination) {
+    private void updateRouting(int destination) {
         double tot = 0;
         for (int a = 0; a < nodes.size(); ++a) {
             Double val = pheromone.get(destination, a);
@@ -209,11 +208,6 @@ class Node_AntNet {
      * @param destination Destination ID
      */
     private void addHeuristic(int neighbour, int destination) {
-        int numNeighbours = 0; // Number of online neighbours
-        for (Edge_ACO edge : adjMat.get(nodeID).values()) {
-            if (!edge.isOffline && !nodes.get(edge.destination).isOffline)
-                ++numNeighbours;
-        }
         updateHeuristic(neighbour, destination, 1. / numNeighbours);
     }
 

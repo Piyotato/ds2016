@@ -79,7 +79,7 @@ class AntNet implements AlgorithmBase {
      * @param speed Processing speed
      */
     public void addNode(int speed) {
-        nodes.add(new Node_AntNet(speed, nodes, edgeList, adjMat, alpha));
+        nodes.add(new Node_AntNet(speed, nodes, adjMat, alpha));
     }
 
     /**
@@ -105,8 +105,8 @@ class AntNet implements AlgorithmBase {
             }
         }
         if (hasInit)
-            for (Node_AntNet _node: nodes) {
-                _node.toggleNode(ID);
+            for (Edge_ACO edge: adjMat.get(ID).values()) {
+                nodes.get(edge.destination).toggleNode(ID);
             }
     }
 
@@ -340,7 +340,7 @@ class AntNet implements AlgorithmBase {
         adjMat.clear();
         // Node
         for (Node_GUI node : _nodes) {
-            nodes.add(new Node_AntNet(node.speed, nodes, edgeList, adjMat, alpha));
+            nodes.add(new Node_AntNet(node.speed, nodes, adjMat, alpha));
             if (node.isOffline) {
                 nodes.get(nodes.size() - 1).isOffline = true;
             }

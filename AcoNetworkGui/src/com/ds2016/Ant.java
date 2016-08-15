@@ -8,20 +8,20 @@ import java.util.ArrayList;
 class Ant extends Packet {
 
     final ArrayList<Double> timings = new ArrayList<>();
-    final ArrayList<Integer> path = new ArrayList<>();
     double totalTime;
     boolean isBackwards;
+    private final ArrayList<Integer> path = new ArrayList<>();
 
     /**
      * Initializes an ant
      *
-     * @param _source      Source node
-     * @param _destination Destination node
-     * @param _TTL         Time to live
-     * @param _creation    Time of creation
+     * @param source      Source node
+     * @param destination Destination node
+     * @param TTL         Time to live
+     * @param creation    Time of creation
      */
-    Ant(int _source, int _destination, int _TTL, int _creation) {
-        super(_source, _destination, _TTL, _creation);
+    Ant(int source, int destination, int TTL, int creation) {
+        super(source, destination, TTL, creation);
     }
 
     /**

@@ -31,11 +31,11 @@ class Packet {
     /**
      * Checks expiration
      *
-     * @param _time Current time
+     * @param time Current time
      * @return Whether packet is still valid
      */
-    boolean isValid(int _time) {
-        return (_time - creation) <= TTL;
+    boolean isValid(int time) {
+        return (time - creation) <= TTL;
     }
 
     /**

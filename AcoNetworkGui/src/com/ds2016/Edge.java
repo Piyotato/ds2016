@@ -12,12 +12,12 @@ class Edge extends SimpleEdge {
     /**
      * Initializes an edge
      *
-     * @param _source      Start node
-     * @param _destination End node
-     * @param _cost        Time taken to traverse
+     * @param source      Start node
+     * @param destination End node
+     * @param cost        Time taken to traverse
      */
-    Edge(int _source, int _destination, int _cost) {
-        super(_source, _destination, _cost);
+    Edge(int source, int destination, int cost) {
+        super(source, destination, cost);
     }
 
     /**

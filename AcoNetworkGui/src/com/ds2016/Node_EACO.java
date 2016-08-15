@@ -10,18 +10,17 @@ import java.util.ArrayList;
  */
 class Node_EACO {
 
-    private final static double EPS = 1e-9;
-    private final double EXP = 1.4;
+    private final static double EPS = 1e-9, EXP = 1.4;
 
     final int speed, nodeID;
     final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node
-    final HashMap2D<Integer, Integer, Double> routing = new HashMap2D<>();
     final ArrayDeque<Ant> fastQ = new ArrayDeque<>();
     final ArrayDeque<Packet> slowQ = new ArrayDeque<>();
     private final double alpha;
     private final ArrayList<Node_EACO> nodes;
     private final ArrayList<Edge_ACO> edgeList;
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat;
+    private final HashMap2D<Integer, Integer, Double> routing = new HashMap2D<>();
     boolean isOffline;
     private UFDS DSU;
 
@@ -83,7 +82,7 @@ class Node_EACO {
      * @return Neighbour for next hop, or null if no candidates
      */
     Integer nextHop(Packet packet) {
-        double RNG = Math.random(), totVal = .0;
+        double RNG = Math.random(), totVal = 0;
         double beta = 1 - alpha;
         ArrayList<Pair<Integer, Double>> neighbours = new ArrayList<>(); // Neighbour, Heuristic
         for (Edge_ACO edge : adjMat.get(nodeID).values()) {
@@ -183,7 +182,7 @@ class Node_EACO {
      *
      * @param destination ID of destination
      */
-    void updateRouting(int destination) {
+    private void updateRouting(int destination) {
         double tot = 0;
         for (int a = 0; a < nodes.size(); ++a) {
             Double val = pheromone.get(destination, a);
