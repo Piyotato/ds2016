@@ -3,6 +3,7 @@ package com.ds2016;
 import com.sun.corba.se.impl.orbutil.concurrent.Mutex;
 
 import static com.ds2016.Main.*;
+import static com.ds2016.NewGui.sDataChart;
 import static com.ds2016.NewGui.sGraphAlgo;
 
 /**
@@ -13,8 +14,9 @@ import static com.ds2016.NewGui.sGraphAlgo;
 class Link {
 
     static void tick() {
-        sAlgo.tick();
+        sTickVal = sAlgo.tick();
         sGraphAlgo.compute();
+        sDataChart.updateCharts();
     }
 
     static void addNode(int speed) {
@@ -91,17 +93,17 @@ class Link {
         sGui.update();
         Main.initAlgo();
         sAlgo.build(sGui.mNodeList, sGui.mEdgeList, sParams.getSource(), sParams.getDestination());
-
+        sDataChart.resetCharts();
     }
 
     /**
      * OSPF chokes; others ok
      */
-    static void buildDemoGraph1() {
-        addNode(8); // Node 0
-        addNode(4); // Node 1
-        addNode(8); // Node 2
-        addNode(4); // Node 3
+    static void buildDiamond1() {
+        // Add 4 nodes
+        for (int i = 0; i < 4; i++) {
+            addNode(8);
+        }
 
         addEdge(0, 1, 4);
         addEdge(1, 2, 4);
@@ -112,15 +114,72 @@ class Link {
     /**
      * AntNet not ok; others ok
      */
-    static void buildDemoGraph2() {
-        addNode(8); // Node 0
-        addNode(8); // Node 1
-        addNode(8); // Node 2
-        addNode(8); // Node 3
+    static void buildDiamond2() {
+        // Add 4 nodes
+        for (int i = 0; i < 4; i++) {
+            addNode(8);
+        }
 
         addEdge(0, 1, 4);
         addEdge(1, 2, 4);
         addEdge(0, 3, 4);
         addEdge(3, 2, 4);
+    }
+
+    static void buildDoubleDiamond() {
+        // Add 5 nodes
+        for (int i = 0; i < 5; i++) {
+            addNode(8);
+        }
+
+        addEdge(0, 1, 4);
+        addEdge(0, 4, 4);
+        addEdge(1, 4, 4);
+        addEdge(2, 3, 4);
+        addEdge(2, 4, 4);
+        addEdge(3, 4, 4);
+    }
+
+    static void buildBananaTree() {
+        // Add 31 nodes
+        for (int i = 0; i < 31; i++) {
+            addNode(8);
+        }
+
+        addEdge(0, 1, 4);
+        addEdge(0, 2, 4);
+        addEdge(0, 3, 4);
+        addEdge(0, 4, 4);
+        addEdge(0, 5, 4);
+
+        addEdge(6, 1, 4);
+        addEdge(6, 7, 4);
+        addEdge(6, 8, 4);
+        addEdge(6, 9, 4);
+        addEdge(6, 10, 4);
+
+        addEdge(11, 2, 4);
+        addEdge(11, 12, 4);
+        addEdge(11, 13, 4);
+        addEdge(11, 14, 4);
+        addEdge(11, 15, 4);
+
+        addEdge(16, 3, 4);
+        addEdge(16, 17, 4);
+        addEdge(16, 18, 4);
+        addEdge(16, 19, 4);
+        addEdge(16, 20, 4);
+
+        addEdge(21, 4, 4);
+        addEdge(21, 22, 4);
+        addEdge(21, 23, 4);
+        addEdge(21, 24, 4);
+        addEdge(21, 25, 4);
+
+        addEdge(26, 5, 4);
+        addEdge(26, 27, 4);
+        addEdge(26, 28, 4);
+        addEdge(26, 29, 4);
+        addEdge(26, 30, 4);
     }
 }

@@ -16,13 +16,13 @@ class Node_EACO {
     final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node
     final ArrayDeque<Ant> fastQ = new ArrayDeque<>();
     final ArrayDeque<Packet> slowQ = new ArrayDeque<>();
-    private ArrayList<Integer> numViableNeighbours = new ArrayList<>();
     private final double alpha;
     private final ArrayList<Node_EACO> nodes;
     private final ArrayList<Edge_ACO> edgeList;
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat;
     private final HashMap2D<Integer, Integer, Double> routing = new HashMap2D<>();
     boolean isOffline;
+    private ArrayList<Integer> numViableNeighbours = new ArrayList<>();
     private UFDS DSU;
 
     /**
@@ -185,13 +185,13 @@ class Node_EACO {
                             !adjMat.get(nodeID, neighbour).isOffline &&
                             !nodes.get(neighbour).isOffline) // Now viable
                         numViableNeighbours.set(dest, numViableNeighbours.get(dest) + 1);
-                        addHeuristic(neighbour, dest);
+                    addHeuristic(neighbour, dest);
                 } else { // Previously viable
                     if (!DSU.sameSet(neighbour, dest) ||
                             adjMat.get(nodeID, neighbour).isOffline ||
                             nodes.get(neighbour).isOffline) // Now not viable
                         numViableNeighbours.set(dest, numViableNeighbours.get(dest) - 1);
-                        removeHeuristic(neighbour, dest);
+                    removeHeuristic(neighbour, dest);
                 }
             }
         }

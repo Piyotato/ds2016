@@ -22,8 +22,8 @@ class AntNet implements AlgorithmBase {
     /**
      * Initialize EACO
      *
-     * @param _alpha Weightage of pheromone
-     * @param _TTL Time To Live of packets
+     * @param _alpha    Weightage of pheromone
+     * @param _TTL      Time To Live of packets
      * @param _interval Interval of Ant Generation
      */
     public AntNet(double _alpha, int _TTL, double _interval) {
@@ -35,13 +35,13 @@ class AntNet implements AlgorithmBase {
     /**
      * Initialize AntNet
      *
-     * @param _source Source node
+     * @param _source      Source node
      * @param _destination Destination node
      */
     public void init(int _source, int _destination) {
         source = _source;
         destination = _destination;
-        for (Node_AntNet node: nodes) {
+        for (Node_AntNet node : nodes) {
             node.init();
         }
         didInit = true;
@@ -54,7 +54,7 @@ class AntNet implements AlgorithmBase {
      */
     public ArrayList<Integer> getNodeStatus() {
         ArrayList<Integer> ret = new ArrayList<>();
-        for (Node_AntNet node: nodes) {
+        for (Node_AntNet node : nodes) {
             ret.add(node.slowQ.size());
         }
         return ret;
@@ -67,7 +67,7 @@ class AntNet implements AlgorithmBase {
      */
     public ArrayList<Integer> getEdgeStatus() {
         ArrayList<Integer> ret = new ArrayList<>();
-        for (Edge_ACO edge: edgeList) {
+        for (Edge_ACO edge : edgeList) {
             ret.add(edge.packets.size());
         }
         return ret;
@@ -98,14 +98,14 @@ class AntNet implements AlgorithmBase {
             packetCnt -= node.slowQ.size();
             node.fastQ.clear();
             node.slowQ.clear();
-            for (Edge_ACO edge: adjMat.get(ID).values()) {
+            for (Edge_ACO edge : adjMat.get(ID).values()) {
                 packetCnt -= edge.packets.size();
                 edge.packets.clear();
                 edge.ants.clear();
             }
         }
         if (didInit)
-            for (Edge_ACO edge: adjMat.get(ID).values()) {
+            for (Edge_ACO edge : adjMat.get(ID).values()) {
                 nodes.get(edge.destination).toggleNode(ID);
             }
     }
@@ -115,7 +115,7 @@ class AntNet implements AlgorithmBase {
      *
      * @param node1 First node
      * @param node2 Second node
-     * @param cost Time taken
+     * @param cost  Time taken
      * @throws IllegalArgumentException if ID is out of bounds
      */
     public void addEdge(int node1, int node2, int cost) throws IllegalArgumentException {
@@ -262,7 +262,7 @@ class AntNet implements AlgorithmBase {
      */
     private void generatePackets() {
         // Send ants from all nodes
-        int curNumAnts = (int)((currentTime * 100) / (interval * 1000));
+        int curNumAnts = (int) ((currentTime * 100) / (interval * 1000));
         Random rand = new Random();
         for (Node_AntNet node : nodes) {
             if (node.isOffline) continue;
@@ -328,9 +328,9 @@ class AntNet implements AlgorithmBase {
     /**
      * Build graph from supplied information
      *
-     * @param _nodes Node_GUI nodes
-     * @param _edgeList SimpleEdge edges
-     * @param _source Source node
+     * @param _nodes       Node_GUI nodes
+     * @param _edgeList    SimpleEdge edges
+     * @param _source      Source node
      * @param _destination Destination node
      */
     public void build(ArrayList<Node_GUI> _nodes, ArrayList<SimpleEdge> _edgeList, int _source, int _destination) {

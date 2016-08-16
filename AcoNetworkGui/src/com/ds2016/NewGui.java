@@ -27,6 +27,7 @@ public class NewGui {
     private static final String FRAME_TITLE = "EACO";
     private static final String GRAPH_TITLE = "Simulation";
     static DynamicAlgorithm sGraphAlgo;
+    static DataChart sDataChart;
     ArrayList<Node_GUI> mNodeList = new ArrayList<>();
     ArrayList<SimpleEdge> mEdgeList = new ArrayList<>();
     private JPanel mainPanel;
@@ -69,7 +70,7 @@ public class NewGui {
     }
 
     private void initNetworkPanel() {
-        // Disabled again since it makes the graph wonky
+        // Disable when necessary
         System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
 
         sGraph = new SingleGraph(GRAPH_TITLE);
@@ -79,9 +80,13 @@ public class NewGui {
 
         sGraphAlgo = new GraphAlgo();
         sGraphAlgo.init(sGraph);
-        //sGraphAlgo.compute();
 
         sGraph.display();
+    }
+
+    private void initChartPanel() {
+        sDataChart = new DataChart();
+        sDataChart.display();
     }
 
     private void createUIComponents() {
@@ -89,9 +94,10 @@ public class NewGui {
         mThread = new Thread(mRunnable, GRAPH_THREAD);
 
         initNetworkPanel();
+        initChartPanel();
 
-        /**
-         * Set the current algorithm
+        /*
+          Set the current algorithm
          */
         mOspfBtn = new JRadioButton();
         mOspfBtn.addActionListener(actionEvent -> sParams.setAlgorithm(1));
@@ -102,20 +108,20 @@ public class NewGui {
         mEAcoBtn = new JRadioButton();
         mEAcoBtn.addActionListener(actionEvent -> sParams.setAlgorithm(3));
 
-        /**
-         * Add a new node
+        /*
+          Add a new node
          */
         mAddNodeBtn = new JButton();
         mAddNodeBtn.addActionListener(actionEvent -> Link.addNode(Integer.parseInt(mSpeedField.getText())));
 
-        /**
-         * Toggle Node
+        /*
+          Toggle Node
          */
         mToggleNodeBtn = new JButton();
         mToggleNodeBtn.addActionListener(actionEvent -> Link.toggleNode(Integer.parseInt(mToggleNodeField.getText())));
 
-        /**
-         * Add a new edge
+        /*
+          Add a new edge
          */
         mAddEdgeBtn = new JButton();
         mAddEdgeBtn.addActionListener(actionEvent -> {
@@ -125,32 +131,32 @@ public class NewGui {
             Link.addEdge(from, to, distance);
         });
 
-        /**
-         * Toggle edge
+        /*
+          Toggle edge
          */
         mToggleEdgeBtn = new JButton();
         mToggleEdgeBtn.addActionListener(actionEvent -> Link.toggleEdge(Integer.parseInt(mToggleEdgeField.getText())));
 
-        /**
-         * Save parameters
+        /*
+          Save parameters
          */
         mUpdateBtn = new JButton();
         mUpdateBtn.addActionListener(actionEvent -> Link.update());
 
-        /**
-         * Start the sGraph algorithm thread
+        /*
+          Start the sGraph algorithm thread
          */
         mStartBtn = new JButton();
         mStartBtn.addActionListener(actionEvent -> Link.start());
 
-        /**
-         * Stop the sGraph algorithm thread
+        /*
+          Stop the sGraph algorithm thread
          */
         mStopBtn = new JButton();
         mStopBtn.addActionListener(actionEvent -> Link.stop());
 
-        /**
-         * Undergo one tick of the entire program (sGraph + algorithm)
+        /*
+          Undergo one tick of the entire program (sGraph + algorithm)
          */
         mTickBtn = new JButton();
         mTickBtn.addActionListener(actionEvent -> Link.tick());

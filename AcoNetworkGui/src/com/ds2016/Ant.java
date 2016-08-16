@@ -8,9 +8,9 @@ import java.util.ArrayList;
 class Ant extends Packet {
 
     final ArrayList<Double> timings = new ArrayList<>();
+    private final ArrayList<Integer> path = new ArrayList<>();
     double totalTime;
     boolean isBackwards;
-    private final ArrayList<Integer> path = new ArrayList<>();
 
     /**
      * Initializes an ant

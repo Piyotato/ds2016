@@ -1,5 +1,6 @@
 package com.ds2016;
 
+import static com.ds2016.NewGui.sDataChart;
 import static com.ds2016.NewGui.sGraphAlgo;
 
 /**
@@ -10,8 +11,9 @@ class GraphRunnable implements Runnable {
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             sGraphAlgo.compute();
+            sDataChart.updateCharts();
             try {
-                Thread.sleep(500);
+                Thread.sleep(Main.POLL_MS);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

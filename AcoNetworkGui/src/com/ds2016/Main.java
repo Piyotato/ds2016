@@ -1,6 +1,7 @@
 package com.ds2016;
 
 import com.sun.corba.se.impl.orbutil.concurrent.Mutex;
+import javafx.util.Pair;
 import org.graphstream.graph.Graph;
 
 /**
@@ -8,16 +9,16 @@ import org.graphstream.graph.Graph;
  */
 public class Main {
 
-    static final boolean DEBUG = true;
-
+    static final boolean DEBUG = false;
+    static final int POLL_MS = 100; // Algorithm tick delay in ms
     private static final String ALGO_THREAD = "ALGO_THREAD";
-    private static final int POLL_MS = 100; // Algorithm tick delay in ms
     private static final int TTL_MS = 15000 / POLL_MS; // Time to live of ants in ms, relative to POLL_MS
 
     static ParameterStorage sParams;
     static AlgorithmBase sAlgo;
     static Graph sGraph;
     static NewGui sGui;
+    static Pair<Integer, Integer> sTickVal;
 
     private static Thread mThread;
     private static Runnable mRunnable;
@@ -29,9 +30,7 @@ public class Main {
 
         sGui.init();
 
-        // Build demo graph
-        //Link.buildDemoGraph1();
-        Link.buildDemoGraph2();
+        Link.buildDoubleDiamond();
 
         Mutex mutex = new Mutex();
 
@@ -40,7 +39,7 @@ public class Main {
                 try {
                     mutex.acquire();
                     try {
-                        sAlgo.tick();
+                        sTickVal = sAlgo.tick();
                     } finally {
                         mutex.release();
                     }

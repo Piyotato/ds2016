@@ -262,7 +262,7 @@ class EACO implements AlgorithmBase {
      */
     private void generatePackets() {
         // Send ants from all nodes
-        int curNumPackets = (int)((currentTime * 100) / (interval * 1000));
+        int curNumPackets = (int) ((currentTime * 100) / (interval * 1000));
         Random rand = new Random();
         for (Node_EACO node : nodes) {
             if (node.isOffline) continue;

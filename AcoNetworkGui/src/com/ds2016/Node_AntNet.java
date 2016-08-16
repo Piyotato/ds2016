@@ -16,20 +16,20 @@ class Node_AntNet {
     final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node
     final ArrayDeque<Ant> fastQ = new ArrayDeque<>();
     final ArrayDeque<Packet> slowQ = new ArrayDeque<>();
-    private int numNeighbours;
     private final double alpha;
     private final ArrayList<Node_AntNet> nodes;
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat;
     private final HashMap2D<Integer, Integer, Double> routing = new HashMap2D<>();
     boolean isOffline;
+    private int numNeighbours;
 
     /**
      * Initialize a node
      *
-     * @param _speed Processing speed
-     * @param _nodes ArrayList of Node_AntNet
+     * @param _speed  Processing speed
+     * @param _nodes  ArrayList of Node_AntNet
      * @param _adjMat Adjacency Matrix
-     * @param _alpha Weightage of pheromone
+     * @param _alpha  Weightage of pheromone
      */
     Node_AntNet(int _speed, ArrayList<Node_AntNet> _nodes,
                 HashMap2D<Integer, Integer, Edge_ACO> _adjMat, double _alpha) {
@@ -147,9 +147,9 @@ class Node_AntNet {
      * Modifies other values proportionally to
      * achieve a sum of one
      *
-     * @param neighbour ID of neighbour
+     * @param neighbour   ID of neighbour
      * @param destination ID of destination
-     * @param change Pheromone change
+     * @param change      Pheromone change
      * @throws IllegalArgumentException if pheromone lies out of range [0, 1]
      */
     void updateHeuristic(int neighbour, int destination, double change) throws IllegalArgumentException {
@@ -204,7 +204,7 @@ class Node_AntNet {
     /**
      * Give pheromone to a new neighbour
      *
-     * @param neighbour Node ID
+     * @param neighbour   Node ID
      * @param destination Destination ID
      */
     private void addHeuristic(int neighbour, int destination) {
@@ -215,7 +215,7 @@ class Node_AntNet {
      * Remove pheromone from a node that is
      * no longer a neighbour
      *
-     * @param neighbour Node ID
+     * @param neighbour   Node ID
      * @param destination Destination ID
      */
     private void removeHeuristic(int neighbour, int destination) {
