@@ -57,6 +57,8 @@ class Node_EACO {
                 if (DSU.sameSet(edge.destination, a)) ++numNeighbours;
             }
             for (Edge_ACO edge : adjMat.get(nodeID).values()) { // For each neighbour
+                if (edge.isOffline || nodes.get(edge.destination).isOffline) continue;
+                if (!DSU.sameSet(edge.destination, a)) continue;
                 pheromone.put(a, edge.destination, 1. / numNeighbours);
                 routing.put(a, edge.destination, 1. / numNeighbours);
             }
