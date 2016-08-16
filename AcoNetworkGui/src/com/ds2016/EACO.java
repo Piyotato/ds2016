@@ -280,6 +280,7 @@ class EACO implements AlgorithmBase {
         Node_EACO src = nodes.get(source);
         // Send packets from source node
         packetCnt += traffic;
+        System.out.println("traffic: " + traffic + " packetCnt: " + packetCnt);
         for (int cnt = 0; cnt < traffic; ++cnt) {
             src.slowQ.add(new Packet(source, destination, TTL, currentTime));
         }

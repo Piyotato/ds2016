@@ -52,6 +52,7 @@ public class NewGui {
     private JButton mToggleNodeBtn;
     private JTextField mToggleNodeField;
     private JTextField mIntervalField;
+    private JTextField mTrafficField;
     private Thread mThread;
     private GraphRunnable mRunnable;
 
@@ -185,6 +186,7 @@ public class NewGui {
         sParams.setSource(mSourceField.getText());
         sParams.setDestination(mDestinationField.getText());
         sParams.setInterval(mIntervalField.getText());
+        sParams.setTraffic(mTrafficField.getText());
     }
 
     /**
@@ -196,6 +198,7 @@ public class NewGui {
         mSourceField.setText(String.valueOf(sParams.getSource()));
         mDestinationField.setText(String.valueOf(sParams.getDestination()));
         mIntervalField.setText(String.valueOf(sParams.getInterval()));
+        mTrafficField.setText(String.valueOf(sParams.getTraffic()));
     }
 
     /**

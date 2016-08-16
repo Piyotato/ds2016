@@ -13,13 +13,16 @@ class ParameterStorage {
     private int destination;
     private int algorithm;
     private double interval;
+    private int traffic;
 
     ParameterStorage(double alpha,
+                     int traffic,
                      double interval,
                      int source,
                      int destination,
                      int algorithm) {
         this.alpha = alpha;
+        this.traffic = traffic;
         this.interval = interval;
         this.source = source;
         this.destination = destination;
@@ -68,5 +71,13 @@ class ParameterStorage {
 
     void setInterval(String intervalStr) {
         if (intervalStr != null) interval = Double.parseDouble(intervalStr);
+    }
+
+    public int getTraffic() {
+        return traffic;
+    }
+
+    public void setTraffic(String trafficStr) {
+        if (trafficStr != null) traffic = Integer.parseInt(trafficStr);
     }
 }

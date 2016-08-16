@@ -21,7 +21,7 @@ class DataChart {
     private static final String CHART_SUCCESS_Y = "Successs";
 
     private long mThroughput;
-    private long mSuccessRate;
+    private double mSuccessRate;
 
     private XYSeries mThroughputSeries;
     private XYSeries mSuccessSeries;
@@ -49,7 +49,11 @@ class DataChart {
         JFreeChart chart = ChartFactory.createXYLineChart(THROUGHPUT_TITLE, CHART_X, CHART_THROUGHPUT_Y,
                 dataset, PlotOrientation.VERTICAL, false, false, false);
         ChartPanel panel = new ChartPanel(chart);
-        panel.setPreferredSize(new Dimension(480, 240));
+
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        double width = screenSize.getWidth() / 3.3;
+        double height = screenSize.getHeight() / 3.75;
+        panel.setPreferredSize(new Dimension((int) width, (int) height));
         return panel;
     }
 
@@ -59,7 +63,10 @@ class DataChart {
         JFreeChart chart = ChartFactory.createXYLineChart(SUCCESS_TITLE, CHART_X, CHART_SUCCESS_Y,
                 dataset, PlotOrientation.VERTICAL, false, false, false);
         ChartPanel panel = new ChartPanel(chart);
-        panel.setPreferredSize(new Dimension(480, 240));
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        double width = screenSize.getWidth() / 3.3;
+        double height = screenSize.getHeight() / 3.75;
+        panel.setPreferredSize(new Dimension((int) width, (int) height));
         return panel;
     }
 

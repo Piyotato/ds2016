@@ -19,12 +19,13 @@ public class Main {
     static Graph sGraph;
     static NewGui sGui;
     static Pair<Integer, Integer> sTickVal;
-
+    static long sTotalThroughput = 0;
+    static double sTotalSuccess = 0;
     private static Thread mThread;
     private static Runnable mRunnable;
 
     public static void main(String[] args) {
-        sParams = new ParameterStorage(0.4, 0.3, 0, 2, ParameterStorage.ALGO_OSPF);
+        sParams = new ParameterStorage(0.4, 1000, 0.3, 0, 2, ParameterStorage.ALGO_OSPF);
         sGui = new NewGui();
         initAlgo();
 
@@ -40,6 +41,12 @@ public class Main {
                     mutex.acquire();
                     try {
                         sTickVal = sAlgo.tick();
+                        if (sTickVal != null) {
+                            long success = sTickVal.getKey();
+                            long failure = sTickVal.getValue();
+                            sTotalThroughput = success;
+                            sTotalSuccess = failure > 0 ? success / failure : success;
+                        }
                     } finally {
                         mutex.release();
                     }
@@ -70,13 +77,13 @@ public class Main {
         if (DEBUG) System.out.println("updateAlgo: algo = " + algo);
         switch (algo) {
             case ParameterStorage.ALGO_OSPF:
-                sAlgo = new OSPF(TTL_MS);
+                sAlgo = new OSPF(TTL_MS, sParams.getTraffic());
                 break;
             case ParameterStorage.ALGO_ANTNET:
-                sAlgo = new AntNet(sParams.getAlpha(), TTL_MS, sParams.getInterval());
+                sAlgo = new AntNet(sParams.getAlpha(), sParams.getTraffic(), TTL_MS, sParams.getInterval());
                 break;
             case ParameterStorage.ALGO_EACO:
-                sAlgo = new EACO(sParams.getAlpha(), TTL_MS, sParams.getInterval());
+                sAlgo = new EACO(sParams.getAlpha(), sParams.getTraffic(), TTL_MS, sParams.getInterval());
                 break;
             default:
                 break;
