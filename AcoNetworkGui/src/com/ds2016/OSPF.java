@@ -9,7 +9,7 @@ import java.util.ArrayList;
  */
 class OSPF implements AlgorithmBase {
 
-    private final int TTL;
+    private final int TTL, traffic;
     private final ArrayList<Node_OSPF> nodes = new ArrayList<>();
     private final ArrayList<Edge> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge> adjMat = new HashMap2D<>();
@@ -21,9 +21,11 @@ class OSPF implements AlgorithmBase {
      * Initialize OSPF
      *
      * @param _TTL Time To Live of packets
+     * @param _traffic  Packets per tick
      */
-    public OSPF(int _TTL) {
+    public OSPF(int _TTL, int _traffic) {
         TTL = _TTL;
+        traffic = _traffic;
     }
 
     /**
@@ -195,8 +197,8 @@ class OSPF implements AlgorithmBase {
      */
     private void generatePackets() {
         Node_OSPF src = nodes.get(source);
-        packetCnt += Math.max(src.speed - src.Q.size(), 0);
-        while (src.Q.size() < src.speed) {
+        packetCnt += traffic;
+        for (int cnt = 0; cnt < traffic; ++cnt) {
             src.Q.add(new Packet(source, destination, TTL, currentTime));
         }
     }

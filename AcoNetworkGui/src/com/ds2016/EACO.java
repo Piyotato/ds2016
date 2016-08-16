@@ -11,7 +11,7 @@ import java.util.Random;
 class EACO implements AlgorithmBase {
 
     private final double alpha, interval;
-    private final int TTL;
+    private final int TTL, traffic;
     private final ArrayList<Edge_ACO> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat = new HashMap2D<>();
     private final ArrayList<Node_EACO> nodes = new ArrayList<>();
@@ -23,11 +23,13 @@ class EACO implements AlgorithmBase {
      * Initialize EACO
      *
      * @param _alpha    Weightage of pheromone
+     * @param _traffic  Packets per tick
      * @param _TTL      Time To Live of packets
      * @param _interval Interval of Ant Generation
      */
-    public EACO(double _alpha, int _TTL, double _interval) {
+    public EACO(double _alpha, int _traffic, int _TTL, double _interval) {
         alpha = _alpha;
+        traffic = _traffic;
         TTL = _TTL;
         interval = _interval;
     }
@@ -277,8 +279,8 @@ class EACO implements AlgorithmBase {
         numAntsGen = curNumPackets;
         Node_EACO src = nodes.get(source);
         // Send packets from source node
-        packetCnt += Math.max(src.speed - src.slowQ.size(), 0);
-        while (src.slowQ.size() < src.speed) {
+        packetCnt += traffic;
+        for (int cnt = 0; cnt < traffic; ++cnt) {
             src.slowQ.add(new Packet(source, destination, TTL, currentTime));
         }
     }

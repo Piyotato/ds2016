@@ -185,15 +185,17 @@ class Node_EACO {
                 if (prev == null) { // Previously not viable
                     if (DSU.sameSet(neighbour, dest) &&
                             !adjMat.get(nodeID, neighbour).isOffline &&
-                            !nodes.get(neighbour).isOffline) // Now viable
+                            !nodes.get(neighbour).isOffline) { // Now viable
                         numViableNeighbours.set(dest, numViableNeighbours.get(dest) + 1);
-                    addHeuristic(neighbour, dest);
+                        addHeuristic(neighbour, dest);
+                    }
                 } else { // Previously viable
                     if (!DSU.sameSet(neighbour, dest) ||
                             adjMat.get(nodeID, neighbour).isOffline ||
-                            nodes.get(neighbour).isOffline) // Now not viable
+                            nodes.get(neighbour).isOffline) { // Now not viable
                         numViableNeighbours.set(dest, numViableNeighbours.get(dest) - 1);
-                    removeHeuristic(neighbour, dest);
+                        removeHeuristic(neighbour, dest);
+                    }
                 }
             }
         }
