@@ -103,7 +103,7 @@ class Link {
     static void buildDiamond1() {
         // Add 4 nodes
         for (int i = 0; i < 4; i++) {
-            addNode(8);
+            addNode(1000);
         }
 
         addEdge(0, 1, 4);
@@ -118,7 +118,7 @@ class Link {
     static void buildDiamond2() {
         // Add 4 nodes
         for (int i = 0; i < 4; i++) {
-            addNode(8);
+            addNode(1000);
         }
 
         addEdge(0, 1, 4);
@@ -130,7 +130,7 @@ class Link {
     static void buildDoubleDiamond() {
         // Add 5 nodes
         for (int i = 0; i < 5; i++) {
-            addNode(8);
+            addNode(1000);
         }
 
         addEdge(0, 1, 4);
@@ -144,7 +144,7 @@ class Link {
     static void buildBananaTree() {
         // Add 31 nodes
         for (int i = 0; i < 31; i++) {
-            addNode(8);
+            addNode(1000);
         }
 
         addEdge(0, 1, 4);

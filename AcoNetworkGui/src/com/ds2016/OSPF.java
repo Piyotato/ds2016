@@ -198,6 +198,7 @@ class OSPF implements AlgorithmBase {
     private void generatePackets() {
         Node_OSPF src = nodes.get(source);
         packetCnt += traffic;
+        System.out.println("traffic: " + traffic + " packetCnt: " + packetCnt);
         for (int cnt = 0; cnt < traffic; ++cnt) {
             src.Q.add(new Packet(source, destination, TTL, currentTime));
         }
