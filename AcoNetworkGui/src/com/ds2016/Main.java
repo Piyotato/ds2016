@@ -18,8 +18,6 @@ public class Main {
     static Graph sGraph;
     static NewGui sGui;
     static Pair<Integer, Integer> sTickVal;
-    static long sTotalThroughput = 0;
-    static double sTotalSuccess = 0;
     private static Thread mThread;
     private static Runnable mRunnable;
 
@@ -40,12 +38,6 @@ public class Main {
                     mutex.acquire();
                     try {
                         sTickVal = sAlgo.tick();
-                        if (sTickVal != null) {
-                            long success = sTickVal.getKey();
-                            long failure = sTickVal.getValue();
-                            sTotalThroughput = success;
-                            sTotalSuccess = failure > 0 ? success / failure : success;
-                        }
                     } finally {
                         mutex.release();
                     }

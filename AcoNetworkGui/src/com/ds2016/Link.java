@@ -87,7 +87,6 @@ class Link {
     static void stop() {
         sGui.stopThread();
         Main.stopThread();
-        System.out.println("stop(): sTotalThroughput: " + sTotalThroughput + " sTotalSuccess: " + sTotalSuccess);
     }
 
     static void update() {
