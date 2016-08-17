@@ -102,24 +102,11 @@ class Link {
      */
     static void buildDiamond1() {
         // Add 4 nodes
-        for (int i = 0; i < 4; i++) {
-            addNode(1000);
+        addNode(1000);
+        for (int i = 0; i < 2; i++) {
+            addNode(600);
         }
-
-        addEdge(0, 1, 4);
-        addEdge(1, 2, 4);
-        addEdge(0, 3, 4);
-        addEdge(3, 2, 4);
-    }
-
-    /**
-     * AntNet not ok; others ok
-     */
-    static void buildDiamond2() {
-        // Add 4 nodes
-        for (int i = 0; i < 4; i++) {
-            addNode(1000);
-        }
+        addNode(800);
 
         addEdge(0, 1, 4);
         addEdge(1, 2, 4);
@@ -128,24 +115,32 @@ class Link {
     }
 
     static void buildDoubleDiamond() {
-        // Add 5 nodes
-        for (int i = 0; i < 5; i++) {
-            addNode(1000);
-        }
+        // Add 7 nodes
+        addNode(1000);
+        addNode(600);
+        addNode(600);
+        addNode(1000);
+        addNode(600);
+        addNode(600);
+        addNode(800);
 
         addEdge(0, 1, 4);
-        addEdge(0, 4, 4);
-        addEdge(1, 4, 4);
+        addEdge(0, 2, 4);
+        addEdge(1, 3, 4);
         addEdge(2, 3, 4);
-        addEdge(2, 4, 4);
-        addEdge(3, 4, 4);
+        addEdge(6, 4, 4);
+        addEdge(6, 5, 4);
+        addEdge(4, 3, 4);
+        addEdge(5, 3, 4);
     }
 
     static void buildBananaTree() {
         // Add 31 nodes
-        for (int i = 0; i < 31; i++) {
-            addNode(1000);
+        addNode(1000);
+        for (int i = 0; i < 29; i++) {
+            addNode(600);
         }
+        addNode(800);
 
         addEdge(0, 1, 4);
         addEdge(0, 2, 4);

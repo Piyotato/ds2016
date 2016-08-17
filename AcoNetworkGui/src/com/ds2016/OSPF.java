@@ -162,6 +162,7 @@ class OSPF implements AlgorithmBase {
             if (packet.destination == node.nodeID) {
                 ++success;
                 --packetCnt;
+                ++left;
                 continue;
             } else if (!packet.isValid(currentTime)) {
                 ++failure;
@@ -221,6 +222,7 @@ class OSPF implements AlgorithmBase {
             processNode(node);
         }
         Pair<Integer, Integer> ret = new Pair<>(success, failure);
+        System.out.println("tick(): success: " + ret.getKey() + " failure: " + ret.getValue());
         success = failure = 0;
         return ret;
     }

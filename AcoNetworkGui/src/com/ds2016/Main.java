@@ -10,10 +10,10 @@ import org.graphstream.graph.Graph;
 public class Main {
 
     static final boolean DEBUG = false;
-    static final int POLL_MS = 100; // Algorithm tick delay in ms
+    static final int POLL_MS = 10; // Algorithm tick delay in ms
+    static final int NUM_TICKS = 6000;
     private static final String ALGO_THREAD = "ALGO_THREAD";
     private static final int TTL_MS = 15000 / POLL_MS; // Time to live of ants in ms, relative to POLL_MS
-
     static ParameterStorage sParams;
     static AlgorithmBase sAlgo;
     static Graph sGraph;
@@ -23,6 +23,7 @@ public class Main {
     static double sTotalSuccess = 0;
     private static Thread mThread;
     private static Runnable mRunnable;
+    private static int mNumTicks = 0;
 
     public static void main(String[] args) {
         sParams = new ParameterStorage(0.4, 1000, 0.3, 0, 2, ParameterStorage.ALGO_OSPF);
@@ -46,6 +47,11 @@ public class Main {
                             long failure = sTickVal.getValue();
                             sTotalThroughput = success;
                             sTotalSuccess = failure > 0 ? success / failure : success;
+                        }
+                        mNumTicks++;
+                        if (mNumTicks >= NUM_TICKS) {
+                            mutex.release();
+                            Thread.currentThread().interrupt();
                         }
                     } finally {
                         mutex.release();

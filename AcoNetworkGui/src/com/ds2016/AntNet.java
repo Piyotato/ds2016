@@ -279,7 +279,9 @@ class AntNet implements AlgorithmBase {
         numAntsGen = curNumAnts;
         Node_AntNet src = nodes.get(source);
         // Send packets from source node
+        System.out.println("packetCnt: " + packetCnt);
         packetCnt += traffic;
+        System.out.println("traffic: " + traffic + " packetCnt: " + packetCnt);
         for (int cnt = 0; cnt < traffic; ++cnt) {
             src.slowQ.add(new Packet(source, destination, TTL, currentTime));
         }
@@ -302,6 +304,7 @@ class AntNet implements AlgorithmBase {
             processNode(node);
         }
         Pair<Integer, Integer> ret = new Pair<>(success, failure);
+        System.out.println("success: " + ret.getKey() + " failure: " + ret.getValue());
         success = failure = 0;
         return ret;
     }

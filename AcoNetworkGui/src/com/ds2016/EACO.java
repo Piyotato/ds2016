@@ -304,7 +304,7 @@ class EACO implements AlgorithmBase {
             processNode(node);
         }
         Pair<Integer, Integer> ret = new Pair<>(success, failure);
-        System.out.println("success: " + ret.getKey() + " failure: " + ret.getValue());
+        System.out.println("tick(): success: " + ret.getKey() + " failure: " + ret.getValue());
         success = failure = 0;
         return ret;
     }

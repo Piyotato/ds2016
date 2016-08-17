@@ -28,7 +28,7 @@ class DataChart {
 
     void display() {
         JFrame frame = new JFrame(FRAME_TITLE);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.add(THROUGHPUT_TITLE, throughputPane());
@@ -72,8 +72,10 @@ class DataChart {
 
     void updateCharts() {
         updateStats();
-        mThroughputSeries.add(mThroughputSeries.getItemCount(), mThroughput);
-        mSuccessSeries.add(mSuccessSeries.getItemCount(), mSuccessRate);
+        if (mThroughput != -1 && mSuccessRate != -1) {
+            mThroughputSeries.add(mThroughputSeries.getItemCount(), mThroughput);
+            mSuccessSeries.add(mSuccessSeries.getItemCount(), mSuccessRate);
+        }
     }
 
     void resetCharts() {
@@ -86,7 +88,13 @@ class DataChart {
         if (sTickVal == null) return;
         long success = sTickVal.getKey();
         long failure = sTickVal.getValue();
-        mThroughput = success;
-        mSuccessRate = failure > 0 ? success / failure : success;
+        if (success + failure > 0) {
+            mThroughput = success;
+            mSuccessRate = failure > 0 ? (double) success / (failure + success) * 100 : 100;
+        } else {
+            mThroughput = -1;
+            mSuccessRate = -1;
+        }
+        System.out.println("updateStats(): mSuccessRate: " + mSuccessRate);
     }
 }

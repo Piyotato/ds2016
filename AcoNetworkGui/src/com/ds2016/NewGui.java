@@ -65,7 +65,7 @@ public class NewGui {
         frame.setPreferredSize(new Dimension((int) width, (int) height));
 
         frame.setContentPane(mainPanel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
     }
