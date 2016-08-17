@@ -20,8 +20,8 @@ class OSPF implements AlgorithmBase {
     /**
      * Initialize OSPF
      *
-     * @param _TTL Time To Live of packets
-     * @param _traffic  Packets per tick
+     * @param _TTL     Time To Live of packets
+     * @param _traffic Packets per tick
      */
     public OSPF(int _TTL, int _traffic) {
         TTL = _TTL;
@@ -199,7 +199,7 @@ class OSPF implements AlgorithmBase {
     private void generatePackets() {
         Node_OSPF src = nodes.get(source);
         packetCnt += traffic;
-        System.out.println("traffic: " + traffic + " packetCnt: " + packetCnt);
+        if (Main.DEBUG) System.out.println("traffic: " + traffic + " packetCnt: " + packetCnt);
         for (int cnt = 0; cnt < traffic; ++cnt) {
             src.Q.add(new Packet(source, destination, TTL, currentTime));
         }
@@ -222,7 +222,7 @@ class OSPF implements AlgorithmBase {
             processNode(node);
         }
         Pair<Integer, Integer> ret = new Pair<>(success, failure);
-        System.out.println("tick(): success: " + ret.getKey() + " failure: " + ret.getValue());
+        if (Main.DEBUG) System.out.println("tick(): success: " + ret.getKey() + " failure: " + ret.getValue());
         success = failure = 0;
         return ret;
     }

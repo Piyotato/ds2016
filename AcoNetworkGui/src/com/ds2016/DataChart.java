@@ -26,6 +26,8 @@ class DataChart {
     private XYSeries mThroughputSeries;
     private XYSeries mSuccessSeries;
 
+    private int updateCnt = 1;
+
     void display() {
         JFrame frame = new JFrame(FRAME_TITLE);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -72,22 +74,24 @@ class DataChart {
 
     void updateCharts() {
         updateStats();
-            mThroughputSeries.add(mThroughputSeries.getItemCount(), mThroughput);
-            mSuccessSeries.add(mSuccessSeries.getItemCount(), mSuccessRate);
+        mThroughputSeries.add(mThroughputSeries.getItemCount(), mThroughput);
+        mSuccessSeries.add(mSuccessSeries.getItemCount(), mSuccessRate);
     }
 
     void resetCharts() {
         sTickVal = null;
         mThroughputSeries.clear();
         mSuccessSeries.clear();
+        updateCnt = 1;
     }
 
     private void updateStats() {
         if (sTickVal == null) return;
         long success = sTickVal.getKey();
         long failure = sTickVal.getValue();
-            mThroughput = success;
-            mSuccessRate = failure > 0 ? (double) success / (failure + success) * 100 : 100;
-        System.out.println("updateStats(): mSuccessRate: " + mSuccessRate);
+        mThroughput = success;
+        mSuccessRate = failure > 0 ? (double) success / (failure + success) * 100 : 100;
+        if (Main.DEBUG) System.out.println("updateStats(): mSuccessRate: " + mSuccessRate);
+        System.out.println(updateCnt++ + " " + success + " " + failure);
     }
 }

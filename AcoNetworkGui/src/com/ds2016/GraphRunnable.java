@@ -17,6 +17,7 @@ class GraphRunnable implements Runnable {
             sDataChart.updateCharts();
             mNumTicks++;
             if (mNumTicks >= NUM_TICKS) {
+                mNumTicks = 0;
                 Link.stop();
             }
             try {

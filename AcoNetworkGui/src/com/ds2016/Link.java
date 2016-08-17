@@ -87,7 +87,7 @@ class Link {
     static void stop() {
         sGui.stopThread();
         Main.stopThread();
-        System.out.println("Throughput: " + sTotalThroughput + " Success: " + sTotalSuccess);
+        System.out.println("stop(): sTotalThroughput: " + sTotalThroughput + " sTotalSuccess: " + sTotalSuccess);
     }
 
     static void update() {
@@ -104,8 +104,8 @@ class Link {
         // Add 4 nodes
         addNode(1000);
         addNode(600);
-        addNode(600);
         addNode(800);
+        addNode(600);
 
         addEdge(0, 1, 4);
         addEdge(1, 2, 6);
