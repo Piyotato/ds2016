@@ -100,18 +100,17 @@ class Link {
     /**
      * OSPF chokes; others ok
      */
-    static void buildDiamond1() {
+    static void buildDiamond() {
         // Add 4 nodes
         addNode(1000);
-        for (int i = 0; i < 2; i++) {
-            addNode(600);
-        }
+        addNode(600);
+        addNode(600);
         addNode(800);
 
         addEdge(0, 1, 4);
-        addEdge(1, 2, 4);
-        addEdge(0, 3, 4);
-        addEdge(3, 2, 4);
+        addEdge(1, 2, 6);
+        addEdge(2, 3, 6);
+        addEdge(3, 0, 5);
     }
 
     static void buildDoubleDiamond() {
@@ -124,14 +123,14 @@ class Link {
         addNode(600);
         addNode(800);
 
-        addEdge(0, 1, 4);
+        addEdge(0, 1, 5);
         addEdge(0, 2, 4);
         addEdge(1, 3, 4);
         addEdge(2, 3, 4);
-        addEdge(6, 4, 4);
-        addEdge(6, 5, 4);
-        addEdge(4, 3, 4);
-        addEdge(5, 3, 4);
+        addEdge(3, 4, 4);
+        addEdge(3, 5, 4);
+        addEdge(4, 6, 4);
+        addEdge(5, 6, 4);
     }
 
     static void buildBananaTree() {

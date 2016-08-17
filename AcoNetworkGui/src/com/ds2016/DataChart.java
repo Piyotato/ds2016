@@ -72,10 +72,8 @@ class DataChart {
 
     void updateCharts() {
         updateStats();
-        if (mThroughput != -1 && mSuccessRate != -1) {
             mThroughputSeries.add(mThroughputSeries.getItemCount(), mThroughput);
             mSuccessSeries.add(mSuccessSeries.getItemCount(), mSuccessRate);
-        }
     }
 
     void resetCharts() {
@@ -88,13 +86,8 @@ class DataChart {
         if (sTickVal == null) return;
         long success = sTickVal.getKey();
         long failure = sTickVal.getValue();
-        if (success + failure > 0) {
             mThroughput = success;
             mSuccessRate = failure > 0 ? (double) success / (failure + success) * 100 : 100;
-        } else {
-            mThroughput = -1;
-            mSuccessRate = -1;
-        }
         System.out.println("updateStats(): mSuccessRate: " + mSuccessRate);
     }
 }

@@ -7,7 +7,8 @@ import static com.ds2016.NewGui.sGraphAlgo;
  * Created by zwliew on 20/6/16.
  */
 class GraphRunnable implements Runnable {
-    private int mNumTicks = 0;
+    private static final int NUM_TICKS = 6000;
+    private static int mNumTicks = 0;
 
     @Override
     public void run() {
@@ -15,8 +16,8 @@ class GraphRunnable implements Runnable {
             sGraphAlgo.compute();
             sDataChart.updateCharts();
             mNumTicks++;
-            if (mNumTicks >= Main.NUM_TICKS) {
-                Thread.currentThread().interrupt();
+            if (mNumTicks >= NUM_TICKS) {
+                Link.stop();
             }
             try {
                 Thread.sleep(Main.POLL_MS);

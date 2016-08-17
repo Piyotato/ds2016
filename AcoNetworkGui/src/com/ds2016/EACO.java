@@ -279,9 +279,8 @@ class EACO implements AlgorithmBase {
         numAntsGen = curNumPackets;
         Node_EACO src = nodes.get(source);
         // Send packets from source node
-        System.out.println("packetCnt: " + packetCnt);
         packetCnt += traffic;
-        System.out.println("traffic: " + traffic + " packetCnt: " + packetCnt);
+        if (Main.DEBUG) System.out.println("traffic: " + traffic + " packetCnt: " + packetCnt);
         for (int cnt = 0; cnt < traffic; ++cnt) {
             src.slowQ.add(new Packet(source, destination, TTL, currentTime));
         }
