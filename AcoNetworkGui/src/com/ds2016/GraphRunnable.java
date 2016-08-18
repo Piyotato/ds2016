@@ -16,7 +16,7 @@ class GraphRunnable implements Runnable {
             sGraphAlgo.compute();
             sDataChart.updateCharts();
             mNumTicks++;
-            if (mNumTicks > NUM_TICKS) {
+            if (mNumTicks == NUM_TICKS) {
                 mNumTicks = 0;
                 Link.stop();
             }

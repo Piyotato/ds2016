@@ -26,7 +26,7 @@ class DataChart {
     private XYSeries mThroughputSeries;
     private XYSeries mSuccessSeries;
 
-    private int updateCnt = 1;
+    private int updateCnt = 0;
 
     void display() {
         JFrame frame = new JFrame(FRAME_TITLE);
@@ -82,7 +82,7 @@ class DataChart {
         sTickVal = null;
         mThroughputSeries.clear();
         mSuccessSeries.clear();
-        updateCnt = 1;
+        updateCnt = 0;
     }
 
     private void updateStats() {
@@ -92,6 +92,6 @@ class DataChart {
         mThroughput = success;
         mSuccessRate = failure > 0 ? (double) success / (failure + success) * 100 : 100;
         if (Main.DEBUG) System.out.println("updateStats(): mSuccessRate: " + mSuccessRate);
-        System.out.println(updateCnt++ + " " + success + " " + failure);
+        System.out.println(++updateCnt + " " + success + " " + failure);
     }
 }

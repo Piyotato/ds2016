@@ -122,8 +122,8 @@ class Link {
         addNode(600);
         addNode(800);
 
-        addEdge(0, 1, 5);
-        addEdge(0, 2, 4);
+        addEdge(0, 1, 4);
+        addEdge(0, 2, 6);
         addEdge(1, 3, 4);
         addEdge(2, 3, 4);
         addEdge(3, 4, 4);
@@ -135,10 +135,36 @@ class Link {
     static void buildBananaTree() {
         // Add 31 nodes
         addNode(1000);
-        for (int i = 0; i < 29; i++) {
-            addNode(600);
-        }
         addNode(800);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(800);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
+        addNode(600);
 
         addEdge(0, 1, 4);
         addEdge(0, 2, 4);
@@ -146,31 +172,31 @@ class Link {
         addEdge(0, 4, 4);
         addEdge(0, 5, 4);
 
-        addEdge(6, 1, 4);
+        addEdge(1, 6, 4);
         addEdge(6, 7, 4);
         addEdge(6, 8, 4);
         addEdge(6, 9, 4);
         addEdge(6, 10, 4);
 
-        addEdge(11, 2, 4);
+        addEdge(2, 11, 4);
         addEdge(11, 12, 4);
         addEdge(11, 13, 4);
         addEdge(11, 14, 4);
         addEdge(11, 15, 4);
 
-        addEdge(16, 3, 4);
+        addEdge(3, 16, 4);
         addEdge(16, 17, 4);
         addEdge(16, 18, 4);
         addEdge(16, 19, 4);
         addEdge(16, 20, 4);
 
-        addEdge(21, 4, 4);
+        addEdge(4, 21, 4);
         addEdge(21, 22, 4);
         addEdge(21, 23, 4);
         addEdge(21, 24, 4);
         addEdge(21, 25, 4);
 
-        addEdge(26, 5, 4);
+        addEdge(5, 26, 4);
         addEdge(26, 27, 4);
         addEdge(26, 28, 4);
         addEdge(26, 29, 4);
