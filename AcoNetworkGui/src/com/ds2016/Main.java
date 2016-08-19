@@ -12,7 +12,7 @@ public class Main {
     static final boolean DEBUG = false;
     static final int POLL_MS = 5; // Algorithm tick delay in ms
     private static final String ALGO_THREAD = "ALGO_THREAD";
-    private static final int TTL_MS = 15000 / POLL_MS; // Time to live of ants in ms, relative to POLL_MS
+    private static final int TTL_MS = 150;
     static ParameterStorage sParams;
     static AlgorithmBase sAlgo;
     static Graph sGraph;

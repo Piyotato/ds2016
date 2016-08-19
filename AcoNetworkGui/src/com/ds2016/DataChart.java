@@ -86,7 +86,10 @@ class DataChart {
     }
 
     private void updateStats() {
-        if (sTickVal == null) return;
+        if (sTickVal == null) {
+            System.out.println(++updateCnt + " " + 0 + " " + 0);
+            return;
+        }
         long success = sTickVal.getKey();
         long failure = sTickVal.getValue();
         mThroughput = success;
