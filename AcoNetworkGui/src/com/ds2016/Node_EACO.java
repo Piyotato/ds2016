@@ -19,10 +19,10 @@ class Node_EACO {
     private final double alpha;
     private final ArrayList<Node_EACO> nodes;
     private final ArrayList<Edge_ACO> edgeList;
+    private final ArrayList<Integer> numViableNeighbours = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat;
     private final HashMap2D<Integer, Integer, Double> routing = new HashMap2D<>();
     boolean isOffline;
-    private ArrayList<Integer> numViableNeighbours = new ArrayList<>();
     private UFDS DSU;
 
     /**
@@ -50,19 +50,19 @@ class Node_EACO {
     void init() {
         initDSU();
         for (int a = 0; a < nodes.size(); ++a) { // For each destination
+            numViableNeighbours.add(0);
             if (a == nodeID) continue;
             int numNeighbours = 0; // Number of viable neighbours
             for (Edge_ACO edge : adjMat.get(nodeID).values()) {
                 if (edge.isOffline || nodes.get(edge.destination).isOffline) continue;
                 if (DSU.sameSet(edge.destination, a)) ++numNeighbours;
             }
+            numViableNeighbours.set(a, numNeighbours);
             for (Edge_ACO edge : adjMat.get(nodeID).values()) { // For each neighbour
                 if (edge.isOffline || nodes.get(edge.destination).isOffline) continue;
                 if (!DSU.sameSet(edge.destination, a)) continue;
-                pheromone.put(a, edge.destination, 1. / numNeighbours);
-                routing.put(a, edge.destination, 1. / numNeighbours);
+                addHeuristic(edge.destination, a);
             }
-            numViableNeighbours.add(numNeighbours);
         }
     }
 
@@ -73,6 +73,7 @@ class Node_EACO {
         DSU = new UFDS(nodes.size());
         for (SimpleEdge edge : edgeList) {
             if (edge.source == nodeID || edge.destination == nodeID) continue;
+            if (nodes.get(edge.source).isOffline || nodes.get(edge.destination).isOffline) continue;
             if (edge.isOffline) continue;
             DSU.unionSet(edge.source, edge.destination);
         }
