@@ -51,8 +51,8 @@ class Node_AntNet {
         for (int a = 0; a < nodes.size(); ++a) { // For each destination
             if (a == nodeID) continue;
             for (Edge_ACO edge : adjMat.get(nodeID).values()) { // For each neighbour
-                pheromone.put(a, edge.destination, 1. / numNeighbours);
-                routing.put(a, edge.destination, 1. / numNeighbours);
+                if (edge.isOffline || nodes.get(edge.destination).isOffline) continue;
+                addHeuristic(edge.destination, a);
             }
         }
     }

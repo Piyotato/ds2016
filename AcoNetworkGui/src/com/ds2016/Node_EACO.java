@@ -90,11 +90,10 @@ class Node_EACO {
         } else {
             // Merge edges
             for (Edge_ACO edge : adjMat.get(ID).values()) {
-                if (!edge.isOffline) {
-                    // Don't merge self
-                    if (edge.source == nodeID || edge.destination == nodeID) continue;
-                    DSU.unionSet(edge.source, edge.destination);
-                }
+                if (edge.source == nodeID || edge.destination == nodeID) continue;
+                if (nodes.get(edge.destination).isOffline) continue; // edge.source not offline
+                if (edge.isOffline) continue;
+                DSU.unionSet(edge.source, edge.destination);
             }
         }
         update();
@@ -107,8 +106,9 @@ class Node_EACO {
      * @param node2 Second node
      */
     void addEdge(int node1, int node2) {
-        // Don't merge self
         if (node1 == nodeID || node2 == nodeID) return;
+        if (nodes.get(node1).isOffline || nodes.get(node2).isOffline) return;
+        // edge not offline
         DSU.unionSet(node1, node2);
         update();
     }
@@ -119,14 +119,14 @@ class Node_EACO {
      * @param ID Edge ID
      */
     void toggleEdge(int ID) {
-        // If self is involved, it doesn't affect viability
         int src = edgeList.get(ID).source;
         int dst = edgeList.get(ID).destination;
-        if (src == nodeID || dst == nodeID)
-            return;
+        if (src == nodeID || dst == nodeID) return;
         if (edgeList.get(ID).isOffline) {
             initDSU();
         } else {
+            if (nodes.get(src).isOffline || nodes.get(dst).isOffline) return;
+            // edge not offline
             DSU.unionSet(src, dst);
         }
         update();
