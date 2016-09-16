@@ -171,17 +171,10 @@ class Node_EACO {
         while (numViableNeighbours.size() < nodes.size()) {
             numViableNeighbours.add(0);
         }
-        ArrayList<Integer> neighbours = new ArrayList<>();
-        ArrayList<Integer> destinations = new ArrayList<>();
         for (Edge_ACO edge : adjMat.get(nodeID).values()) {
-            neighbours.add(edge.destination);
-        }
-        for (int a = 0; a < nodes.size(); ++a) {
-            if (a == nodeID) continue;
-            destinations.add(a);
-        }
-        for (Integer neighbour : neighbours) {
-            for (Integer dest : destinations) {
+            for (int dest = 0; dest < nodes.size(); ++dest) {
+                if (dest == nodeID) continue;
+                int neighbour = edge.destination;
                 Double prev = pheromone.get(dest, neighbour);
                 if (prev == null) { // Previously not viable
                     if (DSU.sameSet(neighbour, dest) &&

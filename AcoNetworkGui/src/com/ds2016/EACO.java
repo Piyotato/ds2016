@@ -194,14 +194,14 @@ class EACO implements AlgorithmBase {
                 if (ant.destination == node.nodeID) {
                     ant.isBackwards = true;
                     nxt = ant.nextNode();
-                    ant.timings.add((double) (node.slowQ.size() + node.fastQ.size()) / node.speed); // Depletion time
+                    ant.timings.add((double) node.slowQ.size() / node.speed); // Depletion time
                     adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
                 } else if (ant.isValid(currentTime)) {
                     nxt = node.nextHop(ant);
                     if (nxt == null) {
                         continue;
                     }
-                    ant.timings.add((double) (node.slowQ.size() + node.fastQ.size()) / node.speed); // Depletion time
+                    ant.timings.add((double) node.slowQ.size() / node.speed); // Depletion time
                     ant.timings.add((double) adjMat.get(node.nodeID, nxt).cost);
                     ant.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
                     if (!ant.isValid(ant.timestamp) && nxt != ant.destination) {
@@ -264,11 +264,11 @@ class EACO implements AlgorithmBase {
      */
     private void generatePackets() {
         // Send ants from all nodes
-        int curNumPackets = (int) ((currentTime * 100) / (interval * 1000));
+        int curNumAnts = (int) ((currentTime * 100) / (interval * 1000));
         Random rand = new Random();
         for (Node_EACO node : nodes) {
             if (node.isOffline) continue;
-            for (int cnt = 0; numAntsGen + cnt < curNumPackets; ++cnt) {
+            for (int cnt = 0; numAntsGen + cnt < curNumAnts; ++cnt) {
                 int randomNode = rand.nextInt(nodes.size());
                 while (randomNode == node.nodeID || nodes.get(randomNode).isOffline) {
                     randomNode = rand.nextInt(nodes.size());
@@ -276,7 +276,7 @@ class EACO implements AlgorithmBase {
                 node.fastQ.add(new Ant(node.nodeID, randomNode, TTL, currentTime));
             }
         }
-        numAntsGen = curNumPackets;
+        numAntsGen = curNumAnts;
         Node_EACO src = nodes.get(source);
         // Send packets from source node
         packetCnt += traffic;

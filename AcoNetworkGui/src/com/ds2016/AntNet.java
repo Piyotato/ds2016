@@ -194,14 +194,14 @@ class AntNet implements AlgorithmBase {
                 if (ant.destination == node.nodeID) {
                     ant.isBackwards = true;
                     nxt = ant.nextNode();
-                    ant.timings.add((double) (node.slowQ.size() + node.fastQ.size()) / node.speed); // Depletion time
+                    ant.timings.add((double) node.slowQ.size() / node.speed); // Depletion time
                     adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
                 } else if (ant.isValid(currentTime)) {
                     nxt = node.nextHop(ant);
                     if (nxt == null) {
                         continue;
                     }
-                    ant.timings.add((double) (node.slowQ.size() + node.fastQ.size()) / node.speed); // Depletion time
+                    ant.timings.add((double) node.slowQ.size() / node.speed); // Depletion time
                     ant.timings.add((double) adjMat.get(node.nodeID, nxt).cost);
                     ant.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
                     if (!ant.isValid(ant.timestamp) && nxt != ant.destination) {
