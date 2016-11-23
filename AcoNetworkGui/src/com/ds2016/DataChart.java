@@ -15,16 +15,12 @@ import static com.ds2016.Main.sTickVal;
 class DataChart {
     private static final String FRAME_TITLE = "Data charts";
     private static final String THROUGHPUT_TITLE = "Throughput";
-    private static final String SUCCESS_TITLE = "Success rate";
     private static final String CHART_X = "Elapsed time";
     private static final String CHART_THROUGHPUT_Y = "Packets received";
-    private static final String CHART_SUCCESS_Y = "Successs";
 
     private long mThroughput;
-    private double mSuccessRate;
 
     private XYSeries mThroughputSeries;
-    private XYSeries mSuccessSeries;
 
     private int updateCnt = 0;
 
@@ -61,12 +57,10 @@ class DataChart {
     void updateCharts() {
         updateStats();
         mThroughputSeries.add(mThroughputSeries.getItemCount(), mThroughput);
-        mSuccessSeries.add(mSuccessSeries.getItemCount(), mSuccessRate);
     }
 
     void resetCharts() {
         mThroughputSeries.clear();
-        mSuccessSeries.clear();
         updateCnt = 0;
     }
 

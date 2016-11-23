@@ -218,37 +218,37 @@ class Link {
         addNode();
         addNode();
 
-        addEdge(0, 1, 900, 2);
-        addEdge(0, 2, 900, 2);
-        addEdge(0, 3, 700, 2);
+        addEdge(0, 1, 9, 1500);
+        addEdge(0, 2, 9, 1500);
+        addEdge(0, 3, 7, 1500);
 
-        addEdge(1, 3, 1300, 2);
-        addEdge(1, 6, 2000, 2);
+        addEdge(1, 3, 13, 1500);
+        addEdge(1, 6, 20, 1500);
 
-        addEdge(2, 4, 700, 2);
-        addEdge(2, 7, 1600, 2);
+        addEdge(2, 4, 70, 1500);
+        addEdge(2, 7, 16, 1500);
 
-        addEdge(3, 10, 1500, 2);
+        addEdge(3, 10, 15, 1500);
 
-        addEdge(4, 5, 700, 2);
-        addEdge(4, 10, 1100, 2);
+        addEdge(4, 5, 7, 1500);
+        addEdge(4, 10, 11, 1500);
 
-        addEdge(5, 6, 700, 2);
+        addEdge(5, 6, 7, 1500);
 
-        addEdge(6, 9, 700, 2);
+        addEdge(6, 9, 7, 1500);
 
-        addEdge(7, 8, 500, 2);
-        addEdge(7, 13, 800, 2);
+        addEdge(7, 8, 5, 1500);
+        addEdge(7, 13, 8, 1500);
 
-        addEdge(8, 9, 500, 2);
-        addEdge(8, 12, 700, 2);
+        addEdge(8, 9, 5, 1500);
+        addEdge(8, 12, 7, 1500);
 
-        addEdge(9, 11, 800, 2);
-        addEdge(9, 13, 800, 2);
+        addEdge(9, 11, 8, 1500);
+        addEdge(9, 13, 8, 1500);
 
-        addEdge(10, 11, 900, 2);
-        addEdge(10, 12, 1400, 2);
+        addEdge(10, 11, 9, 1500);
+        addEdge(10, 12, 14, 1500);
 
-        addEdge(12, 13, 400, 2);
+        addEdge(12, 13, 4, 1500);
     }
 }
