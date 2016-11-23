@@ -19,13 +19,13 @@ class Link {
         sDataChart.updateCharts();
     }
 
-    static void addNode(int speed) {
+    static void addNode() {
         Mutex mutex = new Mutex();
         try {
             mutex.acquire();
             try {
-                sGui.addNode(speed);
-                sAlgo.addNode(speed);
+                sGui.addNode();
+                sAlgo.addNode();
             } finally {
                 mutex.release();
             }
@@ -49,13 +49,13 @@ class Link {
         }
     }
 
-    static void addEdge(int node1, int node2, int cost) {
+    static void addEdge(int node1, int node2, int cost, int bandwith) {
         Mutex mutex = new Mutex();
         try {
             mutex.acquire();
             try {
-                sGui.addEdge(node1, node2, cost);
-                sAlgo.addEdge(node1, node2, cost);
+                sGui.addEdge(node1, node2, cost, bandwith);
+                sAlgo.addEdge(node1, node2, cost, bandwith);
             } finally {
                 mutex.release();
             }
