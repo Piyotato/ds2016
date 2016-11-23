@@ -4,6 +4,7 @@ import javafx.util.Pair;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by damian on 16/5/16.
@@ -11,16 +12,17 @@ import java.util.ArrayList;
 class Node_EACO {
 
     private final static double EPS = 1e-9, EXP = 1.4;
+    private final static int PRECISION = 10;
 
-    final int speed, nodeID;
-    final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node
-    final ArrayDeque<Ant> fastQ = new ArrayDeque<>();
-    final ArrayDeque<Packet> slowQ = new ArrayDeque<>();
+    final int ID;
+    final HashMap<Integer, ArrayDeque<Ant>> fastQ = new HashMap<>();
+    final HashMap<Integer, ArrayDeque<Packet>> slowQ = new HashMap<>();
     private final double alpha;
     private final ArrayList<Node_EACO> nodes;
     private final ArrayList<Edge_ACO> edgeList;
     private final ArrayList<Integer> numViableNeighbours = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat;
+    private final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node
     private final HashMap2D<Integer, Integer, Double> routing = new HashMap2D<>();
     boolean isOffline;
     private UFDS DSU;
@@ -28,16 +30,14 @@ class Node_EACO {
     /**
      * Initialize a node
      *
-     * @param _speed    Processing speed
      * @param _nodes    ArrayList of Node_EACO
      * @param _edgeList ArrayList of Edge_ACO
      * @param _adjMat   Adjacency Matrix
      * @param _alpha    Weightage of pheromone
      */
-    Node_EACO(int _speed, ArrayList<Node_EACO> _nodes, ArrayList<Edge_ACO> _edgeList,
+    Node_EACO(ArrayList<Node_EACO> _nodes, ArrayList<Edge_ACO> _edgeList,
               HashMap2D<Integer, Integer, Edge_ACO> _adjMat, double _alpha) {
-        speed = _speed;
-        nodeID = _nodes.size();
+        ID = _nodes.size();
         alpha = _alpha;
         nodes = _nodes;
         edgeList = _edgeList;
@@ -51,14 +51,14 @@ class Node_EACO {
         initDSU();
         for (int a = 0; a < nodes.size(); ++a) { // For each destination
             numViableNeighbours.add(0);
-            if (a == nodeID) continue;
+            if (a == ID) continue;
             int numNeighbours = 0; // Number of viable neighbours
-            for (Edge_ACO edge : adjMat.get(nodeID).values()) {
+            for (Edge_ACO edge : adjMat.get(ID).values()) {
                 if (edge.isOffline || nodes.get(edge.destination).isOffline) continue;
                 if (DSU.sameSet(edge.destination, a)) ++numNeighbours;
             }
             numViableNeighbours.set(a, numNeighbours);
-            for (Edge_ACO edge : adjMat.get(nodeID).values()) { // For each neighbour
+            for (Edge_ACO edge : adjMat.get(ID).values()) { // For each neighbour
                 if (edge.isOffline || nodes.get(edge.destination).isOffline) continue;
                 if (!DSU.sameSet(edge.destination, a)) continue;
                 addHeuristic(edge.destination, a);
@@ -72,7 +72,7 @@ class Node_EACO {
     private void initDSU() {
         DSU = new UFDS(nodes.size());
         for (SimpleEdge edge : edgeList) {
-            if (edge.source == nodeID || edge.destination == nodeID) continue;
+            if (edge.source == ID || edge.destination == ID) continue;
             if (nodes.get(edge.source).isOffline || nodes.get(edge.destination).isOffline) continue;
             if (edge.isOffline) continue;
             DSU.unionSet(edge.source, edge.destination);
@@ -85,12 +85,12 @@ class Node_EACO {
      * @param ID Node ID
      */
     void toggleNode(int ID) {
-        if (nodes.get(nodeID).isOffline) {
+        if (nodes.get(ID).isOffline) {
             initDSU();
         } else {
             // Merge edges
             for (Edge_ACO edge : adjMat.get(ID).values()) {
-                if (edge.source == nodeID || edge.destination == nodeID) continue;
+                if (edge.source == ID || edge.destination == ID) continue;
                 if (nodes.get(edge.destination).isOffline) continue; // edge.source not offline
                 if (edge.isOffline) continue;
                 DSU.unionSet(edge.source, edge.destination);
@@ -106,7 +106,7 @@ class Node_EACO {
      * @param node2 Second node
      */
     void addEdge(int node1, int node2) {
-        if (node1 == nodeID || node2 == nodeID) return;
+        if (node1 == ID || node2 == ID) return;
         if (nodes.get(node1).isOffline || nodes.get(node2).isOffline) return;
         // edge not offline
         DSU.unionSet(node1, node2);
@@ -121,7 +121,7 @@ class Node_EACO {
     void toggleEdge(int ID) {
         int src = edgeList.get(ID).source;
         int dst = edgeList.get(ID).destination;
-        if (src == nodeID || dst == nodeID) return;
+        if (src == ID || dst == ID) return;
         if (edgeList.get(ID).isOffline) {
             initDSU();
         } else {
@@ -143,7 +143,7 @@ class Node_EACO {
         double RNG = Math.random(), totVal = 0;
         double beta = 1 - alpha;
         ArrayList<Pair<Integer, Double>> neighbours = new ArrayList<>(); // Neighbour, Heuristic
-        for (Edge_ACO edge : adjMat.get(nodeID).values()) {
+        for (Edge_ACO edge : adjMat.get(ID).values()) {
             if (edge.isOffline) continue; // Link is offline
             if (nodes.get(edge.destination).isOffline) continue; // Node is offline
             if (!packet.canVisit(edge.destination)) continue; // Cycle detection
@@ -171,21 +171,21 @@ class Node_EACO {
         while (numViableNeighbours.size() < nodes.size()) {
             numViableNeighbours.add(0);
         }
-        for (Edge_ACO edge : adjMat.get(nodeID).values()) {
+        for (Edge_ACO edge : adjMat.get(ID).values()) {
             for (int dest = 0; dest < nodes.size(); ++dest) {
-                if (dest == nodeID) continue;
+                if (dest == ID) continue;
                 int neighbour = edge.destination;
                 Double prev = pheromone.get(dest, neighbour);
                 if (prev == null) { // Previously not viable
                     if (DSU.sameSet(neighbour, dest) &&
-                            !adjMat.get(nodeID, neighbour).isOffline &&
+                            !adjMat.get(ID, neighbour).isOffline &&
                             !nodes.get(neighbour).isOffline) { // Now viable
                         numViableNeighbours.set(dest, numViableNeighbours.get(dest) + 1);
                         addHeuristic(neighbour, dest);
                     }
                 } else { // Previously viable
                     if (!DSU.sameSet(neighbour, dest) ||
-                            adjMat.get(nodeID, neighbour).isOffline ||
+                            adjMat.get(ID, neighbour).isOffline ||
                             nodes.get(neighbour).isOffline) { // Now not viable
                         numViableNeighbours.set(dest, numViableNeighbours.get(dest) - 1);
                         removeHeuristic(neighbour, dest);
@@ -235,6 +235,94 @@ class Node_EACO {
     }
 
     /**
+     * Process an ant
+     *
+     * @param ant Ant
+     */
+    void processAnt(Ant ant) {
+        Integer nxt;
+        if (ant.isBackwards) { // Backward ant
+            ant.updateTotalTime();
+            int prev = ant.previousNode();
+            Double P = pheromone.get(ant.destination, prev);
+            if (P == null) {
+                return; // Previous Node is gone
+            }
+            double R = 1. / (ant.totalTime * PRECISION);
+            double change = (P * (1 - R) + R) - P;
+            updateHeuristic(prev, ant.destination, change);
+            if (ant.source == ID) {
+                return; // Reached source
+            }
+            nxt = ant.nextNode();
+            if (pheromone.get(ant.destination, prev) == null) {
+                return; // Next node is gone
+            }
+            if (!fastQ.containsKey(nxt)) fastQ.put(nxt, new ArrayDeque<>());
+            fastQ.get(nxt).push(ant);
+        } else { // Forward ant
+            ant.addNode(ID);
+            if (ant.destination == ID) {
+                ant.isBackwards = true;
+                nxt = ant.nextNode();
+                if (pheromone.get(ant.destination, nxt) == null) {
+                    return; // Next node is gone
+                }
+                ant.timings.add(getDepletionTime(nxt)); // Creates fastQ entry if needed
+                fastQ.get(nxt).push(ant);
+            } else {
+                nxt = nextHop(ant);
+                if (nxt == null) {
+                    return; // No valid next node
+                }
+                ant.timings.add(getDepletionTime(nxt)); // Creates fastQ entry if needed
+                ant.timings.add((double) adjMat.get(ID, nxt).cost);
+                fastQ.get(nxt).push(ant);
+            }
+        }
+    }
+
+    /**
+     * Process a packet
+     *
+     * @param packet Packet
+     * @return 1, if packet has reached destination
+     */
+    int processPacket(Packet packet) {
+        packet.tabuList.add(ID); // To be removed
+        if (packet.destination == ID) {
+            return 1;
+        }
+        Integer nxt = nextHop(packet);
+        if (nxt != null) {
+            if (!slowQ.containsKey(nxt)) slowQ.put(nxt, new ArrayDeque<>());
+            slowQ.get(nxt).push(packet);
+        }
+        return 0;
+    }
+
+    /**
+     * Clear the ant queue
+     */
+    void clearFastQ() {
+        fastQ.clear();
+    }
+
+    /**
+     * Clear the packet queue
+     */
+    void clearSlowQ() {
+        slowQ.clear();
+    }
+
+    /**
+     * Toggle isOffline
+     */
+    void toggle() {
+        isOffline ^= true;
+    }
+
+    /**
      * Updating routing tables
      *
      * @param destination ID of destination
@@ -275,5 +363,15 @@ class Node_EACO {
      */
     private void removeHeuristic(int neighbour, int destination) {
         updateHeuristic(neighbour, destination, -pheromone.get(destination, neighbour));
+    }
+
+    /**
+     * Time needed to deplete queue
+     *
+     * @param neighbour Neighbour ID
+     */
+    private double getDepletionTime(int neighbour) {
+        if (!fastQ.containsKey(neighbour)) fastQ.put(neighbour, new ArrayDeque<>());
+        return (double) fastQ.get(neighbour).size() / adjMat.get(ID, neighbour).bandwidth;
     }
 }

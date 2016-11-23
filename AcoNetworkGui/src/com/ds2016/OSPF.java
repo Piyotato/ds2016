@@ -1,7 +1,6 @@
 package com.ds2016;
 
-import javafx.util.Pair;
-
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 
 /**
@@ -14,7 +13,7 @@ class OSPF implements AlgorithmBase {
     private final ArrayList<Edge> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge> adjMat = new HashMap2D<>();
     private int source, destination;
-    private int success, failure, currentTime, packetCnt;
+    private int success, currentTime;
     private boolean didInit;
 
     /**
@@ -35,25 +34,13 @@ class OSPF implements AlgorithmBase {
      * @param _destination Destination node
      */
     public void init(int _source, int _destination) {
+        currentTime = 0;
         source = _source;
         destination = _destination;
         for (Node_OSPF node : nodes) {
             node.update();
         }
         didInit = true;
-    }
-
-    /**
-     * Retrieve the current load of the network's nodes
-     *
-     * @return Number of packets at each node
-     */
-    public ArrayList<Integer> getNodeStatus() {
-        ArrayList<Integer> ret = new ArrayList<>();
-        for (Node_OSPF node : nodes) {
-            ret.add(node.Q.size());
-        }
-        return ret;
     }
 
     /**
@@ -71,11 +58,9 @@ class OSPF implements AlgorithmBase {
 
     /**
      * Add a new node
-     *
-     * @param speed Processing speed
      */
-    public void addNode(int speed) {
-        nodes.add(new Node_OSPF(speed, nodes, adjMat));
+    public void addNode() {
+        nodes.add(new Node_OSPF(nodes, adjMat));
     }
 
     /**
@@ -85,17 +70,16 @@ class OSPF implements AlgorithmBase {
      * @throws IllegalArgumentException if ID is out of bounds
      */
     public void toggleNode(int ID) throws IllegalArgumentException {
-        if (ID == source || ID == destination) {
+        if (ID == source || ID == destination || ID >= nodes.size()) {
             throw new IllegalArgumentException();
         }
         Node_OSPF node = nodes.get(ID);
-        node.isOffline ^= true;
+        node.toggle();
         if (node.isOffline) {
-            packetCnt -= node.Q.size();
-            node.Q.clear();
-            for (Edge edge : adjMat.get(ID).values()) {
-                packetCnt -= edge.packets.size();
-                edge.packets.clear();
+            node.clearQ();
+            for (Edge edge : edgeList) {
+                if (edge.source != ID && edge.destination != ID) continue;
+                edge.clearPacketQ();
             }
         }
         if (didInit)
@@ -110,14 +94,15 @@ class OSPF implements AlgorithmBase {
      * @param node1 First node
      * @param node2 Second node
      * @param cost  Time taken
-     * @throws IllegalArgumentException
+     * @param bandwidth Packets per tick
+     * @throws IllegalArgumentException if ID is out of bounds
      */
-    public void addEdge(int node1, int node2, int cost) throws IllegalArgumentException {
+    public void addEdge(int node1, int node2, int cost, int bandwidth) throws IllegalArgumentException {
         if (node1 >= nodes.size() || node2 >= nodes.size()) {
             throw new IllegalArgumentException();
         }
-        Edge forward = new Edge(node1, node2, cost);
-        Edge backward = new Edge(node2, node1, cost);
+        Edge forward = new Edge(node1, node2, cost, bandwidth);
+        Edge backward = new Edge(node2, node1, cost, bandwidth);
         edgeList.add(forward);
         edgeList.add(backward);
         adjMat.put(node1, node2, forward);
@@ -136,13 +121,11 @@ class OSPF implements AlgorithmBase {
     public void toggleEdge(int ID) {
         Edge forward = edgeList.get(ID * 2);
         Edge backward = edgeList.get(ID * 2 + 1);
-        forward.isOffline ^= true;
-        backward.isOffline ^= true;
+        forward.toggle();
+        backward.toggle();
         if (forward.isOffline) {
-            packetCnt -= forward.packets.size();
-            packetCnt -= backward.packets.size();
-            forward.packets.clear();
-            backward.packets.clear();
+            forward.clearPacketQ();
+            backward.clearPacketQ();
         }
         if (didInit)
             for (Node_OSPF node : nodes) {
@@ -156,28 +139,14 @@ class OSPF implements AlgorithmBase {
      * @param node Node being processed
      */
     private void processNode(Node_OSPF node) {
-        int left = node.speed;
-        while (!node.Q.isEmpty() && left-- > 0) {
-            Packet packet = node.Q.poll();
-            if (packet.destination == node.nodeID) {
-                ++success;
-                --packetCnt;
-                ++left;
-                continue;
-            } else if (!packet.isValid(currentTime)) {
-                ++failure;
-                --packetCnt;
-                ++left; // "Skip" this packet
-                continue;
+        // Process Packets
+        for (Integer neighbour : node.Q.keySet()) {
+            ArrayDeque<Packet> Q = node.Q.get(neighbour);
+            Edge edge = adjMat.get(node.ID, neighbour);
+            int bandwidth = edge.bandwidth;
+            while (!Q.isEmpty() && bandwidth-- > 0) {
+                edge.addPacket(Q.poll(), currentTime);
             }
-            int nxt = node.nextHop(packet);
-            packet.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
-            if (!packet.isValid(packet.timestamp) && nxt != packet.destination) {
-                ++failure;
-                --packetCnt;
-                continue; // Would expire before reaching
-            }
-            adjMat.get(node.nodeID, nxt).addPacket(packet, currentTime);
         }
     }
 
@@ -188,8 +157,12 @@ class OSPF implements AlgorithmBase {
      */
     private void processEdge(Edge edge) {
         while (!edge.packets.isEmpty()) {
-            if (edge.packets.peek().timestamp >= currentTime) break;
-            nodes.get(edge.destination).Q.add(edge.packets.poll());
+            if (edge.packets.peek().timestamp > currentTime) break;
+            if (!edge.packets.peek().isValid(currentTime)) {
+                edge.packets.poll();
+                continue;
+            }
+            success += nodes.get(edge.destination).process(edge.packets.poll());
         }
     }
 
@@ -198,19 +171,18 @@ class OSPF implements AlgorithmBase {
      */
     private void generatePackets() {
         Node_OSPF src = nodes.get(source);
-        packetCnt += traffic;
-        if (Main.DEBUG) System.out.println("traffic: " + traffic + " packetCnt: " + packetCnt);
         for (int cnt = 0; cnt < traffic; ++cnt) {
-            src.Q.add(new Packet(source, destination, TTL, currentTime));
+            src.process(new Packet(source, destination, TTL, currentTime));
         }
     }
 
     /**
      * One tick of the simulation
      *
-     * @return Success, Failure
+     * @return Number of packets that reached their destination
      */
-    public Pair<Integer, Integer> tick() {
+    public int tick() {
+        success = 0;
         ++currentTime;
         for (Edge edge : edgeList) {
             if (edge.isOffline) continue;
@@ -221,32 +193,7 @@ class OSPF implements AlgorithmBase {
             if (node.isOffline) continue;
             processNode(node);
         }
-        Pair<Integer, Integer> ret = new Pair<>(success, failure);
-        if (Main.DEBUG) System.out.println("tick(): success: " + ret.getKey() + " failure: " + ret.getValue());
-        success = failure = 0;
-        return ret;
-    }
-
-
-    /**
-     * Count the number of packets
-     * that will eventually expire
-     *
-     * @return Number of packets
-     */
-    public Pair<Integer, Integer> terminate() {
-        while (packetCnt > 0) {
-            ++currentTime;
-            for (Edge edge : edgeList) {
-                if (edge.isOffline) continue;
-                processEdge(edge);
-            }
-            for (Node_OSPF node : nodes) {
-                if (node.isOffline) continue;
-                processNode(node);
-            }
-        }
-        return new Pair<>(success, failure);
+        return success;
     }
 
     /**
@@ -258,27 +205,26 @@ class OSPF implements AlgorithmBase {
      * @param _destination Destination node
      */
     public void build(ArrayList<Node_GUI> _nodes, ArrayList<SimpleEdge> _edgeList, int _source, int _destination) {
-        currentTime = 0;
         nodes.clear();
         edgeList.clear();
         adjMat.clear();
         // Node
         for (Node_GUI node : _nodes) {
-            nodes.add(new Node_OSPF(node.speed, nodes, adjMat));
+            nodes.add(new Node_OSPF(nodes, adjMat));
             if (node.isOffline) {
-                nodes.get(nodes.size() - 1).isOffline = true;
+                nodes.get(nodes.size() - 1).toggle();
             }
         }
         // Edge
         for (SimpleEdge edge : _edgeList) {
-            Edge forward = new Edge(edge.source, edge.destination, edge.cost);
-            Edge backward = new Edge(edge.destination, edge.source, edge.cost);
+            Edge forward = new Edge(edge.source, edge.destination, edge.cost, edge.bandwidth);
+            Edge backward = new Edge(edge.destination, edge.source, edge.cost, edge.bandwidth);
+            if (edge.isOffline) {
+                forward.toggle();
+                backward.toggle();
+            }
             edgeList.add(forward);
             edgeList.add(backward);
-            if (edge.isOffline) {
-                forward.isOffline = true;
-                backward.isOffline = true;
-            }
             adjMat.put(edge.source, edge.destination, forward);
             adjMat.put(edge.destination, edge.source, backward);
         }

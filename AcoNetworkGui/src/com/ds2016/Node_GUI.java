@@ -5,16 +5,12 @@ package com.ds2016;
  */
 class Node_GUI {
 
-    final int speed;
     boolean isOffline;
 
     /**
      * Construct Node
-     *
-     * @param _speed Speed
      */
-    Node_GUI(int _speed) {
-        speed = _speed;
+    Node_GUI() {
         isOffline = false;
     }
 }

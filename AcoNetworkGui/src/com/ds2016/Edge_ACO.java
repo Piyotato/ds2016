@@ -15,9 +15,10 @@ class Edge_ACO extends Edge {
      * @param source      Start node
      * @param destination End node
      * @param cost        Time taken to traverse
+     * @param bandwidth   Packets per tick
      */
-    Edge_ACO(int source, int destination, int cost) {
-        super(source, destination, cost);
+    Edge_ACO(int source, int destination, int cost, int bandwidth) {
+        super(source, destination, cost, bandwidth);
     }
 
     /**
@@ -29,5 +30,12 @@ class Edge_ACO extends Edge {
     void addAnt(Ant ant, int currentTime) {
         ant.timestamp = currentTime + cost;
         ants.add(ant);
+    }
+
+    /**
+     * Clear ant queue
+     */
+    void clearAntQ() {
+        ants.clear();
     }
 }

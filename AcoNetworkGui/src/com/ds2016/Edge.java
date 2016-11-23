@@ -15,9 +15,10 @@ class Edge extends SimpleEdge {
      * @param source      Start node
      * @param destination End node
      * @param cost        Time taken to traverse
+     * @param bandwidth   Packets per tick
      */
-    Edge(int source, int destination, int cost) {
-        super(source, destination, cost);
+    Edge(int source, int destination, int cost, int bandwidth) {
+        super(source, destination, cost, bandwidth);
     }
 
     /**
@@ -29,5 +30,12 @@ class Edge extends SimpleEdge {
     void addPacket(Packet packet, int currentTime) {
         packet.timestamp = currentTime + cost;
         packets.add(packet);
+    }
+
+    /**
+     * Clear packet queue
+     */
+    void clearPacketQ() {
+        packets.clear();
     }
 }

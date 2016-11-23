@@ -4,6 +4,7 @@ import javafx.util.Pair;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by damian on 27/5/16.
@@ -11,14 +12,15 @@ import java.util.ArrayList;
 class Node_AntNet {
 
     private final static double EPS = 1e-9, EXP = 1.4;
+    private final static int PRECISION = 10;
 
-    final int speed, nodeID;
-    final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node
-    final ArrayDeque<Ant> fastQ = new ArrayDeque<>();
-    final ArrayDeque<Packet> slowQ = new ArrayDeque<>();
+    final int ID;
+    final HashMap<Integer, ArrayDeque<Ant>> fastQ = new HashMap<>();
+    final HashMap<Integer, ArrayDeque<Packet>> slowQ = new HashMap<>();
     private final double alpha;
     private final ArrayList<Node_AntNet> nodes;
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat;
+    private final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node
     private final HashMap2D<Integer, Integer, Double> routing = new HashMap2D<>();
     boolean isOffline;
     private int numNeighbours;
@@ -26,15 +28,13 @@ class Node_AntNet {
     /**
      * Initialize a node
      *
-     * @param _speed  Processing speed
      * @param _nodes  ArrayList of Node_AntNet
      * @param _adjMat Adjacency Matrix
      * @param _alpha  Weightage of pheromone
      */
-    Node_AntNet(int _speed, ArrayList<Node_AntNet> _nodes,
+    Node_AntNet(ArrayList<Node_AntNet> _nodes,
                 HashMap2D<Integer, Integer, Edge_ACO> _adjMat, double _alpha) {
-        speed = _speed;
-        nodeID = _nodes.size();
+        ID = _nodes.size();
         alpha = _alpha;
         nodes = _nodes;
         adjMat = _adjMat;
@@ -44,13 +44,13 @@ class Node_AntNet {
      * Build pheromone table
      */
     void init() {
-        for (Edge_ACO edge : adjMat.get(nodeID).values()) {
+        for (Edge_ACO edge : adjMat.get(ID).values()) {
             if (!edge.isOffline && !nodes.get(edge.destination).isOffline)
                 ++numNeighbours;
         }
         for (int a = 0; a < nodes.size(); ++a) { // For each destination
-            if (a == nodeID) continue;
-            for (Edge_ACO edge : adjMat.get(nodeID).values()) { // For each neighbour
+            if (a == ID) continue;
+            for (Edge_ACO edge : adjMat.get(ID).values()) { // For each neighbour
                 if (edge.isOffline || nodes.get(edge.destination).isOffline) continue;
                 addHeuristic(edge.destination, a);
             }
@@ -66,13 +66,13 @@ class Node_AntNet {
         if (nodes.get(ID).isOffline) {
             --numNeighbours;
             for (int a = 0; a < nodes.size(); ++a) {
-                if (a == nodeID) continue;
+                if (a == ID) continue;
                 removeHeuristic(ID, a);
             }
         } else {
             ++numNeighbours;
             for (int a = 0; a < nodes.size(); ++a) {
-                if (a == nodeID) continue;
+                if (a == ID) continue;
                 addHeuristic(ID, a);
             }
         }
@@ -86,7 +86,7 @@ class Node_AntNet {
     void addEdge(int node) {
         ++numNeighbours;
         for (int a = 0; a < nodes.size(); ++a) {
-            if (a == nodeID) continue;
+            if (a == ID) continue;
             addHeuristic(node, a);
         }
     }
@@ -97,16 +97,16 @@ class Node_AntNet {
      * @param node Other Node
      */
     void toggleEdge(int node) {
-        if (adjMat.get(nodeID, node).isOffline) {
+        if (adjMat.get(ID, node).isOffline) {
             --numNeighbours;
             for (int a = 0; a < nodes.size(); ++a) {
-                if (a == nodeID) continue;
+                if (a == ID) continue;
                 removeHeuristic(node, a);
             }
         } else {
             ++numNeighbours;
             for (int a = 0; a < nodes.size(); ++a) {
-                if (a == nodeID) continue;
+                if (a == ID) continue;
                 addHeuristic(node, a);
             }
         }
@@ -123,7 +123,7 @@ class Node_AntNet {
         double RNG = Math.random(), totVal = 0;
         double beta = 1 - alpha;
         ArrayList<Pair<Integer, Double>> neighbours = new ArrayList<>(); // Neighbour, Heuristic
-        for (Edge_ACO edge : adjMat.get(nodeID).values()) {
+        for (Edge_ACO edge : adjMat.get(ID).values()) {
             if (edge.isOffline) continue; // Link is offline
             if (nodes.get(edge.destination).isOffline) continue; // Node is offline
             if (!packet.canVisit(edge.destination)) continue; // Cycle detection
@@ -181,6 +181,94 @@ class Node_AntNet {
     }
 
     /**
+     * Process an ant
+     *
+     * @param ant Ant
+     */
+    void processAnt(Ant ant) {
+        Integer nxt;
+        if (ant.isBackwards) { // Backward ant
+            ant.updateTotalTime();
+            int prev = ant.previousNode();
+            Double P = pheromone.get(ant.destination, prev);
+            if (P == null) {
+                return; // Previous Node is gone
+            }
+            double R = 1. / (ant.totalTime * PRECISION);
+            double change = (P * (1 - R) + R) - P;
+            updateHeuristic(prev, ant.destination, change);
+            if (ant.source == ID) {
+                return; // Reached source
+            }
+            nxt = ant.nextNode();
+            if (pheromone.get(ant.destination, prev) == null) {
+                return; // Next node is gone
+            }
+            if (!fastQ.containsKey(nxt)) fastQ.put(nxt, new ArrayDeque<>());
+            fastQ.get(nxt).push(ant);
+        } else { // Forward ant
+            ant.addNode(ID);
+            if (ant.destination == ID) {
+                ant.isBackwards = true;
+                nxt = ant.nextNode();
+                if (pheromone.get(ant.destination, nxt) == null) {
+                    return; // Next node is gone
+                }
+                ant.timings.add(getDepletionTime(nxt)); // Creates fastQ entry if needed
+                fastQ.get(nxt).push(ant);
+            } else {
+                nxt = nextHop(ant);
+                if (nxt == null) {
+                    return; // No valid next node
+                }
+                ant.timings.add(getDepletionTime(nxt)); // Creates fastQ entry if needed
+                ant.timings.add((double) adjMat.get(ID, nxt).cost);
+                fastQ.get(nxt).push(ant);
+            }
+        }
+    }
+
+    /**
+     * Process a packet
+     *
+     * @param packet Packet
+     * @return 1, if packet has reached destination
+     */
+    int processPacket(Packet packet) {
+        packet.tabuList.add(ID); // To be removed
+        if (packet.destination == ID) {
+            return 1;
+        }
+        Integer nxt = nextHop(packet);
+        if (nxt != null) {
+            if (!slowQ.containsKey(nxt)) slowQ.put(nxt, new ArrayDeque<>());
+            slowQ.get(nxt).push(packet);
+        }
+        return 0;
+    }
+
+    /**
+     * Clear the ant queue
+     */
+    void clearFastQ() {
+        fastQ.clear();
+    }
+
+    /**
+     * Clear the packet queue
+     */
+    void clearSlowQ() {
+        slowQ.clear();
+    }
+
+    /**
+     * Toggle isOffline
+     */
+    void toggle() {
+        isOffline ^= true;
+    }
+
+    /**
      * Updating routing tables
      *
      * @param destination ID of destination
@@ -220,5 +308,15 @@ class Node_AntNet {
      */
     private void removeHeuristic(int neighbour, int destination) {
         updateHeuristic(neighbour, destination, -pheromone.get(destination, neighbour));
+    }
+
+    /**
+     * Time needed to deplete queue
+     *
+     * @param neighbour Neighbour ID
+     */
+    private double getDepletionTime(int neighbour) {
+        if (!fastQ.containsKey(neighbour)) fastQ.put(neighbour, new ArrayDeque<>());
+        return (double) fastQ.get(neighbour).size() / adjMat.get(ID, neighbour).bandwidth;
     }
 }

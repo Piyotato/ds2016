@@ -1,8 +1,8 @@
 package com.ds2016;
 
-import javafx.util.Pair;
-
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -16,7 +16,7 @@ class AntNet implements AlgorithmBase {
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat = new HashMap2D<>();
     private final ArrayList<Node_AntNet> nodes = new ArrayList<>();
     private int source, destination;
-    private int success, failure, currentTime, packetCnt, numAntsGen;
+    private int success, currentTime, numAntsGen;
     private boolean didInit;
 
     /**
@@ -41,25 +41,13 @@ class AntNet implements AlgorithmBase {
      * @param _destination Destination node
      */
     public void init(int _source, int _destination) {
+        currentTime = 0;
         source = _source;
         destination = _destination;
         for (Node_AntNet node : nodes) {
             node.init();
         }
         didInit = true;
-    }
-
-    /**
-     * Retrieve the current load of the network's nodes
-     *
-     * @return Number of packets at each node
-     */
-    public ArrayList<Integer> getNodeStatus() {
-        ArrayList<Integer> ret = new ArrayList<>();
-        for (Node_AntNet node : nodes) {
-            ret.add(node.slowQ.size());
-        }
-        return ret;
     }
 
     /**
@@ -77,11 +65,9 @@ class AntNet implements AlgorithmBase {
 
     /**
      * Add a new node
-     *
-     * @param speed Processing speed
      */
-    public void addNode(int speed) {
-        nodes.add(new Node_AntNet(speed, nodes, adjMat, alpha));
+    public void addNode() {
+        nodes.add(new Node_AntNet(nodes, adjMat, alpha));
     }
 
     /**
@@ -91,19 +77,18 @@ class AntNet implements AlgorithmBase {
      * @throws IllegalArgumentException if ID is out of bounds
      */
     public void toggleNode(int ID) throws IllegalArgumentException {
-        if (ID == source || ID == destination) {
+        if (ID == source || ID == destination || ID >= nodes.size()) {
             throw new IllegalArgumentException();
         }
         Node_AntNet node = nodes.get(ID);
-        node.isOffline ^= true;
+        node.toggle();
         if (node.isOffline) {
-            packetCnt -= node.slowQ.size();
-            node.fastQ.clear();
-            node.slowQ.clear();
-            for (Edge_ACO edge : adjMat.get(ID).values()) {
-                packetCnt -= edge.packets.size();
-                edge.packets.clear();
-                edge.ants.clear();
+            node.clearFastQ();
+            node.clearSlowQ();
+            for (Edge_ACO edge : edgeList) {
+                if (edge.source != ID && edge.destination != ID) continue;
+                edge.clearPacketQ();
+                edge.clearAntQ();
             }
         }
         if (didInit)
@@ -118,14 +103,15 @@ class AntNet implements AlgorithmBase {
      * @param node1 First node
      * @param node2 Second node
      * @param cost  Time taken
+     * @param bandwidth Packets per tick
      * @throws IllegalArgumentException if ID is out of bounds
      */
-    public void addEdge(int node1, int node2, int cost) throws IllegalArgumentException {
+    public void addEdge(int node1, int node2, int cost, int bandwidth) throws IllegalArgumentException {
         if (node1 >= nodes.size() || node2 >= nodes.size()) {
             throw new IllegalArgumentException();
         }
-        Edge_ACO forward = new Edge_ACO(node1, node2, cost);
-        Edge_ACO backward = new Edge_ACO(node2, node1, cost);
+        Edge_ACO forward = new Edge_ACO(node1, node2, cost, bandwidth);
+        Edge_ACO backward = new Edge_ACO(node2, node1, cost, bandwidth);
         edgeList.add(forward);
         edgeList.add(backward);
         adjMat.put(node1, node2, forward);
@@ -144,15 +130,13 @@ class AntNet implements AlgorithmBase {
     public void toggleEdge(int ID) {
         Edge_ACO forward = edgeList.get(ID * 2);
         Edge_ACO backward = edgeList.get(ID * 2 + 1);
-        forward.isOffline ^= true;
-        backward.isOffline ^= true;
+        forward.toggle();
+        backward.toggle();
         if (forward.isOffline) {
-            packetCnt -= forward.packets.size();
-            packetCnt -= backward.packets.size();
-            forward.packets.clear();
-            forward.ants.clear();
-            backward.packets.clear();
-            backward.ants.clear();
+            forward.clearAntQ();
+            forward.clearPacketQ();
+            backward.clearAntQ();
+            backward.clearPacketQ();
         }
         if (didInit) {
             nodes.get(forward.source).toggleEdge(forward.destination);
@@ -166,80 +150,27 @@ class AntNet implements AlgorithmBase {
      * @param node Node being processed
      */
     private void processNode(Node_AntNet node) {
-        int left = node.speed;
-        while (!node.fastQ.isEmpty()) {
-            Ant ant = node.fastQ.poll();
-            if (ant.isBackwards) { // Backward ant
-                ant.updateTotalTime();
-                int prev = ant.previousNode();
-                Double P = node.pheromone.get(ant.destination, prev);
-                if (P == null) {
-                    continue; // This path is no longer viable
-                }
-                double R = 1. / (ant.totalTime * 10);
-                double change = (P * (1 - R) + R) - P;
-                node.updateHeuristic(prev, ant.destination, change);
-                if (ant.source == node.nodeID) {
-                    continue; // Reached source
-                }
-                int nxt = ant.nextNode();
-                if (nodes.get(nxt).isOffline || adjMat.get(node.nodeID, nxt).isOffline) {
-                    continue; // Path is gone
-                }
-                ant.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
-                adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
-            } else { // Forward ant
-                ant.addNode(node.nodeID);
-                Integer nxt;
-                if (ant.destination == node.nodeID) {
-                    ant.isBackwards = true;
-                    nxt = ant.nextNode();
-                    ant.timings.add((double) node.slowQ.size() / node.speed); // Depletion time
-                    adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
-                } else if (ant.isValid(currentTime)) {
-                    nxt = node.nextHop(ant);
-                    if (nxt == null) {
-                        continue;
-                    }
-                    ant.timings.add((double) node.slowQ.size() / node.speed); // Depletion time
-                    ant.timings.add((double) adjMat.get(node.nodeID, nxt).cost);
-                    ant.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
-                    if (!ant.isValid(ant.timestamp) && nxt != ant.destination) {
-                        continue; // Would expire before reaching
-                    }
-                    adjMat.get(node.nodeID, nxt).addAnt(ant, currentTime);
-                } else {
-                    ++left; // "Skip" this packet
-                }
+        HashMap<Integer, Integer> bandwidth = new HashMap<>();
+        // Process Ants
+        for (Integer neighbour : node.fastQ.keySet()) {
+            ArrayDeque<Ant> Q = node.fastQ.get(neighbour);
+            Edge_ACO edge = adjMat.get(node.ID, neighbour);
+            bandwidth.put(neighbour, edge.bandwidth);
+            while (!Q.isEmpty() && bandwidth.get(neighbour) > 0) {
+                edge.addAnt(Q.poll(), currentTime);
+                bandwidth.put(neighbour, bandwidth.get(neighbour) - 1);
             }
         }
-        while (!node.slowQ.isEmpty() && left-- > 0) {
-            Packet packet = node.slowQ.poll();
-            packet.tabuList.add(node.nodeID);
-            if (packet.destination == node.nodeID) {
-                ++success;
-                --packetCnt;
-                ++left;
-                continue;
-            } else if (!packet.isValid(currentTime)) {
-                ++failure;
-                --packetCnt;
-                ++left;
-                continue;
+        // Process Packets
+        for (Integer neighbour : node.slowQ.keySet()) {
+            ArrayDeque<Packet> Q = node.slowQ.get(neighbour);
+            Edge_ACO edge = adjMat.get(node.ID, neighbour);
+            if (!bandwidth.containsKey(neighbour))
+                bandwidth.put(neighbour, edge.bandwidth);
+            while (!Q.isEmpty() && bandwidth.get(neighbour) > 0) {
+                edge.addPacket(Q.poll(), currentTime);
+                bandwidth.put(neighbour, bandwidth.get(neighbour) - 1);
             }
-            Integer nxt = node.nextHop(packet);
-            if (nxt == null) {
-                ++failure;
-                --packetCnt;
-                continue;
-            }
-            packet.timestamp = currentTime + adjMat.get(node.nodeID, nxt).cost;
-            if (!packet.isValid(packet.timestamp) && nxt != packet.destination) {
-                ++failure;
-                --packetCnt;
-                continue; // Would expire before reaching
-            }
-            adjMat.get(node.nodeID, nxt).addPacket(packet, currentTime);
         }
     }
 
@@ -251,11 +182,19 @@ class AntNet implements AlgorithmBase {
     private void processEdge(Edge_ACO edge) {
         while (!edge.ants.isEmpty()) {
             if (edge.ants.peek().timestamp > currentTime) break;
-            nodes.get(edge.destination).fastQ.add(edge.ants.poll());
+            if (!edge.ants.peek().isValid(currentTime)) {
+                edge.ants.poll();
+                continue;
+            }
+            nodes.get(edge.destination).processAnt(edge.ants.poll());
         }
         while (!edge.packets.isEmpty()) {
             if (edge.packets.peek().timestamp > currentTime) break;
-            nodes.get(edge.destination).slowQ.add(edge.packets.poll());
+            if (!edge.packets.peek().isValid(currentTime)) {
+                edge.packets.poll();
+                continue;
+            }
+            success += nodes.get(edge.destination).processPacket(edge.packets.poll());
         }
     }
 
@@ -263,35 +202,44 @@ class AntNet implements AlgorithmBase {
      * Generate packets from source
      */
     private void generatePackets() {
-        // Send ants from all nodes
         int curNumAnts = (int) ((currentTime * 100) / (interval * 1000));
-        Random rand = new Random();
         for (Node_AntNet node : nodes) {
             if (node.isOffline) continue;
             for (int cnt = 0; numAntsGen + cnt < curNumAnts; ++cnt) {
-                int randomNode = rand.nextInt(nodes.size());
-                while (randomNode == node.nodeID || nodes.get(randomNode).isOffline) {
-                    randomNode = rand.nextInt(nodes.size());
-                }
-                node.fastQ.add(new Ant(node.nodeID, randomNode, TTL, currentTime));
+                node.processAnt(new Ant(node.ID, getRandomNode(node.ID), TTL, currentTime));
             }
         }
         numAntsGen = curNumAnts;
         Node_AntNet src = nodes.get(source);
         // Send packets from source node
-        packetCnt += traffic;
-        if (Main.DEBUG) System.out.println("traffic: " + traffic + " packetCnt: " + packetCnt);
         for (int cnt = 0; cnt < traffic; ++cnt) {
-            src.slowQ.add(new Packet(source, destination, TTL, currentTime));
+            src.processPacket(new Packet(source, destination, TTL, currentTime));
         }
+    }
+
+    /**
+     * Generate a random destination for ants
+     * Beware of infinite loop when all other nodes are offline!
+     *
+     * @param currentNode Node to exclude
+     * @return Node ID
+     */
+    private int getRandomNode(int currentNode) {
+        Random rand = new Random();
+        int randomNode = rand.nextInt(nodes.size());
+        while (randomNode == currentNode || nodes.get(randomNode).isOffline) {
+            randomNode = rand.nextInt(nodes.size());
+        }
+        return randomNode;
     }
 
     /**
      * One tick of the simulation
      *
-     * @return Success, Failure
+     * @return Number of packets that reached their destination
      */
-    public Pair<Integer, Integer> tick() {
+    public int tick() {
+        success = 0;
         ++currentTime;
         for (Edge_ACO edge : edgeList) {
             if (edge.isOffline) continue;
@@ -302,31 +250,7 @@ class AntNet implements AlgorithmBase {
             if (node.isOffline) continue;
             processNode(node);
         }
-        Pair<Integer, Integer> ret = new Pair<>(success, failure);
-        if (Main.DEBUG) System.out.println("success: " + ret.getKey() + " failure: " + ret.getValue());
-        success = failure = 0;
-        return ret;
-    }
-
-    /**
-     * Count the number of packets
-     * that will eventually expire
-     *
-     * @return Number of packets
-     */
-    public Pair<Integer, Integer> terminate() {
-        while (packetCnt > 0) {
-            ++currentTime;
-            for (Edge_ACO edge : edgeList) {
-                if (edge.isOffline) continue;
-                processEdge(edge);
-            }
-            for (Node_AntNet node : nodes) {
-                if (node.isOffline) continue;
-                processNode(node);
-            }
-        }
-        return new Pair<>(success, failure);
+        return success;
     }
 
     /**
@@ -338,24 +262,23 @@ class AntNet implements AlgorithmBase {
      * @param _destination Destination node
      */
     public void build(ArrayList<Node_GUI> _nodes, ArrayList<SimpleEdge> _edgeList, int _source, int _destination) {
-        currentTime = 0;
         nodes.clear();
         edgeList.clear();
         adjMat.clear();
         // Node
         for (Node_GUI node : _nodes) {
-            nodes.add(new Node_AntNet(node.speed, nodes, adjMat, alpha));
+            nodes.add(new Node_AntNet(nodes, adjMat, alpha));
             if (node.isOffline) {
-                nodes.get(nodes.size() - 1).isOffline = true;
+                nodes.get(nodes.size() - 1).toggle();
             }
         }
         // Edges
         for (SimpleEdge edge : _edgeList) {
-            Edge_ACO forward = new Edge_ACO(edge.source, edge.destination, edge.cost);
-            Edge_ACO backward = new Edge_ACO(edge.destination, edge.source, edge.cost);
+            Edge_ACO forward = new Edge_ACO(edge.source, edge.destination, edge.cost, edge.bandwidth);
+            Edge_ACO backward = new Edge_ACO(edge.destination, edge.source, edge.cost, edge.bandwidth);
             if (edge.isOffline) {
-                forward.isOffline = true;
-                backward.isOffline = true;
+                forward.toggle();
+                backward.toggle();
             }
             edgeList.add(forward);
             edgeList.add(backward);

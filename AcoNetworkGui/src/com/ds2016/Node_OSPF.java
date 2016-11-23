@@ -2,14 +2,15 @@ package com.ds2016;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by damian on 28/5/16.
  */
 class Node_OSPF {
 
-    final int speed, nodeID;
-    final ArrayDeque<Packet> Q = new ArrayDeque<>();
+    final int ID;
+    final HashMap<Integer, ArrayDeque<Packet>> Q = new HashMap<>();
     private final ArrayList<Node_OSPF> nodes;
     private final HashMap2D<Integer, Integer, Edge> adjMat;
     boolean isOffline;
@@ -18,13 +19,11 @@ class Node_OSPF {
     /**
      * Initialize a node
      *
-     * @param _speed  Processing speed
      * @param _nodes  ArrayList of Node_OSPF
      * @param _adjMat Adjacency Matrix
      */
-    Node_OSPF(int _speed, ArrayList<Node_OSPF> _nodes, HashMap2D<Integer, Integer, Edge> _adjMat) {
-        speed = _speed;
-        nodeID = _nodes.size();
+    Node_OSPF(ArrayList<Node_OSPF> _nodes, HashMap2D<Integer, Integer, Edge> _adjMat) {
+        ID = _nodes.size();
         nodes = _nodes;
         adjMat = _adjMat;
     }
@@ -33,7 +32,7 @@ class Node_OSPF {
      * React to updates
      */
     void update() {
-        SSSP = new Dijkstra(nodeID, nodes, adjMat);
+        SSSP = new Dijkstra(ID, nodes, adjMat);
     }
 
     /**
@@ -45,5 +44,36 @@ class Node_OSPF {
      */
     int nextHop(Packet packet) {
         return SSSP.next(packet.destination);
+    }
+
+    /**
+     * Process a packet
+     *
+     * @param packet Packet
+     * @return 1, if packet has reached destination
+     */
+    int process(Packet packet) {
+        packet.tabuList.add(ID); // To be removed
+        if (packet.destination == ID) {
+            return 1;
+        }
+        int nxt = nextHop(packet);
+        if (!Q.containsKey(nxt)) Q.put(nxt, new ArrayDeque<>());
+        Q.get(nxt).push(packet);
+        return 0;
+    }
+
+    /**
+     * Clear the packet queue
+     */
+    void clearQ() {
+        Q.clear();
+    }
+
+    /**
+     * Toggle isOffline
+     */
+    void toggle() {
+        isOffline ^= true;
     }
 }
