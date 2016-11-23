@@ -34,7 +34,6 @@ class DataChart {
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.add(THROUGHPUT_TITLE, throughputPane());
-        tabbedPane.add(SUCCESS_TITLE, successPane());
         frame.add(tabbedPane, BorderLayout.CENTER);
 
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -59,19 +58,6 @@ class DataChart {
         return panel;
     }
 
-    private ChartPanel successPane() {
-        mSuccessSeries = new XYSeries("Success rate data");
-        XYSeriesCollection dataset = new XYSeriesCollection(mSuccessSeries);
-        JFreeChart chart = ChartFactory.createXYLineChart(SUCCESS_TITLE, CHART_X, CHART_SUCCESS_Y,
-                dataset, PlotOrientation.VERTICAL, false, false, false);
-        ChartPanel panel = new ChartPanel(chart);
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        double width = screenSize.getWidth() / 3.3;
-        double height = screenSize.getHeight() / 3.75;
-        panel.setPreferredSize(new Dimension((int) width, (int) height));
-        return panel;
-    }
-
     void updateCharts() {
         updateStats();
         mThroughputSeries.add(mThroughputSeries.getItemCount(), mThroughput);
@@ -79,22 +65,13 @@ class DataChart {
     }
 
     void resetCharts() {
-        sTickVal = null;
         mThroughputSeries.clear();
         mSuccessSeries.clear();
         updateCnt = 0;
     }
 
     private void updateStats() {
-        if (sTickVal == null) {
-            System.out.println(++updateCnt + " " + 0 + " " + 0);
-            return;
-        }
-        long success = sTickVal.getKey();
-        long failure = sTickVal.getValue();
-        mThroughput = success;
-        mSuccessRate = failure > 0 ? (double) success / (failure + success) * 100 : 100;
-        if (Main.DEBUG) System.out.println("updateStats(): mSuccessRate: " + mSuccessRate);
-        System.out.println(++updateCnt + " " + success + " " + failure);
+        mThroughput = sTickVal;
+        System.out.println(++updateCnt + " " + sTickVal);
     }
 }

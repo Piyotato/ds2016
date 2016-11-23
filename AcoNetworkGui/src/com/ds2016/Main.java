@@ -1,7 +1,6 @@
 package com.ds2016;
 
 import com.sun.corba.se.impl.orbutil.concurrent.Mutex;
-import javafx.util.Pair;
 import org.graphstream.graph.Graph;
 
 /**
@@ -17,7 +16,7 @@ public class Main {
     static AlgorithmBase sAlgo;
     static Graph sGraph;
     static NewGui sGui;
-    static Pair<Integer, Integer> sTickVal;
+    static int sTickVal;
     private static Thread mThread;
     private static Runnable mRunnable;
 
@@ -28,7 +27,7 @@ public class Main {
 
         sGui.init();
 
-        Link.buildDoubleDiamond();
+        Link.buildNsfNet();
 
         Mutex mutex = new Mutex();
 
