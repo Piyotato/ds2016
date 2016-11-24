@@ -3,14 +3,14 @@ package com.ds2016;
 /**
  * Created by damian on 1/7/16.
  */
-class Node_GUI {
+public class Node_GUI {
 
-    boolean isOffline;
+    public boolean isOffline;
 
     /**
      * Construct Node
      */
-    Node_GUI() {
+    public Node_GUI() {
         isOffline = false;
     }
 }

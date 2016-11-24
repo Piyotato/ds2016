@@ -1,14 +1,14 @@
-package com.ds2016;
+package com.ds2016.ui;
 
+import com.ds2016.Link;
+import com.ds2016.Main;
+import com.ds2016.listeners.GraphEventListener;
 import org.graphstream.algorithm.DynamicAlgorithm;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.stream.SinkAdapter;
 
 import java.util.ArrayList;
-
-import static com.ds2016.Main.sAlgo;
-import static com.ds2016.Main.sGraph;
 
 /**
  * Created by zwliew on 19/6/16.
@@ -20,11 +20,17 @@ class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
     private static final double MED_LOAD_FACTOR = 1.5;
     private static final double LOW_LOAD_FACTOR = 0.5;
 
+    private GraphEventListener mListener;
+
     private int mLoadMean;
+
+    GraphAlgo(final GraphEventListener listener) {
+        mListener = listener;
+    }
 
     @Override
     public void terminate() {
-        sGraph.removeSink(this);
+        mListener.onGraphTerminated(this);
     }
 
     @Override
@@ -33,8 +39,9 @@ class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
 
     @Override
     public void compute() {
+        final Graph graph = mListener.onGraphUpdated();
         int temp = 0;
-        ArrayList<Integer> edgeLoadList = sAlgo.getEdgeStatus();
+        ArrayList<Integer> edgeLoadList = Link.sAlgorithm.getEdgeStatus();
         for (int edgeLoad : edgeLoadList) {
             temp += edgeLoad;
         }
@@ -45,7 +52,7 @@ class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
         mLoadMean = loadTotal / edgeCount;
 
         for (int i = 0; i < edgeCount; i++) {
-            Edge edge = sGraph.getEdge(i);
+            Edge edge = graph.getEdge(i);
             if (Main.DEBUG) System.out.println("compute: edgeId = " + edge.getId());
             setEdgeColor(edge, edgeLoadList.get(i));
         }

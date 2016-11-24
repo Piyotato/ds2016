@@ -101,9 +101,9 @@ class EACO implements AlgorithmBase {
     /**
      * Add a bidirectional edge
      *
-     * @param node1 First node
-     * @param node2 Second node
-     * @param cost  Time taken
+     * @param node1     First node
+     * @param node2     Second node
+     * @param cost      Time taken
      * @param bandwidth Packets per tick
      * @throws IllegalArgumentException if ID is out of bounds
      */

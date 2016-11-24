@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * Created by damian on 17/5/16.
  */
-interface AlgorithmBase {
+public interface AlgorithmBase {
 
     ArrayList<Integer> getEdgeStatus();
 

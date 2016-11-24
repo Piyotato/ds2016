@@ -1,22 +1,28 @@
-package com.ds2016;
+package com.ds2016.ui;
 
+import com.ds2016.Main;
+import com.ds2016.Node_GUI;
+import com.ds2016.SimpleEdge;
+import com.ds2016.listeners.GraphEventListener;
+import com.ds2016.listeners.GuiEventListener;
+import com.ds2016.listeners.NetworkEventListener;
+import com.ds2016.networks.NsfNetwork;
+import com.ds2016.networks.PrebuiltNetwork;
 import org.graphstream.algorithm.DynamicAlgorithm;
 import org.graphstream.graph.Edge;
+import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.stream.Sink;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
-import static com.ds2016.Main.sGraph;
-import static com.ds2016.Main.sParams;
-
 /**
  * Created by zwliew on 19/6/16.
  */
-public class Gui {
-    private static final String GRAPH_THREAD = "GRAPH_THREAD";
+public class Gui implements GraphEventListener, NetworkEventListener {
     private static final String STYLE_SHEET =
             "edge.highLoad { fill-color: red; }" +
                     "edge.midLoad { fill-color: orange; }" +
@@ -26,10 +32,8 @@ public class Gui {
                     "node.destination { fill-color: red; }";
     private static final String FRAME_TITLE = "EACO";
     private static final String GRAPH_TITLE = "Simulation";
-    static DynamicAlgorithm sGraphAlgo;
-    static DataChart sDataChart;
-    ArrayList<Node_GUI> mNodeList = new ArrayList<>();
-    ArrayList<SimpleEdge> mEdgeList = new ArrayList<>();
+    public ArrayList<Node_GUI> mNodeList = new ArrayList<>();
+    public ArrayList<SimpleEdge> mEdgeList = new ArrayList<>();
     private JPanel mainPanel;
     private JTextField mAlphaField;
     private JTextField mDistanceField;
@@ -53,10 +57,21 @@ public class Gui {
     private JTextField mToggleNodeField;
     private JTextField mIntervalField;
     private JTextField mTrafficField;
-    private Thread mThread;
-    private GraphRunnable mRunnable;
+    private GuiEventListener mListener;
+    private Graph mGraph;
+    private DynamicAlgorithm mGraphAlgo;
+    private DataChart mDataChart;
+    private PrebuiltNetwork mNetwork;
 
-    void init() {
+    private int mSourceNode;
+    private int mDestinationNode;
+
+    public Gui(final GuiEventListener listener) {
+        mListener = listener;
+        mNetwork = new NsfNetwork();
+    }
+
+    public void init() {
         JFrame frame = new JFrame(FRAME_TITLE);
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -68,32 +83,32 @@ public class Gui {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
+
+        mNetwork.init(this);
+        mNetwork.build();
     }
 
     private void initNetworkPanel() {
         // Disable when necessary
         System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
 
-        sGraph = new SingleGraph(GRAPH_TITLE);
-        sGraph.setStrict(false);
-        sGraph.setAutoCreate(true);
-        sGraph.addAttribute("ui.stylesheet", STYLE_SHEET);
+        mGraph = new SingleGraph(GRAPH_TITLE);
+        mGraph.setStrict(false);
+        mGraph.setAutoCreate(true);
+        mGraph.addAttribute("ui.stylesheet", STYLE_SHEET);
 
-        sGraphAlgo = new GraphAlgo();
-        sGraphAlgo.init(sGraph);
+        mGraphAlgo = new GraphAlgo(this);
+        mGraphAlgo.init(mGraph);
 
-        sGraph.display();
+        mGraph.display();
     }
 
     private void initChartPanel() {
-        sDataChart = new DataChart();
-        sDataChart.display();
+        mDataChart = new DataChart();
+        mDataChart.display();
     }
 
     private void createUIComponents() {
-        mRunnable = new GraphRunnable();
-        mThread = new Thread(mRunnable, GRAPH_THREAD);
-
         initNetworkPanel();
         initChartPanel();
 
@@ -101,25 +116,35 @@ public class Gui {
           Set the current algorithm
          */
         mOspfBtn = new JRadioButton();
-        mOspfBtn.addActionListener(actionEvent -> sParams.setAlgorithm(1));
+        mOspfBtn.addActionListener(actionEvent ->
+                mListener.onAlgorithmChanged(Integer.parseInt(actionEvent.getActionCommand())));
 
         mAntNetBtn = new JRadioButton();
-        mAntNetBtn.addActionListener(actionEvent -> sParams.setAlgorithm(2));
+        mAntNetBtn.addActionListener(actionEvent ->
+                mListener.onAlgorithmChanged(Integer.parseInt(actionEvent.getActionCommand())));
 
         mEAcoBtn = new JRadioButton();
-        mEAcoBtn.addActionListener(actionEvent -> sParams.setAlgorithm(3));
+        mEAcoBtn.addActionListener(actionEvent ->
+                mListener.onAlgorithmChanged(Integer.parseInt(actionEvent.getActionCommand())));
 
         /*
           Add a new node
          */
         mAddNodeBtn = new JButton();
-        mAddNodeBtn.addActionListener(actionEvent -> Link.addNode());
+        mAddNodeBtn.addActionListener(actionEvent -> {
+            addNode();
+            mListener.onNodeAdded();
+        });
 
         /*
           Toggle Node
          */
         mToggleNodeBtn = new JButton();
-        mToggleNodeBtn.addActionListener(actionEvent -> Link.toggleNode(Integer.parseInt(mToggleNodeField.getText())));
+        mToggleNodeBtn.addActionListener(actionEvent -> {
+            final int node = Integer.parseInt(mToggleNodeField.getText());
+            toggleNode(node);
+            mListener.onNodeToggled(node);
+        });
 
         /*
           Add a new edge
@@ -130,85 +155,72 @@ public class Gui {
             int to = Integer.parseInt(mToField.getText());
             int distance = Integer.parseInt(mDistanceField.getText());
             int bandwidth = Integer.parseInt(mBandwidthField.getText());
-            Link.addEdge(from, to, distance, bandwidth);
+            addEdge(from, to, distance, bandwidth);
+            mListener.onEdgeAdded(from, to, distance, bandwidth);
         });
 
         /*
           Toggle edge
          */
         mToggleEdgeBtn = new JButton();
-        mToggleEdgeBtn.addActionListener(actionEvent -> Link.toggleEdge(Integer.parseInt(mToggleEdgeField.getText())));
+        mToggleEdgeBtn.addActionListener(actionEvent -> {
+            final int id = Integer.parseInt(mToggleEdgeField.getText());
+            toggleEdge(id);
+            mListener.onEdgeToggled(Integer.parseInt(mToggleEdgeField.getText()));
+        });
 
         /*
           Save parameters
          */
         mUpdateBtn = new JButton();
-        mUpdateBtn.addActionListener(actionEvent -> Link.update());
+        mUpdateBtn.addActionListener(e -> {
+            mSourceNode = Integer.parseInt(mSourceField.getText());
+            mDestinationNode = Integer.parseInt(mDestinationField.getText());
+            final ParameterStorage params = new ParameterStorage(
+                    Double.parseDouble(mAlphaField.getText()),
+                    Integer.parseInt(mTrafficField.getText()),
+                    Double.parseDouble(mIntervalField.getText()),
+                    mSourceNode,
+                    mDestinationNode);
+            colouriseNodes(mSourceNode, mDestinationNode);
+            mListener.onUpdate(params);
+            mDataChart.resetCharts();
+        });
 
         /*
-          Start the sGraph algorithm thread
+          Start the mGraph algorithm thread
          */
         mStartBtn = new JButton();
-        mStartBtn.addActionListener(actionEvent -> Link.start());
+        mStartBtn.addActionListener(actionEvent -> mListener.onStart());
 
         /*
-          Stop the sGraph algorithm thread
+          Stop the mGraph algorithm thread
          */
         mStopBtn = new JButton();
-        mStopBtn.addActionListener(actionEvent -> Link.stop());
+        mStopBtn.addActionListener(actionEvent -> mListener.onStop());
 
         /*
-          Undergo one tick of the entire program (sGraph + algorithm)
+          Undergo one tick of the entire program (mGraph + algorithm)
          */
         mTickBtn = new JButton();
-        mTickBtn.addActionListener(actionEvent -> Link.tick());
+        mTickBtn.addActionListener(actionEvent -> {
+            tick();
+            mListener.onTick();
+        });
     }
 
-    void startThread() {
-        mThread = new Thread(mRunnable, GRAPH_THREAD);
-        mThread.start();
-    }
-
-    void stopThread() {
-        mThread.interrupt();
-    }
-
-    void update() {
-        updateParams();
-        updateTextFields();
-        colouriseNodes();
-    }
-
-    /**
-     * Update ParameterStorage parameters
-     */
-    private void updateParams() {
-        sParams.setAlpha(mAlphaField.getText());
-        sParams.setSource(mSourceField.getText());
-        sParams.setDestination(mDestinationField.getText());
-        sParams.setInterval(mIntervalField.getText());
-        sParams.setTraffic(mTrafficField.getText());
-    }
-
-    /**
-     * Update text in text fields
-     * Mainly to verify that the params were stored correctly
-     */
-    private void updateTextFields() {
-        mAlphaField.setText(String.valueOf(sParams.getAlpha()));
-        mSourceField.setText(String.valueOf(sParams.getSource()));
-        mDestinationField.setText(String.valueOf(sParams.getDestination()));
-        mIntervalField.setText(String.valueOf(sParams.getInterval()));
-        mTrafficField.setText(String.valueOf(sParams.getTraffic()));
+    public void tick() {
+        mGraphAlgo.compute();
+        mDataChart.updateCharts();
     }
 
     /**
      * Colourise source and destination node
      */
-    private void colouriseNodes() {
-        Node source = sGraph.getNode(String.valueOf(sParams.getSource()));
-        Node destination = sGraph.getNode(String.valueOf(sParams.getDestination()));
-        for (Node n : sGraph) {
+    private void colouriseNodes(final int sourceId, final int destinationId) {
+        Node source = mGraph.getNode(String.valueOf(sourceId));
+        Node destination = mGraph.getNode(String.valueOf(destinationId));
+        for (Node n : mGraph) {
             if (n == source) {
                 n.setAttribute("ui.class", "source");
             } else if (n == destination) {
@@ -222,11 +234,11 @@ public class Gui {
     /**
      * Add a new node
      */
-    void addNode() {
+    private void addNode() {
         // Add GUI node
-        int nodeCount = sGraph.getNodeCount();
+        int nodeCount = mGraph.getNodeCount();
         if (Main.DEBUG) System.out.println("addNode: nodeCount = " + nodeCount);
-        Node node = sGraph.addNode(String.valueOf(nodeCount));
+        Node node = mGraph.addNode(String.valueOf(nodeCount));
         node.addAttribute("ui.label", nodeCount);
 
         // Add Node_GUI node for algorithm to read from
@@ -237,16 +249,17 @@ public class Gui {
     /**
      * Toggle state of a node
      *
-     * @param ID Node ID
+     * @param id Node ID
      * @throws IllegalArgumentException if ID is out of bounds
      */
-    void toggleNode(int ID) throws IllegalArgumentException {
-        if (ID == sParams.getSource() || ID == sParams.getDestination()) {
+    private void toggleNode(final int id)
+            throws IllegalArgumentException {
+        if (id == mSourceNode || id == mDestinationNode) {
             throw new IllegalArgumentException();
         }
-        Node node = sGraph.getNode(ID);
+        Node node = mGraph.getNode(id);
 
-        // Toggle sGraph state
+        // Toggle mGraph state
         if (node.hasAttribute("ui.hide")) {
             node.removeAttribute("ui.hide");
         } else {
@@ -254,38 +267,38 @@ public class Gui {
         }
 
         // Toggle Node_GUI state
-        Node_GUI listNode = mNodeList.get(ID);
+        Node_GUI listNode = mNodeList.get(id);
         listNode.isOffline ^= true;
     }
 
     /**
      * Add a bidirectional edge
      *
-     * @param node1 First node
-     * @param node2 Second node
-     * @param cost  Time taken
+     * @param node1     First node
+     * @param node2     Second node
+     * @param cost      Time taken
      * @param bandwidth Bandwidth
      * @throws IllegalArgumentException if ID is out of bounds
      */
-    void addEdge(int node1, int node2, int cost, int bandwidth) throws IllegalArgumentException {
+    private void addEdge(int node1, int node2, int cost, int bandwidth) throws IllegalArgumentException {
         // We can't add edges between non-existent nodes
-        int nodeCount = sGraph.getNodeCount();
+        int nodeCount = mGraph.getNodeCount();
         if (Main.DEBUG) System.out.println("addEdge: nodeCount = " + nodeCount);
         if (node1 >= nodeCount || node2 >= nodeCount) {
             throw new IllegalArgumentException();
         }
 
         // Add forward edge
-        int edgeCount = sGraph.getEdgeCount() / 2;
+        int edgeCount = mGraph.getEdgeCount() / 2;
         if (Main.DEBUG) System.out.println("addEdge: edgeCount = " + nodeCount);
 
-        Edge forward = sGraph.addEdge(String.valueOf(edgeCount + "f"), node1, node2, true);
+        Edge forward = mGraph.addEdge(String.valueOf(edgeCount + "f"), node1, node2, true);
         forward.addAttribute("ui.label", String.valueOf(edgeCount));
         forward.addAttribute("edge.cluster", String.valueOf(edgeCount));
         forward.addAttribute("cost", cost);
 
         // Add backward edge
-        Edge backward = sGraph.addEdge(String.valueOf(edgeCount + "b"), node2, node1, true);
+        Edge backward = mGraph.addEdge(String.valueOf(edgeCount + "b"), node2, node1, true);
         backward.addAttribute("edge.cluster", String.valueOf(edgeCount));
         backward.addAttribute("cost", cost);
 
@@ -298,11 +311,11 @@ public class Gui {
      *
      * @param ID Edge ID
      */
-    void toggleEdge(int ID) {
+    private void toggleEdge(int ID) {
         String forwardId = ID + "f";
         String backwardId = ID + "b";
-        Edge forward = sGraph.getEdge(forwardId);
-        Edge backward = sGraph.getEdge(backwardId);
+        Edge forward = mGraph.getEdge(forwardId);
+        Edge backward = mGraph.getEdge(backwardId);
         if (Main.DEBUG) System.out.println("toggleEdge: forwardId = " + forwardId + " backwardId = " + backwardId);
 
         // Toggle forward edge visibility
@@ -318,5 +331,30 @@ public class Gui {
         } else {
             backward.addAttribute("ui.hide");
         }
+    }
+
+    @Override
+    public void onGraphTerminated(final Sink sink) {
+        mGraph.removeSink(sink);
+    }
+
+    @Override
+    public Graph onGraphUpdated() {
+        return mGraph;
+    }
+
+    @Override
+    public void onNodeAdded() {
+        addNode();
+        mListener.onNodeAdded();
+    }
+
+    @Override
+    public void onEdgeAdded(final int source,
+                            final int destination,
+                            final int cost,
+                            final int bandwidth) {
+        addEdge(source, destination, cost, bandwidth);
+        mListener.onEdgeAdded(source, destination, cost, bandwidth);
     }
 }
