@@ -2,9 +2,9 @@ package com.ds2016;
 
 import com.sun.corba.se.impl.orbutil.concurrent.Mutex;
 
+import static com.ds2016.Gui.sDataChart;
+import static com.ds2016.Gui.sGraphAlgo;
 import static com.ds2016.Main.*;
-import static com.ds2016.NewGui.sDataChart;
-import static com.ds2016.NewGui.sGraphAlgo;
 
 /**
  * Created by zwliew on 4/7/16.

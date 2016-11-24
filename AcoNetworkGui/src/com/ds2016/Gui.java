@@ -15,7 +15,7 @@ import static com.ds2016.Main.sParams;
 /**
  * Created by zwliew on 19/6/16.
  */
-public class NewGui {
+public class Gui {
     private static final String GRAPH_THREAD = "GRAPH_THREAD";
     private static final String STYLE_SHEET =
             "edge.highLoad { fill-color: red; }" +

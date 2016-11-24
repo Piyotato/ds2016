@@ -1,7 +1,7 @@
 package com.ds2016;
 
-import static com.ds2016.NewGui.sDataChart;
-import static com.ds2016.NewGui.sGraphAlgo;
+import static com.ds2016.Gui.sDataChart;
+import static com.ds2016.Gui.sGraphAlgo;
 
 /**
  * Created by zwliew on 20/6/16.

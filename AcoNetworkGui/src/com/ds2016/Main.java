@@ -15,14 +15,14 @@ public class Main {
     static ParameterStorage sParams;
     static AlgorithmBase sAlgo;
     static Graph sGraph;
-    static NewGui sGui;
+    static Gui sGui;
     static int sTickVal;
     private static Thread mThread;
     private static Runnable mRunnable;
 
     public static void main(String[] args) {
         sParams = new ParameterStorage(0.4, 1000, 0.3, 0, 2, ParameterStorage.ALGO_OSPF);
-        sGui = new NewGui();
+        sGui = new Gui();
         initAlgo();
 
         sGui.init();
