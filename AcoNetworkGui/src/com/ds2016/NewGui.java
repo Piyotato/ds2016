@@ -47,7 +47,7 @@ public class NewGui {
     private JTextField mDestinationField;
     private JTextField mToggleEdgeField;
     private JButton mToggleEdgeBtn;
-    private JTextField mBandwithField;
+    private JTextField mBandwidthField;
     private JButton mUpdateBtn;
     private JButton mToggleNodeBtn;
     private JTextField mToggleNodeField;
@@ -129,8 +129,8 @@ public class NewGui {
             int from = Integer.parseInt(mFromField.getText());
             int to = Integer.parseInt(mToField.getText());
             int distance = Integer.parseInt(mDistanceField.getText());
-            int bandwith = Integer.parseInt(mBandwithField.getText());
-            Link.addEdge(from, to, distance, bandwith);
+            int bandwidth = Integer.parseInt(mBandwidthField.getText());
+            Link.addEdge(from, to, distance, bandwidth);
         });
 
         /*
@@ -264,10 +264,10 @@ public class NewGui {
      * @param node1 First node
      * @param node2 Second node
      * @param cost  Time taken
-     * @param bandwith Bandwith
+     * @param bandwidth Bandwidth
      * @throws IllegalArgumentException if ID is out of bounds
      */
-    void addEdge(int node1, int node2, int cost, int bandwith) throws IllegalArgumentException {
+    void addEdge(int node1, int node2, int cost, int bandwidth) throws IllegalArgumentException {
         // We can't add edges between non-existent nodes
         int nodeCount = sGraph.getNodeCount();
         if (Main.DEBUG) System.out.println("addEdge: nodeCount = " + nodeCount);
@@ -283,16 +283,14 @@ public class NewGui {
         forward.addAttribute("ui.label", String.valueOf(edgeCount));
         forward.addAttribute("edge.cluster", String.valueOf(edgeCount));
         forward.addAttribute("cost", cost);
-        forward.addAttribute("bandwith", bandwith);
 
         // Add backward edge
         Edge backward = sGraph.addEdge(String.valueOf(edgeCount + "b"), node2, node1, true);
         backward.addAttribute("edge.cluster", String.valueOf(edgeCount));
         backward.addAttribute("cost", cost);
-        backward.addAttribute("bandwith", bandwith);
 
         // Add edge to the SimpleEdge list
-        mEdgeList.add(new SimpleEdge(node1, node2, cost, bandwith));
+        mEdgeList.add(new SimpleEdge(node1, node2, cost, bandwidth));
     }
 
     /**

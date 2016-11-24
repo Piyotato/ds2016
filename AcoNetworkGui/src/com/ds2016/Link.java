@@ -49,13 +49,13 @@ class Link {
         }
     }
 
-    static void addEdge(int node1, int node2, int cost, int bandwith) {
+    static void addEdge(int node1, int node2, int cost, int bandwidth) {
         Mutex mutex = new Mutex();
         try {
             mutex.acquire();
             try {
-                sGui.addEdge(node1, node2, cost, bandwith);
-                sAlgo.addEdge(node1, node2, cost, bandwith);
+                sGui.addEdge(node1, node2, cost, bandwidth);
+                sAlgo.addEdge(node1, node2, cost, bandwidth);
             } finally {
                 mutex.release();
             }

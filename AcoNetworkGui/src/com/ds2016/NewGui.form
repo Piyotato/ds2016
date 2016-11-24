@@ -241,7 +241,7 @@
                   <text value="Packets per tick"/>
                 </properties>
               </component>
-              <component id="d46de" class="javax.swing.JTextField" binding="mBandwithField">
+              <component id="d46de" class="javax.swing.JTextField" binding="mBandwidthField">
                 <constraints>
                   <grid row="3" column="3" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
