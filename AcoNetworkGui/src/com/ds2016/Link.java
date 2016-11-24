@@ -251,4 +251,183 @@ class Link {
 
         addEdge(12, 13, 4, 1500);
     }
+
+    static void buildNttNet() {
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+        addNode();
+
+        addEdge(0, 2, 18, 6000);
+
+        addEdge(1, 2, 15, 6000);
+
+        addEdge(2, 5, 18, 6000);
+        addEdge(2, 7, 20, 6000);
+
+        addEdge(3, 5, 12, 6000);
+
+        addEdge(4, 7, 21, 6000);
+
+        addEdge(5, 6, 12, 6000);
+        addEdge(5, 11, 40, 6000);
+
+        addEdge(6, 7, 15, 6000);
+        addEdge(6, 8, 17, 6000);
+
+        addEdge(7, 10, 23, 6000);
+
+        addEdge(8, 9, 22, 6000);
+
+        addEdge(10, 12, 20, 6000);
+
+        addEdge(11, 14, 17, 6000);
+
+        addEdge(12, 15, 10, 6000);
+
+        addEdge(13, 15, 12, 6000);
+
+        addEdge(14, 19, 20, 6000);
+
+        addEdge(15, 16, 30, 6000);
+
+        addEdge(16, 20, 14, 6000);
+        addEdge(16, 23, 15, 6000);
+
+        addEdge(17, 18, 21, 6000);
+
+        addEdge(18, 20, 10, 6000);
+
+        addEdge(19, 20, 12, 6000);
+
+        addEdge(20, 21, 10, 6000);
+        addEdge(20, 23, 13, 6000);
+
+        addEdge(21, 22, 11, 6000);
+        addEdge(21, 24, 11, 6000);
+
+        addEdge(22, 26, 16, 6000);
+
+        addEdge(23, 25, 13, 6000);
+
+        addEdge(24, 29, 11, 6000);
+
+        addEdge(25, 28, 11, 6000);
+        addEdge(25, 31, 10, 6000);
+
+        addEdge(26, 27, 11, 6000);
+
+        addEdge(27, 35, 15, 6000);
+
+        addEdge(28, 29, 11, 6000);
+        addEdge(28, 30, 11, 6000);
+
+        addEdge(29, 30, 12, 6000);
+
+        addEdge(30, 33, 12, 6000);
+
+        addEdge(31, 32, 10, 6000);
+
+        addEdge(33, 34, 11, 6000);
+        addEdge(33, 36, 16, 6000);
+
+        addEdge(34, 35, 12, 6000);
+        addEdge(34, 38, 17, 6000);
+
+        addEdge(35, 42, 23, 6000);
+
+        addEdge(36, 37, 11, 6000);
+
+        addEdge(37, 40, 12, 6000);
+
+        addEdge(38, 39, 10, 6000);
+
+        addEdge(39, 40, 11, 6000);
+        addEdge(39, 41, 16, 6000);
+
+        addEdge(40, 41, 19, 6000);
+
+        addEdge(41, 42, 23, 6000);
+        addEdge(41, 45, 20, 6000);
+
+        addEdge(42, 43, 20, 6000);
+        addEdge(42, 51, 50, 6000);
+
+        addEdge(43, 44, 12, 6000);
+        addEdge(43, 46, 12, 6000);
+
+        addEdge(44, 45, 11, 6000);
+
+        addEdge(45, 48, 27, 6000);
+
+        addEdge(46, 47, 21, 6000);
+
+        addEdge(47, 48, 11, 6000);
+        addEdge(47, 49, 22, 6000);
+
+        addEdge(48, 50, 28, 6000);
+
+        addEdge(49, 50, 16, 6000);
+        addEdge(49, 51, 21, 6000);
+
+        addEdge(50, 51, 12, 6000);
+        addEdge(50, 53, 27, 6000);
+
+        addEdge(51, 52, 17, 6000);
+
+        addEdge(52, 54, 19, 6000);
+
+        addEdge(53, 54, 13, 6000);
+    }
 }
