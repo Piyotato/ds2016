@@ -3,7 +3,7 @@ package com.ds2016.networks;
 /**
  * Created by wchee on 24/11/2016.
  */
-public class NsfNetwork extends PrebuiltNetwork {
+public class NsfNetwork extends Network {
     @Override
     public void build() {
         mListener.onNodeAdded();

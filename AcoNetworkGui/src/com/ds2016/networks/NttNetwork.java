@@ -3,7 +3,7 @@ package com.ds2016.networks;
 /**
  * Created by wchee on 24/11/2016.
  */
-public class NttNetwork extends PrebuiltNetwork {
+public class NttNetwork extends Network {
     @Override
     public void build() {
         mListener.onNodeAdded();

@@ -17,7 +17,6 @@ public class Link implements GuiEventListener {
     private static final int ALGO_EACO = 2;
     private static final int POLL_MS = 5;
     private static final int TTL_MS = 150;
-    private static final int NUM_TICKS = 6000;
     public static AlgorithmBase sAlgorithm; // TODO
     public static long sThroughput; // TODO
     private final Mutex mMutex = new Mutex();
@@ -29,8 +28,8 @@ public class Link implements GuiEventListener {
 
     Link() {
         mGui = new Gui(this);
-        mParams = new ParameterStorage(
-                0.4, 1000, 0.3, 0, 2, ALGO_OSPF);
+        mParams = new ParameterStorage(0, 2,
+                0.4, 0.3, 1000, 6000, ALGO_OSPF);
         sAlgorithm = new OSPF(TTL_MS, 1000);
         mNumTicks = 0;
     }
@@ -46,7 +45,7 @@ public class Link implements GuiEventListener {
                         tick();
                         mGui.tick();
                         mNumTicks++;
-                        if (mNumTicks == NUM_TICKS) {
+                        if (mNumTicks == mParams.getNumTicks()) {
                             mNumTicks = 0;
                             stop();
                         }
@@ -134,11 +133,12 @@ public class Link implements GuiEventListener {
     }
 
     private void update(final ParameterStorage params) {
-        mParams.setAlpha(params.getAlpha());
         mParams.setSource(params.getSource());
         mParams.setDestination(params.getDestination());
+        mParams.setAlpha(params.getAlpha());
         mParams.setInterval(params.getInterval());
         mParams.setTraffic(params.getTraffic());
+        mParams.setNumTicks(params.getNumTicks());
 
         buildNewAlgorithm(params);
     }
@@ -146,9 +146,9 @@ public class Link implements GuiEventListener {
     private void buildNewAlgorithm(final ParameterStorage params) {
         final int source = params.getSource();
         final int destination = params.getDestination();
-        final int traffic = params.getTraffic();
         final double alpha = params.getAlpha();
         final double interval = params.getInterval();
+        final int traffic = params.getTraffic();
         final int algorithm = mParams.getAlgorithm();
 
         switch (algorithm) {

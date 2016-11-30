@@ -5,85 +5,98 @@ package com.ds2016.ui;
  */
 public class ParameterStorage {
 
-    private double alpha;
-    private int source;
-    private int destination;
-    private int algorithm;
-    private double interval;
-    private int traffic;
+    private double mAlpha;
+    private int mSource;
+    private int mDestination;
+    private int mAlgorithm;
+    private double mInterval;
+    private int mTraffic;
+    private int mNumTicks;
 
-    public ParameterStorage(final double alpha,
-                            final int traffic,
-                            final double interval,
-                            final int source,
+    public ParameterStorage(final int source,
                             final int destination,
+                            final double alpha,
+                            final double interval,
+                            final int traffic,
+                            final int numTicks,
                             final int algorithm) {
-        this.alpha = alpha;
-        this.traffic = traffic;
-        this.interval = interval;
-        this.source = source;
-        this.destination = destination;
-        this.algorithm = algorithm;
+        mSource = source;
+        mDestination = destination;
+        mAlpha = alpha;
+        mInterval = interval;
+        mTraffic = traffic;
+        mNumTicks = numTicks;
+        mAlgorithm = algorithm;
     }
 
-    ParameterStorage(final double alpha,
-                     final int traffic,
+    ParameterStorage(final int source,
+                     final int destination,
+                     final double alpha,
                      final double interval,
-                     final int source,
-                     final int destination) {
-        this.alpha = alpha;
-        this.traffic = traffic;
-        this.interval = interval;
-        this.source = source;
-        this.destination = destination;
-        this.algorithm = 0;
-    }
-
-    public double getAlpha() {
-        return alpha;
-    }
-
-    public void setAlpha(final double alpha) {
-        this.alpha = alpha;
+                     final int traffic,
+                     final int numTicks) {
+        mSource = source;
+        mDestination = destination;
+        mAlpha = alpha;
+        mInterval = interval;
+        mTraffic = traffic;
+        mNumTicks = numTicks;
+        mAlgorithm = 0;
     }
 
     public int getSource() {
-        return source;
+        return mSource;
     }
 
     public void setSource(final int source) {
-        this.source = source;
+        mSource = source;
     }
 
     public int getDestination() {
-        return destination;
+        return mDestination;
     }
 
     public void setDestination(final int destination) {
-        this.destination = destination;
+        mDestination = destination;
     }
 
-    public int getAlgorithm() {
-        return algorithm;
+    public double getAlpha() {
+        return mAlpha;
     }
 
-    public void setAlgorithm(final int algorithm) {
-        this.algorithm = algorithm;
+    public void setAlpha(final double alpha) {
+        mAlpha = alpha;
     }
 
     public double getInterval() {
-        return interval;
+        return mInterval;
     }
 
     public void setInterval(final double interval) {
-        this.interval = interval;
+        mInterval = interval;
     }
 
     public int getTraffic() {
-        return traffic;
+        return mTraffic;
     }
 
     public void setTraffic(final int traffic) {
-        this.traffic = traffic;
+        mTraffic = traffic;
+    }
+
+    public int getAlgorithm() {
+        return mAlgorithm;
+    }
+
+    public void setAlgorithm(final int algorithm) {
+        mAlgorithm = algorithm;
+    }
+
+    public int getNumTicks() {
+        return mNumTicks;
+    }
+
+    public void setNumTicks(final int numTicks) {
+        mNumTicks = numTicks;
     }
 }

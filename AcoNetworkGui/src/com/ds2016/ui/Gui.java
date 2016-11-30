@@ -6,8 +6,8 @@ import com.ds2016.SimpleEdge;
 import com.ds2016.listeners.GraphEventListener;
 import com.ds2016.listeners.GuiEventListener;
 import com.ds2016.listeners.NetworkEventListener;
+import com.ds2016.networks.Network;
 import com.ds2016.networks.NsfNetwork;
-import com.ds2016.networks.PrebuiltNetwork;
 import org.graphstream.algorithm.DynamicAlgorithm;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
@@ -58,11 +58,12 @@ public class Gui implements GraphEventListener, NetworkEventListener {
     private JTextField mToggleNodeField;
     private JTextField mIntervalField;
     private JTextField mTrafficField;
+    private JTextField mNumTicksField;
     private GuiEventListener mListener;
     private Graph mGraph;
     private DynamicAlgorithm mGraphAlgo;
     private DataChart mDataChart;
-    private PrebuiltNetwork mNetwork;
+    private Network mNetwork;
 
     private int mSourceNode;
     private int mDestinationNode;
@@ -178,11 +179,12 @@ public class Gui implements GraphEventListener, NetworkEventListener {
             mSourceNode = Integer.parseInt(mSourceField.getText());
             mDestinationNode = Integer.parseInt(mDestinationField.getText());
             final ParameterStorage params = new ParameterStorage(
-                    Double.parseDouble(mAlphaField.getText()),
-                    Integer.parseInt(mTrafficField.getText()),
-                    Double.parseDouble(mIntervalField.getText()),
                     mSourceNode,
-                    mDestinationNode);
+                    mDestinationNode,
+                    Double.parseDouble(mAlphaField.getText()),
+                    Double.parseDouble(mIntervalField.getText()),
+                    Integer.parseInt(mTrafficField.getText()),
+                    Integer.parseInt(mNumTicksField.getText()));
             colouriseNodes(mSourceNode, mDestinationNode);
             mListener.onUpdate(params);
             mDataChart.resetCharts();
