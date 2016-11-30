@@ -28,6 +28,7 @@ public class Gui implements GraphEventListener, NetworkEventListener {
                     "edge.midLoad { fill-color: orange; }" +
                     "edge.lowLoad { fill-color: green; }" +
                     "edge.noLoad { fill-color: black; }" +
+                    "node { fill-color: gray; }" +
                     "node.source { fill-color: green; }" +
                     "node.destination { fill-color: red; }";
     private static final String FRAME_TITLE = "EACO";
