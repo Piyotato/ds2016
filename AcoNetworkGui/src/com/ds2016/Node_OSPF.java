@@ -42,7 +42,7 @@ class Node_OSPF {
      * @param packet Packet being processed
      * @return Neighbour for next hop
      */
-    int nextHop(Packet packet) {
+    private int nextHop(Packet packet) {
         return SSSP.next(packet.destination);
     }
 
@@ -53,7 +53,6 @@ class Node_OSPF {
      * @return 1, if packet has reached destination
      */
     int process(Packet packet) {
-        packet.tabuList.add(ID); // To be removed
         if (packet.destination == ID) {
             return 1;
         }

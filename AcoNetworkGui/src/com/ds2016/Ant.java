@@ -1,6 +1,7 @@
 package com.ds2016;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Created by damian on 16/5/16.
@@ -9,6 +10,7 @@ class Ant extends Packet {
 
     final ArrayList<Double> timings = new ArrayList<>();
     private final ArrayList<Integer> path = new ArrayList<>();
+    private final HashSet<Integer> tabuList = new HashSet<>();
     double totalTime;
     boolean isBackwards;
 
@@ -33,6 +35,17 @@ class Ant extends Packet {
     void addNode(int node) {
         path.add(node);
         tabuList.add(node);
+    }
+
+    /**
+     * Check if a node is
+     * currently in the Tabu list
+     *
+     * @param node Neighbouring node
+     * @return Whether node is valid
+     */
+    boolean canVisit(int node) {
+        return !tabuList.contains(node);
     }
 
     /**
