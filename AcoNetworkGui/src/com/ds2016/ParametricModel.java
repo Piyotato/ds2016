@@ -49,7 +49,7 @@ public class ParametricModel {
      * @return Reinforcement Value
      */
     double getReinforcement(double T) {
-        while (!minDeque.isEmpty() && minDeque.peekLast() >= T) {
+        while (!minDeque.isEmpty() && minDeque.peekLast() > T) {
             minDeque.pollLast();
         }
         window.offerLast(T);
@@ -62,7 +62,7 @@ public class ParametricModel {
         }
         // Update Variables
         μ = μ + η * (T - μ);
-        σ = σ + η * (Math.pow((T - σ), 2) - Math.pow(σ, 2));
+        σ = σ + η * ((T - σ) * (T - σ) - σ * σ);
         W = minDeque.peekFirst();
         // Calculate reinforcement
         double I_inf = W;
