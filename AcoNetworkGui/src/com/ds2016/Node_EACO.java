@@ -352,14 +352,23 @@ class Node_EACO {
      * @param destination Destination ID
      */
     private void addHeuristic(int neighbour, int destination) {
-        // Intelligent Initialization
+        boolean destinationIsNeighbour = false;
+        for (Edge_ACO edge : adjMat.get(ID).values()) {
+            if (edge.isOffline || nodes.get(edge.destination).isOffline) continue;
+            if (edge.destination == destination) destinationIsNeighbour = true;
+        }
         double NN = numViableNeighbours.get(destination);
-        if (neighbour == destination) {
-            double amt = 1. / NN + 3. / 2. * (NN - 1) / (NN * NN);
-            updateHeuristic(neighbour, destination, amt);
+        if (destinationIsNeighbour) {
+            // Intelligent Initialization
+            if (neighbour == destination) {
+                double amt = 1. / NN + 3. / 2. * (NN - 1) / (NN * NN);
+                updateHeuristic(neighbour, destination, amt);
+            } else {
+                double amt = 1. / NN - 3. / 2. * 1. / (NN * NN);
+                updateHeuristic(neighbour, destination, amt);
+            }
         } else {
-            double amt = 1. / NN - 3. / 2. * 1. / (NN * NN);
-            updateHeuristic(neighbour, destination, amt);
+            updateHeuristic(neighbour, destination, 1. / NN);
         }
     }
 
