@@ -93,7 +93,6 @@ public class Gui implements GraphEventListener, NetworkEventListener {
     }
 
     private void initNetworkPanel() {
-        // Disable when necessary
         System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
 
         mGraph = new SingleGraph(GRAPH_TITLE);

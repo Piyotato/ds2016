@@ -16,7 +16,7 @@ public class Link implements GuiEventListener {
     private static final int ALGO_ANTNET = 1;
     private static final int ALGO_EACO = 2;
     private static final int POLL_MS = 5;
-    private static final int TTL_MS = 150;
+    private static final int TTL_MS = 1500;
     public static AlgorithmBase sAlgorithm; // TODO
     public static long sThroughput; // TODO
     private final Mutex mMutex = new Mutex();

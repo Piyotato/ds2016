@@ -217,7 +217,9 @@ public class Node_EACO {
         if (Math.abs(old + change) < EPS) {
             pheromone.put(destination, neighbour, null);
         } else {
-            if ((old + change) < -EPS || (old + change - 1) > EPS) throw new IllegalArgumentException();
+            if ((old + change) < -EPS || (old + change - 1) > EPS) {
+                throw new IllegalArgumentException();
+            }
             pheromone.put(destination, neighbour, old + change);
         }
         change += (tot - 1);
