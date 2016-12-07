@@ -85,7 +85,7 @@
                   </grid>
                 </constraints>
                 <properties>
-                  <text value="2"/>
+                  <text value="6"/>
                 </properties>
               </component>
               <component id="e95da" class="javax.swing.JTextField" binding="mSourceField">
@@ -319,7 +319,7 @@
         </constraints>
         <properties>
           <actionCommand value="0"/>
-          <selected value="true"/>
+          <selected value="false"/>
           <text value="OSPF"/>
         </properties>
       </component>
@@ -339,6 +339,7 @@
         </constraints>
         <properties>
           <actionCommand value="2"/>
+          <selected value="true"/>
           <text value="EACO"/>
         </properties>
       </component>

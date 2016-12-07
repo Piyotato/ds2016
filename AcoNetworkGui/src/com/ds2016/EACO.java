@@ -8,13 +8,13 @@ import java.util.Random;
 /**
  * Created by damian on 16/5/16.
  */
-class EACO implements AlgorithmBase {
+public class EACO implements AlgorithmBase {
 
+    public final ArrayList<Node_EACO> nodes = new ArrayList<>();
     private final double alpha, interval;
     private final int TTL, traffic;
     private final ArrayList<Edge_ACO> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat = new HashMap2D<>();
-    private final ArrayList<Node_EACO> nodes = new ArrayList<>();
     private int source, destination;
     private int success, currentTime, numAntsGen;
     private boolean didInit;

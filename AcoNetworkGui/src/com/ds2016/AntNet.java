@@ -8,13 +8,13 @@ import java.util.Random;
 /**
  * Created by damian on 28/5/16.
  */
-class AntNet implements AlgorithmBase {
+public class AntNet implements AlgorithmBase {
 
+    public final ArrayList<Node_AntNet> nodes = new ArrayList<>();
     private final double alpha, interval;
     private final int TTL, traffic;
     private final ArrayList<Edge_ACO> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat = new HashMap2D<>();
-    private final ArrayList<Node_AntNet> nodes = new ArrayList<>();
     private int source, destination;
     private int success, currentTime, numAntsGen;
     private boolean didInit;

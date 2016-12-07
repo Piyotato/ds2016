@@ -9,11 +9,11 @@ import java.util.HashMap;
 /**
  * Created by damian on 16/5/16.
  */
-class Node_EACO {
+public class Node_EACO {
 
     private final static double EPS = 1e-9, EXP = 1.4;
     private final static int PRECISION = 10;
-
+    public final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node
     final int ID;
     final HashMap<Integer, ArrayDeque<Ant>> fastQ = new HashMap<>();
     final HashMap<Integer, ArrayDeque<Packet>> slowQ = new HashMap<>();
@@ -22,7 +22,6 @@ class Node_EACO {
     private final ArrayList<Edge_ACO> edgeList;
     private final ArrayList<Integer> numViableNeighbours = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat;
-    private final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node
     private final HashMap2D<Integer, Integer, Double> routing = new HashMap2D<>();
     boolean isOffline;
     private UFDS DSU;
@@ -255,7 +254,7 @@ class Node_EACO {
                 return; // Reached source
             }
             nxt = ant.nextNode();
-            if (pheromone.get(ant.destination, prev) == null) {
+            if (pheromone.get(nxt, nxt) == null) {
                 return; // Next node is gone
             }
             fastQ.putIfAbsent(nxt, new ArrayDeque<>());
@@ -265,7 +264,7 @@ class Node_EACO {
             if (ant.destination == ID) {
                 ant.isBackwards = true;
                 nxt = ant.nextNode();
-                if (pheromone.get(ant.destination, nxt) == null) {
+                if (pheromone.get(nxt, nxt) == null) {
                     return; // Next node is gone
                 }
                 fastQ.putIfAbsent(nxt, new ArrayDeque<>());

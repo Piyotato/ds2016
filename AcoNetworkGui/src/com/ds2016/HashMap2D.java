@@ -5,9 +5,9 @@ import java.util.HashMap;
 /**
  * Created by damian on 23/5/16.
  */
-class HashMap2D<K1, K2, V> {
+public class HashMap2D<K1, K2, V> {
 
-    private final HashMap<K1, HashMap<K2, V>> M = new HashMap<>();
+    public final HashMap<K1, HashMap<K2, V>> M = new HashMap<>();
 
     /**
      * Allocates a value to an entry
@@ -17,7 +17,7 @@ class HashMap2D<K1, K2, V> {
      * @param value Value to be set
      * @return The previous value associated with key, or null if there was no mapping for key.
      */
-    public V put(K1 key1, K2 key2, V value) {
+    V put(K1 key1, K2 key2, V value) {
         HashMap<K2, V> M2;
         if (M.containsKey(key1)) {
             M2 = M.get(key1);

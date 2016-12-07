@@ -2,13 +2,12 @@ package com.ds2016.ui;
 
 import com.ds2016.Main;
 import com.ds2016.Node_GUI;
-import com.ds2016.Range;
 import com.ds2016.SimpleEdge;
 import com.ds2016.listeners.GraphEventListener;
 import com.ds2016.listeners.GuiEventListener;
 import com.ds2016.listeners.NetworkEventListener;
 import com.ds2016.networks.Network;
-import com.ds2016.networks.RandomNetwork;
+import com.ds2016.networks.NttNetwork;
 import org.graphstream.algorithm.DynamicAlgorithm;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
@@ -71,7 +70,7 @@ public class Gui implements GraphEventListener, NetworkEventListener {
 
     public Gui(final GuiEventListener listener) {
         mListener = listener;
-        mNetwork = new RandomNetwork(20, 0.7, Range.create(2, 15), Range.create(1000, 3000));
+        mNetwork = new NttNetwork();
     }
 
     public void init() {
@@ -89,6 +88,8 @@ public class Gui implements GraphEventListener, NetworkEventListener {
 
         mNetwork.init(this);
         mNetwork.build();
+
+        update();
     }
 
     private void initNetworkPanel() {
@@ -176,20 +177,7 @@ public class Gui implements GraphEventListener, NetworkEventListener {
           Save parameters
          */
         mUpdateBtn = new JButton();
-        mUpdateBtn.addActionListener(e -> {
-            mSourceNode = Integer.parseInt(mSourceField.getText());
-            mDestinationNode = Integer.parseInt(mDestinationField.getText());
-            final ParameterStorage params = new ParameterStorage(
-                    mSourceNode,
-                    mDestinationNode,
-                    Double.parseDouble(mAlphaField.getText()),
-                    Double.parseDouble(mIntervalField.getText()),
-                    Integer.parseInt(mTrafficField.getText()),
-                    Integer.parseInt(mNumTicksField.getText()));
-            colouriseNodes(mSourceNode, mDestinationNode);
-            mListener.onUpdate(params);
-            mDataChart.resetCharts();
-        });
+        mUpdateBtn.addActionListener(e -> update());
 
         /*
           Start the mGraph algorithm thread
@@ -216,6 +204,21 @@ public class Gui implements GraphEventListener, NetworkEventListener {
     public void tick() {
         mGraphAlgo.compute();
         mDataChart.updateCharts();
+    }
+
+    private void update() {
+        mSourceNode = Integer.parseInt(mSourceField.getText());
+        mDestinationNode = Integer.parseInt(mDestinationField.getText());
+        final ParameterStorage params = new ParameterStorage(
+                mSourceNode,
+                mDestinationNode,
+                Double.parseDouble(mAlphaField.getText()),
+                Double.parseDouble(mIntervalField.getText()),
+                Integer.parseInt(mTrafficField.getText()),
+                Integer.parseInt(mNumTicksField.getText()));
+        colouriseNodes(mSourceNode, mDestinationNode);
+        mListener.onUpdate(params);
+        mDataChart.resetCharts();
     }
 
     /**
@@ -351,6 +354,7 @@ public class Gui implements GraphEventListener, NetworkEventListener {
     public void onNodeAdded() {
         addNode();
         mListener.onNodeAdded();
+        mDataChart.addNode();
     }
 
     @Override

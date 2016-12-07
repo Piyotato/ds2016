@@ -6,10 +6,10 @@ import java.util.ArrayList;
 /**
  * Created by damian on 28/5/16.
  */
-class OSPF implements AlgorithmBase {
+public class OSPF implements AlgorithmBase {
 
+    public final ArrayList<Node_OSPF> nodes = new ArrayList<>();
     private final int TTL, traffic;
-    private final ArrayList<Node_OSPF> nodes = new ArrayList<>();
     private final ArrayList<Edge> edgeList = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge> adjMat = new HashMap2D<>();
     private int source, destination;
