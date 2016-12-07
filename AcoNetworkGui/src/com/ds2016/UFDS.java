@@ -28,7 +28,10 @@ class UFDS {
      * @return The set of the element
      */
     private int findSet(int node) {
-        return P.get(node) == node ? node : P.set(node, findSet(P.get(node)));
+        if (P.get(node) == node)
+            return node;
+        P.set(node, findSet(P.get(node)));
+        return P.get(node);
     }
 
     /**
