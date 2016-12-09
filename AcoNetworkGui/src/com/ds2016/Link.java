@@ -46,7 +46,8 @@ public class Link implements GuiEventListener {
                         tick();
                         mGui.tick();
                         mNumTicks++;
-                        if (mNumTicks >= mParams.getNumTicks()) {
+                        if (mParams.getNumTicks() > 0 &&
+                                mNumTicks >= mParams.getNumTicks()) {
                             mNumTicks = 0;
                             stop();
                         }
