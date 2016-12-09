@@ -7,6 +7,8 @@ import java.util.ArrayList;
  */
 public interface AlgorithmBase {
 
+    ArrayList<Integer> getNodeStatus();
+
     ArrayList<Integer> getEdgeStatus();
 
     void addNode();

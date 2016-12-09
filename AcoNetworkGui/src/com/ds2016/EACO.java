@@ -3,7 +3,6 @@ package com.ds2016;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 
 /**
  * Created by damian on 16/5/16.
@@ -48,6 +47,19 @@ public class EACO implements AlgorithmBase {
             node.init();
         }
         didInit = true;
+    }
+
+    /**
+     * Retrieve the current load of the network's nodes
+     *
+     * @return Number of packets on each node
+     */
+    public ArrayList<Integer> getNodeStatus() {
+        ArrayList<Integer> ret = new ArrayList<>();
+        for (Node_EACO node : nodes) {
+            ret.add(node.numberOfPackets());
+        }
+        return ret;
     }
 
     /**
@@ -207,8 +219,9 @@ public class EACO implements AlgorithmBase {
         int curNumAnts = (int) ((currentTime * 100) / (interval * 1000));
         for (Node_EACO node : nodes) {
             if (node.isOffline) continue;
+            if (node.ID == destination) continue;
             for (int cnt = 0; numAntsGen + cnt < curNumAnts; ++cnt) {
-                node.processAnt(new Ant(node.ID, getRandomNode(node.ID), TTL, currentTime));
+                node.processAnt(new Ant(node.ID, destination, TTL, currentTime));
             }
         }
         numAntsGen = curNumAnts;
@@ -217,22 +230,6 @@ public class EACO implements AlgorithmBase {
         for (int cnt = 0; cnt < traffic; ++cnt) {
             src.processPacket(new Packet(source, destination, TTL, currentTime));
         }
-    }
-
-    /**
-     * Generate a random destination for ants
-     * Beware of infinite loop when all other nodes are offline!
-     *
-     * @param currentNode Node to exclude
-     * @return Node ID
-     */
-    private int getRandomNode(int currentNode) {
-        Random rand = new Random();
-        int randomNode = rand.nextInt(nodes.size());
-        while (randomNode == currentNode || nodes.get(randomNode).isOffline) {
-            randomNode = rand.nextInt(nodes.size());
-        }
-        return randomNode;
     }
 
     /**

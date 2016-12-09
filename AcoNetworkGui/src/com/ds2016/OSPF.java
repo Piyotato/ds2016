@@ -44,6 +44,19 @@ public class OSPF implements AlgorithmBase {
     }
 
     /**
+     * Retrieve the current load of the network's nodes
+     *
+     * @return Number of packets on each node
+     */
+    public ArrayList<Integer> getNodeStatus() {
+        ArrayList<Integer> ret = new ArrayList<>();
+        for (Node_OSPF node : nodes) {
+            ret.add(node.numberOfPackets());
+        }
+        return ret;
+    }
+
+    /**
      * Retrieve the current load of the network's edges
      *
      * @return Number of packets on each edge

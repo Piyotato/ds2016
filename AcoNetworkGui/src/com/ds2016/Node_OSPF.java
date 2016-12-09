@@ -63,6 +63,19 @@ public class Node_OSPF {
     }
 
     /**
+     * Calculate size of backlog
+     *
+     * @return Number of packets in link-queues
+     */
+    int numberOfPackets() {
+        int total = 0;
+        for (Integer neighbour : Q.keySet()) {
+            total += Q.get(neighbour).size();
+        }
+        return total;
+    }
+
+    /**
      * Clear the packet queue
      */
     void clearQ() {

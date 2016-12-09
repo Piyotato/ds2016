@@ -304,6 +304,19 @@ public class Node_EACO {
     }
 
     /**
+     * Calculate size of backlog
+     *
+     * @return Number of packets in link-queues
+     */
+    int numberOfPackets() {
+        int total = 0;
+        for (Integer neighbour : slowQ.keySet()) {
+            total += slowQ.get(neighbour).size();
+        }
+        return total;
+    }
+
+    /**
      * Clear the ant queue
      */
     void clearFastQ() {
