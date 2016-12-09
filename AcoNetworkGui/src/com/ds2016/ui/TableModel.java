@@ -8,12 +8,9 @@ import javax.swing.table.DefaultTableModel;
  * Created by zwliew on 6/12/16.
  */
 public class TableModel extends DefaultTableModel {
-    // To be changed according to the network
-    private static final int NUM_ARRAY_ROWS = 60;
-    private static final int NUM_ARRAY_COLS = 60;
 
     private final int mNode;
-    private String[][] mData = new String[NUM_ARRAY_ROWS][NUM_ARRAY_COLS];
+    private String[][] mData = new String[Main.NUM_ARRAY_ROWS][Main.NUM_ARRAY_COLS];
 
     TableModel(final int node) {
         mNode = node;
@@ -53,8 +50,8 @@ public class TableModel extends DefaultTableModel {
     }
 
     void resetData() {
-        for (int row = 0; row < NUM_ARRAY_ROWS; row++) {
-            for (int col = 0; col < NUM_ARRAY_COLS; col++) {
+        for (int row = 0; row < Main.NUM_ARRAY_ROWS; row++) {
+            for (int col = 0; col < Main.NUM_ARRAY_COLS; col++) {
                 mData[row][col] = "NULL";
             }
         }

@@ -23,18 +23,6 @@ import java.util.ArrayList;
  * Created by zwliew on 19/6/16.
  */
 public class Gui implements GraphEventListener, NetworkEventListener {
-    private static final String STYLE_SHEET =
-            "edge.highLoad { fill-color: #F44336; }" +
-                    "edge.midLoad { fill-color: #FF9800; }" +
-                    "edge.lowLoad { fill-color: #8BC34A; }" +
-                    "edge.minimalLoad { fill-color: #607D8B; }" +
-                    "edge.noLoad { fill-color: #000000; }" +
-                    "node.highLoad { fill-color: #F44336; }" +
-                    "node.midLoad { fill-color: #FF9800; }" +
-                    "node.lowLoad { fill-color: #8BC34A; }" +
-                    "node.minimalLoad { fill-color: #607D8B; }" +
-                    "node.noLoad { fill-color: #9E9E9E; }" +
-                    "node { fill-color: #9E9E9E; }";
     private static final String FRAME_TITLE = "EACO";
     private static final String GRAPH_TITLE = "Simulation";
     public ArrayList<Node_GUI> mNodeList = new ArrayList<>();
@@ -102,7 +90,7 @@ public class Gui implements GraphEventListener, NetworkEventListener {
         mGraph = new SingleGraph(GRAPH_TITLE);
         mGraph.setStrict(false);
         mGraph.setAutoCreate(true);
-        mGraph.addAttribute("ui.stylesheet", STYLE_SHEET);
+        mGraph.addAttribute("ui.stylesheet", Main.STYLE_SHEET);
 
         mGraphAlgo = new GraphAlgo(this);
         mGraphAlgo.init(mGraph);

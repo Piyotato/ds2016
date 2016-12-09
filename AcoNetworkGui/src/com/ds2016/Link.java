@@ -15,8 +15,6 @@ public class Link implements GuiEventListener {
     private static final int ALGO_OSPF = 0;
     private static final int ALGO_ANTNET = 1;
     private static final int ALGO_EACO = 2;
-    private static final int POLL_MS = 5;
-    private static final int TTL_MS = 1500;
     public static AlgorithmBase sAlgorithm; // TODO
     public static long sThroughput; // TODO
     private final Mutex mMutex = new Mutex();
@@ -31,7 +29,7 @@ public class Link implements GuiEventListener {
         mGui = new Gui(this);
         mParams = new ParameterStorage(0, 6,
                 0.4, 0.3, 1000, 6000, ALGO_EACO);
-        sAlgorithm = new EACO(0.4, 1000, TTL_MS, 0.3);
+        sAlgorithm = new EACO(0.4, 1000, Main.TTL_MS, 0.3);
         mNumTicks = 0;
     }
 
@@ -54,7 +52,7 @@ public class Link implements GuiEventListener {
                     } finally {
                         mMutex.release();
                     }
-                    Thread.sleep(POLL_MS);
+                    Thread.sleep(Main.POLL_MS);
                 } catch (InterruptedException e) {
                     // This exception is expected, swallow it.
                     //e.printStackTrace();
@@ -159,13 +157,13 @@ public class Link implements GuiEventListener {
 
         switch (algorithm) {
             case ALGO_OSPF:
-                sAlgorithm = new OSPF(TTL_MS, traffic);
+                sAlgorithm = new OSPF(Main.TTL_MS, traffic);
                 break;
             case ALGO_ANTNET:
-                sAlgorithm = new AntNet(alpha, traffic, TTL_MS, interval);
+                sAlgorithm = new AntNet(alpha, traffic, Main.TTL_MS, interval);
                 break;
             case ALGO_EACO:
-                sAlgorithm = new EACO(alpha, traffic, TTL_MS, interval);
+                sAlgorithm = new EACO(alpha, traffic, Main.TTL_MS, interval);
                 break;
         }
         sAlgorithm.build(mGui.mNodeList, mGui.mEdgeList, source, destination);

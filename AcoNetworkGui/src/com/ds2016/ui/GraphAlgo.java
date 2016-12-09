@@ -17,9 +17,6 @@ import java.util.ArrayList;
  */
 class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
 
-    private static final double HIGH_LOAD_FACTOR = 3;
-    private static final double MED_LOAD_FACTOR = 1.5;
-    private static final double LOW_LOAD_FACTOR = 0.5;
 
     private GraphEventListener mListener;
 
@@ -82,11 +79,11 @@ class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
         if (Main.DEBUG) System.out.println("setEdgeColor: curLoad = " + curLoad);
 
         String loadLv;
-        if (curLoad >= HIGH_LOAD_FACTOR * mEdgeLoadMean) {
+        if (curLoad >= Main.HIGH_LOAD_FACTOR * mEdgeLoadMean) {
             loadLv = "highLoad";
-        } else if (curLoad >= MED_LOAD_FACTOR * mEdgeLoadMean) {
+        } else if (curLoad >= Main.MED_LOAD_FACTOR * mEdgeLoadMean) {
             loadLv = "midLoad";
-        } else if (curLoad >= LOW_LOAD_FACTOR * mEdgeLoadMean) {
+        } else if (curLoad >= Main.LOW_LOAD_FACTOR * mEdgeLoadMean) {
             loadLv = "lowLoad";
         } else if (curLoad > 0) {
             loadLv = "minimalLoad";
@@ -101,11 +98,11 @@ class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
         String loadLv;
         if (mNodeLoadMean == 0) {
             loadLv = "minimalLoad";
-        } else if (curLoad >= HIGH_LOAD_FACTOR * mNodeLoadMean) {
+        } else if (curLoad >= Main.HIGH_LOAD_FACTOR * mNodeLoadMean) {
             loadLv = "highLoad";
-        } else if (curLoad >= MED_LOAD_FACTOR * mNodeLoadMean) {
+        } else if (curLoad >= Main.MED_LOAD_FACTOR * mNodeLoadMean) {
             loadLv = "midLoad";
-        } else if (curLoad >= LOW_LOAD_FACTOR * mNodeLoadMean) {
+        } else if (curLoad >= Main.LOW_LOAD_FACTOR * mNodeLoadMean) {
             loadLv = "lowLoad";
         } else if (curLoad > 0) {
             loadLv = "minimalLoad";
