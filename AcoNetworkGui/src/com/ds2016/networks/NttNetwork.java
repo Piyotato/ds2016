@@ -6,61 +6,9 @@ package com.ds2016.networks;
 public class NttNetwork extends Network {
     @Override
     public void build() {
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
+        for (int i = 0; i < 55; i++) {
+            mListener.onNodeAdded();
+        }
 
         mListener.onEdgeAdded(0, 2, 18, 6000);
 

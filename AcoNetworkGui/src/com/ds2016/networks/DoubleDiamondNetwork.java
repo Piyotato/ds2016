@@ -6,14 +6,9 @@ package com.ds2016.networks;
 public class DoubleDiamondNetwork extends Network {
     @Override
     public void build() {
-        // Build 7 nodes
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
+        for (int i = 0; i < 7; i++) {
+            mListener.onNodeAdded();
+        }
 
         mListener.onEdgeAdded(0, 1, 4, 600);
         mListener.onEdgeAdded(0, 2, 6, 600);

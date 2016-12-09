@@ -6,21 +6,9 @@ package com.ds2016.networks;
 public class NsfNetwork extends Network {
     @Override
     public void build() {
-        // Build 14 nodes
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
-        mListener.onNodeAdded();
+        for (int i = 0; i < 14; i++) {
+            mListener.onNodeAdded();
+        }
 
         mListener.onEdgeAdded(0, 1, 9, 1500);
         mListener.onEdgeAdded(0, 2, 9, 1500);
