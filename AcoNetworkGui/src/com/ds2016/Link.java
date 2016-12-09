@@ -25,6 +25,7 @@ public class Link implements GuiEventListener {
     private Thread mThread;
     private Runnable mRunnable;
     private int mNumTicks;
+    private boolean mStarted;
 
     Link() {
         mGui = new Gui(this);
@@ -122,14 +123,18 @@ public class Link implements GuiEventListener {
     }
 
     private void start() {
+        if (mStarted) return;
         mThread = new Thread(mRunnable, "ALGO_THREAD");
         mThread.start();
+        mStarted = true;
     }
 
     private void stop() {
+        if (!mStarted) return;
         if (mThread != null) {
             mThread.interrupt();
         }
+        mStarted = false;
     }
 
     private void update(final ParameterStorage params) {
