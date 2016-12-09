@@ -10,18 +10,14 @@ import javax.swing.table.DefaultTableModel;
 public class TableModel extends DefaultTableModel {
     // To be changed according to the network
     private static final int NUM_ARRAY_ROWS = 60;
-    private static final int NUM_ARRAY_COLS = 30;
+    private static final int NUM_ARRAY_COLS = 60;
 
     private final int mNode;
     private String[][] mData = new String[NUM_ARRAY_ROWS][NUM_ARRAY_COLS];
 
     TableModel(final int node) {
         mNode = node;
-        for (int row = 0; row < NUM_ARRAY_ROWS; row++) {
-            for (int col = 0; col < NUM_ARRAY_COLS; col++) {
-                mData[row][col] = "NULL";
-            }
-        }
+        resetData();
     }
 
     @Override
@@ -54,5 +50,13 @@ public class TableModel extends DefaultTableModel {
         if (Main.DEBUG) System.out.println("setValueAt(): row=" + row + " col=" + col + " value=" + value);
         mData[row][col] = String.valueOf(value);
         fireTableCellUpdated(row, col);
+    }
+
+    void resetData() {
+        for (int row = 0; row < NUM_ARRAY_ROWS; row++) {
+            for (int col = 0; col < NUM_ARRAY_COLS; col++) {
+                mData[row][col] = "NULL";
+            }
+        }
     }
 }

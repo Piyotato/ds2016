@@ -9,14 +9,14 @@ import java.util.PriorityQueue;
 /**
  * Created by damian on 28/5/16.
  */
-class Dijkstra {
+public class Dijkstra {
 
     private final static int INF = 1000000000, K = 4;
     private final static Comparator<Pair<Integer, Integer>> pairCMP =
-            (Pair<Integer, Integer> lhs, Pair<Integer, Integer> rhs) -> lhs.getKey().compareTo(rhs.getKey());
+            Comparator.comparing(Pair::getKey);
+    public final ArrayList<ArrayList<Integer>> P = new ArrayList<>(); // Best parents
     private final ArrayList<Integer> CNT = new ArrayList<>(); // Current count
     private final ArrayList<Integer> D = new ArrayList<>(); // Distance
-    private final ArrayList<ArrayList<Integer>> P = new ArrayList<>(); // Best parents
 
     /**
      * Initialize Dijkstra data structure

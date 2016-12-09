@@ -62,7 +62,7 @@ class DataChart {
             int row = 1;
             final TableModel model = mModelList.get(i);
             if (Link.sAlgorithm instanceof EACO) {
-                Node_EACO node = ((EACO) Link.sAlgorithm).nodes.get(i);
+                final Node_EACO node = ((EACO) Link.sAlgorithm).nodes.get(i);
                 for (Map.Entry<Integer, HashMap<Integer, Double>> entry : node.pheromone.M.entrySet()) {
                     final HashMap<Integer, Double> value = entry.getValue();
                     int col = 1;
@@ -76,7 +76,7 @@ class DataChart {
                     row++;
                 }
             } else if (Link.sAlgorithm instanceof AntNet) {
-                Node_AntNet node = ((AntNet) Link.sAlgorithm).nodes.get(i);
+                final Node_AntNet node = ((AntNet) Link.sAlgorithm).nodes.get(i);
                 for (Map.Entry<Integer, HashMap<Integer, Double>> entry : node.pheromone.M.entrySet()) {
                     final HashMap<Integer, Double> value = entry.getValue();
                     int col = 1;
@@ -89,8 +89,18 @@ class DataChart {
                     model.setValueAt(key, row, 0);
                     row++;
                 }
-            } else {
-                // Todo: OSPF
+            } else if (Link.sAlgorithm instanceof OSPF) {
+                final Node_OSPF node = ((OSPF) Link.sAlgorithm).nodes.get(i);
+                for (ArrayList<Integer> value : node.SSSP.P) {
+                    int col = 1;
+                    for (Integer valueEntry : value) {
+                        model.setValueAt(valueEntry, 0, col);
+                        model.setValueAt(String.valueOf(valueEntry), row, col);
+                        col++;
+                    }
+                    model.setValueAt(value, row, 0);
+                    row++;
+                }
             }
         }
     }
@@ -104,14 +114,22 @@ class DataChart {
     void resetCharts() {
         mThroughputSeries.clear();
         mUpdateCnt = 0;
+        for (int node = 0; node < mNumNodes; node++) {
+            final TableModel model = mModelList.get(node);
+            model.resetData();
+        }
     }
 
     void addNode() {
-        TableModel model = new TableModel(mNumNodes);
+        final TableModel model = new TableModel(mNumNodes);
         mModelList.add(model);
-        JTable table = new JTable(model);
+        final JTable table = new JTable(model);
         table.getTableHeader().setReorderingAllowed(false);
         mTabbedPane.add("Node " + String.valueOf(mNumNodes), new JScrollPane(table));
         mNumNodes++;
+    }
+
+    void toggleNode(final boolean isOffline) {
+        mNumNodes += isOffline ? -1 : 1;
     }
 }

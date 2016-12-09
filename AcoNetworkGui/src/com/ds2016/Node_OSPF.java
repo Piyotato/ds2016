@@ -7,14 +7,14 @@ import java.util.HashMap;
 /**
  * Created by damian on 28/5/16.
  */
-class Node_OSPF {
+public class Node_OSPF {
 
     final int ID;
     final HashMap<Integer, ArrayDeque<Packet>> Q = new HashMap<>();
     private final ArrayList<Node_OSPF> nodes;
     private final HashMap2D<Integer, Integer, Edge> adjMat;
+    public Dijkstra SSSP;
     boolean isOffline;
-    private Dijkstra SSSP;
 
     /**
      * Initialize a node

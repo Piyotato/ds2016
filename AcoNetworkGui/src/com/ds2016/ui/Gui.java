@@ -137,6 +137,7 @@ public class Gui implements GraphEventListener, NetworkEventListener {
         mAddNodeBtn.addActionListener(actionEvent -> {
             addNode();
             mListener.onNodeAdded();
+            mDataChart.addNode();
         });
 
         /*
@@ -144,9 +145,10 @@ public class Gui implements GraphEventListener, NetworkEventListener {
          */
         mToggleNodeBtn = new JButton();
         mToggleNodeBtn.addActionListener(actionEvent -> {
-            final int node = Integer.parseInt(mToggleNodeField.getText());
-            toggleNode(node);
-            mListener.onNodeToggled(node);
+            final int nodeId = Integer.parseInt(mToggleNodeField.getText());
+            toggleNode(nodeId);
+            mListener.onNodeToggled(nodeId);
+            mDataChart.toggleNode(mNodeList.get(nodeId).isOffline);
         });
 
         /*
