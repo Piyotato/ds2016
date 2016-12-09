@@ -6,6 +6,7 @@ import com.ds2016.listeners.GraphEventListener;
 import org.graphstream.algorithm.DynamicAlgorithm;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
 import org.graphstream.stream.SinkAdapter;
 
 import java.util.ArrayList;
@@ -22,7 +23,8 @@ class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
 
     private GraphEventListener mListener;
 
-    private int mLoadMean;
+    private int mEdgeLoadMean;
+    private int mNodeLoadMean;
 
     GraphAlgo(final GraphEventListener listener) {
         mListener = listener;
@@ -41,7 +43,7 @@ class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
     public void compute() {
         final Graph graph = mListener.onGraphUpdated();
         int temp = 0;
-        ArrayList<Integer> edgeLoadList = Link.sAlgorithm.getEdgeStatus();
+        final ArrayList<Integer> edgeLoadList = Link.sAlgorithm.getEdgeStatus();
         for (int edgeLoad : edgeLoadList) {
             temp += edgeLoad;
         }
@@ -49,30 +51,62 @@ class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
         if (Main.DEBUG) System.out.println("compute: loadTotal = " + loadTotal);
         int edgeCount = edgeLoadList.size();
         if (Main.DEBUG) System.out.println("compute: edgeCount = " + edgeCount);
-        mLoadMean = loadTotal / edgeCount;
+        mEdgeLoadMean = loadTotal / edgeCount;
 
         for (int i = 0; i < edgeCount; i++) {
             Edge edge = graph.getEdge(i);
             if (Main.DEBUG) System.out.println("compute: edgeId = " + edge.getId());
             setEdgeColor(edge, edgeLoadList.get(i));
         }
+
+        temp = 0;
+        final ArrayList<Integer> nodeLoadlist = Link.sAlgorithm.getNodeStatus();
+        for (int nodeLoad : nodeLoadlist) {
+            temp += nodeLoad;
+        }
+        loadTotal = temp;
+        if (Main.DEBUG) System.out.println("compute: loadTotal = " + loadTotal);
+        final int nodeCount = nodeLoadlist.size();
+        if (Main.DEBUG) System.out.println("compute: nodeCount = " + nodeCount);
+        mNodeLoadMean = loadTotal / nodeCount;
+
+        for (int i = 0; i < nodeCount; i++) {
+            Node node = graph.getNode(i);
+            if (Main.DEBUG) System.out.println("compute: nodeId = " + node.getId());
+            setNodeColor(node, nodeLoadlist.get(i));
+        }
     }
 
-    private void setEdgeColor(Edge edge, int curLoad) {
+    private void setEdgeColor(final Edge edge, final int curLoad) {
         //int avgLoad = calcLoadAvg(curLoad);
         if (Main.DEBUG) System.out.println("setEdgeColor: curLoad = " + curLoad);
 
         String loadLv;
-        if (curLoad >= HIGH_LOAD_FACTOR * mLoadMean) {
+        if (curLoad >= HIGH_LOAD_FACTOR * mEdgeLoadMean) {
             loadLv = "highLoad";
-        } else if (curLoad >= MED_LOAD_FACTOR * mLoadMean) {
+        } else if (curLoad >= MED_LOAD_FACTOR * mEdgeLoadMean) {
             loadLv = "midLoad";
-        } else if (curLoad >= LOW_LOAD_FACTOR * mLoadMean) {
+        } else if (curLoad >= LOW_LOAD_FACTOR * mEdgeLoadMean) {
             loadLv = "lowLoad";
         } else {
             loadLv = "noLoad";
         }
 
         edge.setAttribute("ui.class", loadLv);
+    }
+
+    private void setNodeColor(final Node node, final int curLoad) {
+        String loadLv;
+        if (curLoad >= HIGH_LOAD_FACTOR * mNodeLoadMean) {
+            loadLv = "highLoad";
+        } else if (curLoad >= MED_LOAD_FACTOR * mNodeLoadMean) {
+            loadLv = "midLoad";
+        } else if (curLoad >= LOW_LOAD_FACTOR * mNodeLoadMean) {
+            loadLv = "lowLoad";
+        } else {
+            loadLv = "noLoad";
+        }
+
+        node.setAttribute("ui.class", loadLv);
     }
 }
