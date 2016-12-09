@@ -88,6 +88,8 @@ class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
             loadLv = "midLoad";
         } else if (curLoad >= LOW_LOAD_FACTOR * mEdgeLoadMean) {
             loadLv = "lowLoad";
+        } else if (curLoad > 0) {
+            loadLv = "minimalLoad";
         } else {
             loadLv = "noLoad";
         }
