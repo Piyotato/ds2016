@@ -7,7 +7,6 @@ import com.ds2016.listeners.GraphEventListener;
 import com.ds2016.listeners.GuiEventListener;
 import com.ds2016.listeners.NetworkEventListener;
 import com.ds2016.networks.Network;
-import com.ds2016.networks.NttNetwork;
 import org.graphstream.algorithm.DynamicAlgorithm;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
@@ -62,7 +61,7 @@ public class Gui implements GraphEventListener, NetworkEventListener {
 
     public Gui(final GuiEventListener listener) {
         mListener = listener;
-        mNetwork = new NttNetwork();
+        mNetwork = Main.GUI_NETWORK;
     }
 
     public void init() {

@@ -1,5 +1,8 @@
 package com.ds2016;
 
+import com.ds2016.networks.Network;
+import com.ds2016.networks.SixXSixNetwork;
+
 /**
  * Created by zwliew on 13/6/16.
  */
@@ -33,6 +36,9 @@ public class Main {
     public static final double HIGH_LOAD_FACTOR = 3;
     public static final double MED_LOAD_FACTOR = 1.5;
     public static final double LOW_LOAD_FACTOR = 0.5;
+
+    // GUI network shape tunables
+    public static final Network GUI_NETWORK = new SixXSixNetwork();
 
     public static void main(String[] args) {
         final Link link = new Link();
