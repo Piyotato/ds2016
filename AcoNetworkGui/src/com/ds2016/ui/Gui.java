@@ -32,6 +32,7 @@ public class Gui implements GraphEventListener, NetworkEventListener {
                     "node.highLoad { fill-color: #F44336; }" +
                     "node.midLoad { fill-color: #FF9800; }" +
                     "node.lowLoad { fill-color: #8BC34A; }" +
+                    "node.minimalLoad { fill-color: #607D8B; }" +
                     "node.noLoad { fill-color: #9E9E9E; }" +
                     "node { fill-color: #9E9E9E; }";
     private static final String FRAME_TITLE = "EACO";
