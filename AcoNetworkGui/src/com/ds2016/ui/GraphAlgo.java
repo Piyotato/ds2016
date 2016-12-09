@@ -99,7 +99,9 @@ class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
 
     private void setNodeColor(final Node node, final int curLoad) {
         String loadLv;
-        if (curLoad >= HIGH_LOAD_FACTOR * mNodeLoadMean) {
+        if (mNodeLoadMean == 0) {
+            loadLv = "minimalLoad";
+        } else if (curLoad >= HIGH_LOAD_FACTOR * mNodeLoadMean) {
             loadLv = "highLoad";
         } else if (curLoad >= MED_LOAD_FACTOR * mNodeLoadMean) {
             loadLv = "midLoad";
