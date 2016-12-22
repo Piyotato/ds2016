@@ -69,6 +69,8 @@ class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
 
         for (int i = 0; i < nodeCount; i++) {
             Node node = graph.getNode(i);
+            if ("destination".equals(node.getAttribute("ui.class")) ||
+                    "source".equals(node.getAttribute("ui.class"))) continue;
             if (Main.DEBUG) System.out.println("compute: nodeId = " + node.getId());
             setNodeColor(node, nodeLoadlist.get(i));
         }
