@@ -4,16 +4,15 @@ import com.ds2016.networks.Network;
 import com.ds2016.networks.NsfNetwork;
 
 /**
- * Created by zwliew on 13/6/16.
+ * We run on the assumption that 1 tick == 1 ms
  */
 public class Main {
     // Debug tunables
     public static final boolean DEBUG = false;
 
     // Algorithm tunables
-    public static final int CHART_UPDATE_MS = 1000;
-    public static final int POLL_MS = 5;
-    public static final int TTL_MS = 1500;
+    public static final int NUM_TICKS_PER_CHART_UPDATE = 1000;
+    public static final int TTL_MS = 15000;
     // Debug table tunables
     public static final int NUM_ARRAY_ROWS = 60;
     public static final int NUM_ARRAY_COLS = 60;

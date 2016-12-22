@@ -266,7 +266,7 @@
                   </grid>
                 </constraints>
                 <properties>
-                  <text value="6000"/>
+                  <text value="60000"/>
                 </properties>
               </component>
               <component id="5c2ef" class="javax.swing.JLabel">

@@ -22,10 +22,10 @@ class DataChart {
 
     private JTabbedPane mTabbedPane;
     private XYSeries mThroughputSeries;
-    private int mUpdateCnt = 0;
-    private int mNumNodes = 0;
+    private int mUpdateCnt;
+    private int mNumNodes;
     private long mAccumulatedThroughput;
-    private long mUpdateChartTimeStamp;
+    private long mElapsedTicks;
 
     private java.util.List<TableModel> mModelList = new ArrayList<>();
 
@@ -110,21 +110,25 @@ class DataChart {
     void updateCharts() {
         mAccumulatedThroughput += Link.sThroughput;
 
-        long now = System.nanoTime();
-        if (now - mUpdateChartTimeStamp < Main.CHART_UPDATE_MS * 1000000) {
+        if (++mElapsedTicks < Main.NUM_TICKS_PER_CHART_UPDATE) {
             return;
         }
-        mUpdateChartTimeStamp = now;
 
         if (Main.DEBUG) System.out.println(++mUpdateCnt + " " + mAccumulatedThroughput);
         mThroughputSeries.add(mThroughputSeries.getItemCount(), mAccumulatedThroughput);
-        updatePheromoneTables();
+
         mAccumulatedThroughput = 0;
+        mElapsedTicks = 0;
+
+        updatePheromoneTables();
     }
 
     void resetCharts() {
         mThroughputSeries.clear();
+        mThroughputSeries.add(0, 0);
         mUpdateCnt = 0;
+        mAccumulatedThroughput = 0;
+        mElapsedTicks = 0;
         for (int node = 0; node < mNumNodes; node++) {
             final TableModel model = mModelList.get(node);
             model.resetData();
