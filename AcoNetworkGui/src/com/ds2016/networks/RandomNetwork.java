@@ -49,8 +49,10 @@ public class RandomNetwork extends Network {
             }
             if (v < mNumNodes) {
                 mListener.onEdgeAdded(v, w,
-                        random.nextInt(mCostRange.getUpper()) + mCostRange.getLower(),
-                        random.nextInt(mBandwidthRange.getUpper()) + mBandwidthRange.getLower());
+                        random.nextInt(mCostRange.getUpper() - mCostRange.getLower() + 1)
+                                + mCostRange.getLower(),
+                        random.nextInt(mBandwidthRange.getUpper() - mBandwidthRange.getLower() + 1)
+                                + mBandwidthRange.getLower());
             }
         }
     }
