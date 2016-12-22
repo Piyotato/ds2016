@@ -28,6 +28,8 @@ public class Main {
                     "node.lowLoad { fill-color: #8BC34A; }" +
                     "node.minimalLoad { fill-color: #607D8B; }" +
                     "node.noLoad { fill-color: #9E9E9E; }" +
+                    "node.source { fill-color: #AAE66E; }" +
+                    "node.destination { fill-color: #E66E6E; }" +
                     "node { fill-color: #9E9E9E; }";
     // GUI network color algorithm tunables
     public static final double HIGH_LOAD_FACTOR = 3;
