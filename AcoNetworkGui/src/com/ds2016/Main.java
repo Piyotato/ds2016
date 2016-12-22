@@ -12,6 +12,8 @@ public class Main {
 
     // Algorithm tunables
     public static final int CHART_UPDATE_MS = 1000;
+    public static final int POLL_MS = 5;
+    public static final int TTL_MS = 1500;
     // Debug table tunables
     public static final int NUM_ARRAY_ROWS = 60;
     public static final int NUM_ARRAY_COLS = 60;
@@ -35,8 +37,6 @@ public class Main {
     // GUI network shape tunables
     public static final Network GUI_NETWORK = new RandomNetwork(
             20, 0.2, Range.create(2, 15), Range.create(1000, 3000));
-    static final int POLL_MS = 5;
-    static final int TTL_MS = 1500;
 
     public static void main(String[] args) {
         final Link link = new Link();
