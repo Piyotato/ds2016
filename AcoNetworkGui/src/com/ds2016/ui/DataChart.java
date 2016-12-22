@@ -24,6 +24,8 @@ class DataChart {
     private XYSeries mThroughputSeries;
     private int mUpdateCnt = 0;
     private int mNumNodes = 0;
+    private long mAccumulatedThroughput;
+    private long mUpdateChartTimeStamp;
 
     private java.util.List<TableModel> mModelList = new ArrayList<>();
 
@@ -106,9 +108,18 @@ class DataChart {
     }
 
     void updateCharts() {
-        if (Main.DEBUG) System.out.println(++mUpdateCnt + " " + Link.sThroughput);
-        mThroughputSeries.add(mThroughputSeries.getItemCount(), Link.sThroughput);
+        mAccumulatedThroughput += Link.sThroughput;
+
+        long now = System.nanoTime();
+        if (now - mUpdateChartTimeStamp < Main.CHART_UPDATE_MS * 1000000) {
+            return;
+        }
+        mUpdateChartTimeStamp = now;
+
+        if (Main.DEBUG) System.out.println(++mUpdateCnt + " " + mAccumulatedThroughput);
+        mThroughputSeries.add(mThroughputSeries.getItemCount(), mAccumulatedThroughput);
         updatePheromoneTables();
+        mAccumulatedThroughput = 0;
     }
 
     void resetCharts() {

@@ -58,7 +58,6 @@ public class Gui implements GraphEventListener, NetworkEventListener {
 
     private int mSourceNode;
     private int mDestinationNode;
-    private long mUpdateChartTimeStamp;
 
     public Gui(final GuiEventListener listener) {
         mListener = listener;
@@ -196,12 +195,7 @@ public class Gui implements GraphEventListener, NetworkEventListener {
 
     public void tick() {
         mGraphAlgo.compute();
-
-        long now = System.nanoTime();
-        if (now - mUpdateChartTimeStamp >= Main.CHART_UPDATE_MS * 1000000) {
-            mDataChart.updateCharts();
-            mUpdateChartTimeStamp = now;
-        }
+        mDataChart.updateCharts();
     }
 
     private void update() {
