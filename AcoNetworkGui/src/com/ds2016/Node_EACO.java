@@ -12,7 +12,6 @@ import java.util.HashMap;
 public class Node_EACO {
 
     private final static double EPS = 1e-9, EXP = 1.4;
-    private final static int PRECISION = 10;
     public final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node
     final int ID;
     final HashMap<Integer, ArrayDeque<Ant>> fastQ = new HashMap<>();
@@ -249,7 +248,7 @@ public class Node_EACO {
             if (P == null) {
                 return; // Previous Node is gone
             }
-            double R = 1. / (ant.totalTime * PRECISION);
+            double R = 1. / ant.totalTime;
             double change = (P * (1 - R) + R) - P;
             updateHeuristic(prev, ant.destination, change);
             if (ant.source == ID) {

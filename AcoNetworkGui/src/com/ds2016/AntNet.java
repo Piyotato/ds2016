@@ -214,7 +214,7 @@ public class AntNet implements AlgorithmBase {
      * Generate packets from source
      */
     private void generatePackets() {
-        int curNumAnts = (int) ((currentTime * 100) / (interval * 1000));
+        int curNumAnts = (int) ((double) currentTime / (interval * 1000));
         for (Node_AntNet node : nodes) {
             if (node.isOffline) continue;
             if (node.ID == destination) continue;

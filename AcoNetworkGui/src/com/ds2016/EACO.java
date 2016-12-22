@@ -215,8 +215,7 @@ public class EACO implements AlgorithmBase {
      * Generate packets from source
      */
     private void generatePackets() {
-        // Send ants from all nodes
-        int curNumAnts = (int) ((currentTime * 100) / (interval * 1000));
+        int curNumAnts = (int) ((double) currentTime / (interval * 1000));
         for (Node_EACO node : nodes) {
             if (node.isOffline) continue;
             if (node.ID == destination) continue;
