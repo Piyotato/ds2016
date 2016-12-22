@@ -54,7 +54,7 @@ public class Graph {
             for (Edge edge : adjMat.get(node).values()) {
                 // Assuming edges are not offline
                 // Assuming nodes are not offline
-                if (Distance.get(edge.destination) != -1) {
+                if (Distance.get(edge.destination) == -1) {
                     Distance.set(edge.destination, cost + 1);
                     Queue.add(edge.destination);
                 }
