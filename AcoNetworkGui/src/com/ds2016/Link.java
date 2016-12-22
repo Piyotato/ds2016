@@ -28,8 +28,8 @@ public class Link implements GuiEventListener {
     Link() {
         mGui = new Gui(this);
         mParams = new ParameterStorage(0, 6,
-                0.4, 0.3, 1000, 6000, ALGO_EACO);
-        sAlgorithm = new EACO(0.4, 1000, Main.TTL_MS, 0.3);
+                0.4, 0.3, 10, 6000, ALGO_EACO);
+        sAlgorithm = new EACO(0.4, 10, Main.TTL_MS, 0.3);
         mNumTicks = 0;
     }
 
