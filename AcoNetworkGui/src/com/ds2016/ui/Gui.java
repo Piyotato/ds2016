@@ -94,7 +94,9 @@ public class Gui implements GraphEventListener, NetworkEventListener {
         mGraphAlgo = new GraphAlgo(this);
         mGraphAlgo.init(mGraph);
 
-        mGraph.display();
+        if (Main.DISPLAY_NETWORK) {
+            mGraph.display();
+        }
     }
 
     private void initChartPanel() {

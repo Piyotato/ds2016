@@ -37,6 +37,9 @@ public class Main {
     public static final double LOW_LOAD_FACTOR = 0.5;
     // GUI network shape tunables
     public static final Network GUI_NETWORK = new NsfNetwork();
+    // Display GUI elements
+    public static final boolean DISPLAY_NETWORK = true;
+    public static final boolean DISPLAY_PHEROMONE = true;
 
     public static void main(String[] args) {
         final Link link = new Link();

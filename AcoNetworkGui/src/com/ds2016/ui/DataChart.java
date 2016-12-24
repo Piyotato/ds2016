@@ -136,6 +136,9 @@ class DataChart {
     }
 
     void addNode() {
+        if (!Main.DISPLAY_PHEROMONE) {
+            return;
+        }
         final TableModel model = new TableModel(mNumNodes);
         mModelList.add(model);
         final JTable table = new JTable(model);
