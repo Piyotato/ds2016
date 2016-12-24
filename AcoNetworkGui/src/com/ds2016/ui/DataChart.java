@@ -108,6 +108,8 @@ class DataChart {
     }
 
     void updateCharts() {
+        updatePheromoneTables();
+        
         mAccumulatedThroughput += Link.sThroughput;
 
         if (++mElapsedTicks < Main.NUM_TICKS_PER_CHART_UPDATE) {
@@ -119,8 +121,6 @@ class DataChart {
 
         mAccumulatedThroughput = 0;
         mElapsedTicks = 0;
-
-        updatePheromoneTables();
     }
 
     void resetCharts() {
