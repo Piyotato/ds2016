@@ -222,7 +222,7 @@
                   </grid>
                 </constraints>
                 <properties>
-                  <text value="10"/>
+                  <text value="1"/>
                 </properties>
               </component>
               <component id="15b27" class="javax.swing.JLabel">
