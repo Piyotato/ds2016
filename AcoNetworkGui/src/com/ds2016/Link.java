@@ -137,6 +137,7 @@ public class Link implements GuiEventListener {
     }
 
     private void update(final ParameterStorage params) {
+        mNumTicks = 0;
         mParams.setSource(params.getSource());
         mParams.setDestination(params.getDestination());
         mParams.setAlpha(params.getAlpha());
