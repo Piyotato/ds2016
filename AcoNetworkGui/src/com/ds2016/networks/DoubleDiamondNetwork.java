@@ -10,13 +10,13 @@ public class DoubleDiamondNetwork extends Network {
             mListener.onNodeAdded();
         }
 
-        mListener.onEdgeAdded(0, 1, 4, 600);
-        mListener.onEdgeAdded(0, 2, 6, 600);
-        mListener.onEdgeAdded(1, 3, 4, 600);
-        mListener.onEdgeAdded(2, 3, 4, 600);
-        mListener.onEdgeAdded(3, 4, 4, 600);
-        mListener.onEdgeAdded(3, 5, 4, 600);
-        mListener.onEdgeAdded(4, 6, 4, 600);
-        mListener.onEdgeAdded(5, 6, 4, 600);
+        mListener.onEdgeAdded(0, 1, 4, 6);
+        mListener.onEdgeAdded(0, 2, 6, 6);
+        mListener.onEdgeAdded(1, 3, 4, 6);
+        mListener.onEdgeAdded(2, 3, 4, 6);
+        mListener.onEdgeAdded(3, 4, 4, 6);
+        mListener.onEdgeAdded(3, 5, 4, 6);
+        mListener.onEdgeAdded(4, 6, 4, 6);
+        mListener.onEdgeAdded(5, 6, 4, 6);
     }
 }
