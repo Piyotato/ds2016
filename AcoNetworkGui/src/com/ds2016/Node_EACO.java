@@ -146,6 +146,7 @@ public class Node_EACO {
             if (nodes.get(edge.destination).isOffline) continue; // Node is offline
             if (packet instanceof Ant && !((Ant) packet).canVisit(edge.destination)) continue; // Cycle detection
             Double tau = routing.get(packet.destination, edge.destination); // Pheromone
+            if (packet instanceof Ant) tau = pheromone.get(packet.destination, edge.destination);
             if (tau == null) continue; // Not viable
             double eta = 1. / edge.cost; // 1 / Distance
             neighbours.add(new Pair<>(edge.destination, Math.pow(tau, alpha) * Math.pow(eta, beta)));

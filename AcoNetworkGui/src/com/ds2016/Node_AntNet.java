@@ -126,6 +126,7 @@ public class Node_AntNet {
             if (nodes.get(edge.destination).isOffline) continue; // Node is offline
             if (packet instanceof Ant && !((Ant) packet).canVisit(edge.destination)) continue; // Cycle detection
             Double tau = routing.get(packet.destination, edge.destination); // Pheromone
+            if (packet instanceof Ant) tau = pheromone.get(packet.destination, edge.destination);
             double eta = 1. / edge.cost; // 1 / Distance
             neighbours.add(new Pair<>(edge.destination, Math.pow(tau, alpha) * Math.pow(eta, beta)));
             totVal += neighbours.get(neighbours.size() - 1).getValue();
