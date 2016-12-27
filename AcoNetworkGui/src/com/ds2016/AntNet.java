@@ -177,8 +177,7 @@ public class AntNet implements AlgorithmBase {
         for (Integer neighbour : node.slowQ.keySet()) {
             ArrayDeque<Packet> Q = node.slowQ.get(neighbour);
             Edge_ACO edge = adjMat.get(node.ID, neighbour);
-            if (!bandwidth.containsKey(neighbour))
-                bandwidth.put(neighbour, edge.bandwidth);
+            bandwidth.putIfAbsent(neighbour, edge.bandwidth);
             while (!Q.isEmpty() && bandwidth.get(neighbour) > 0) {
                 edge.addPacket(Q.poll(), currentTime);
                 bandwidth.put(neighbour, bandwidth.get(neighbour) - 1);
