@@ -61,6 +61,7 @@ public class Node_EACO {
                 if (!DSU.sameSet(edge.destination, a)) continue;
                 addHeuristic(edge.destination, a);
             }
+            updateRouting(a);
         }
     }
 
@@ -207,8 +208,8 @@ public class Node_EACO {
     private void updateHeuristic(int neighbour, int destination, double change) throws IllegalArgumentException {
         Double old = pheromone.get(destination, neighbour);
         double tot = 0;
-        for (int a = 0; a < nodes.size(); ++a) {
-            Double val = pheromone.get(destination, a);
+        for (Edge_ACO edge : adjMat.get(ID).values()) {
+            Double val = pheromone.get(destination, edge.destination);
             if (val != null) {
                 tot += val;
             }
@@ -225,11 +226,11 @@ public class Node_EACO {
         change += (tot - 1);
         tot -= old;
         /* Decrease proportionally */
-        for (int a = 0; a < nodes.size(); ++a) {
-            if (a == neighbour) continue;
-            Double val = pheromone.get(destination, a);
+        for (Edge_ACO edge : adjMat.get(ID).values()) {
+            if (edge.destination == neighbour) continue;
+            Double val = pheromone.get(destination, edge.destination);
             if (val != null) {
-                pheromone.put(destination, a, val * (1 - change / tot));
+                pheromone.put(destination, edge.destination, val * (1 - change / tot));
             }
         }
         updateRouting(destination);
@@ -344,16 +345,16 @@ public class Node_EACO {
      */
     private void updateRouting(int destination) {
         double tot = 0;
-        for (int a = 0; a < nodes.size(); ++a) {
-            Double val = pheromone.get(destination, a);
+        for (Edge_ACO edge : adjMat.get(ID).values()) {
+            Double val = pheromone.get(destination, edge.destination);
             if (val != null) {
                 tot += Math.pow(val, EXP);
-                routing.put(destination, a, Math.pow(val, EXP));
+                routing.put(destination, edge.destination, Math.pow(val, EXP));
             }
         }
-        for (int a = 0; a < nodes.size(); ++a) {
-            if (pheromone.get(destination, a) != null) {
-                routing.put(destination, a, routing.get(destination, a) / tot);
+        for (Edge_ACO edge : adjMat.get(ID).values()) {
+            if (pheromone.get(destination, edge.destination) != null) {
+                routing.put(destination, edge.destination, routing.get(destination, edge.destination) / tot);
             }
         }
     }
