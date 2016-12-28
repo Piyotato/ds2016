@@ -319,13 +319,13 @@ public class Node_AntNet {
             // Intelligent Initialization
             if (neighbour == destination) {
                 double amt = 1. / NN + 3. / 2. * (NN - 1) / (NN * NN);
-                updateHeuristic(neighbour, destination, amt);
+                pheromone.put(neighbour, destination, amt);
             } else {
                 double amt = 1. / NN - 3. / 2. * 1. / (NN * NN);
-                updateHeuristic(neighbour, destination, amt);
+                pheromone.put(neighbour, destination, amt);
             }
         } else {
-            updateHeuristic(neighbour, destination, 1. / NN);
+            pheromone.put(neighbour, destination, 1. / NN);
         }
     }
 

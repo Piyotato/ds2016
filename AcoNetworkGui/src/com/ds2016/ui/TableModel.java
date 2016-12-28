@@ -52,7 +52,7 @@ public class TableModel extends DefaultTableModel {
     void resetData() {
         for (int row = 0; row < Main.NUM_ARRAY_ROWS; row++) {
             for (int col = 0; col < Main.NUM_ARRAY_COLS; col++) {
-                mData[row][col] = "NULL";
+                mData[row][col] = "";
             }
         }
     }

@@ -133,6 +133,7 @@ class DataChart {
             final TableModel model = mModelList.get(node);
             model.resetData();
         }
+        updatePheromoneTables();
     }
 
     void addNode() {
