@@ -13,21 +13,12 @@ public class ParametricModel {
     private final static double η = 0.005, a = 10, c = 0.3;
     // w = Size of window (Dependant on value of η)
     private final static int w = (int) (5 * (c / η) + 0.5);
-    private final int N;
+    private int N;
     // μ = Sample Mean
     // σ2 = Sample Variance
     // W = Sample Minimum
     private double μ, σ2, W = Double.MAX_VALUE;
     private int windowCount;
-
-    /**
-     * Build Parametric Model
-     *
-     * @param _N Number of neighbours
-     */
-    ParametricModel(int _N) {
-        N = _N;
-    }
 
     /**
      * Squash Function
@@ -46,10 +37,12 @@ public class ParametricModel {
      * Get reinforcement
      *
      * @param T Time taken for trip
+     * @param _N Number of neighbour nodes
      * @return Reinforcement Value
      */
-    double getReinforcement(double T) {
+    double getReinforcement(double T, int _N) {
         // Update Variables
+        N = _N;
         if (μ == 0) {
             μ = T;
         } else {

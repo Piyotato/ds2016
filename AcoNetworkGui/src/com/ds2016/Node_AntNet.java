@@ -11,7 +11,7 @@ import java.util.HashMap;
  */
 public class Node_AntNet {
 
-    private final static double EPS = 1e-9, EXP = 1.4;
+    private final static double EPS = 1e-9, EXP = 1.4, TMAX = .95;
     public final HashMap2D<Integer, Integer, Double> pheromone = new HashMap2D<>(); // Destination, Node
     final int ID;
     final HashMap<Integer, ArrayDeque<Ant>> fastQ = new HashMap<>();
@@ -166,6 +166,7 @@ public class Node_AntNet {
             pheromone.put(destination, neighbour, null);
         } else {
             if ((old + change) < -EPS || (old + change - 1) > EPS) throw new IllegalArgumentException();
+            if (old + change > TMAX) change = TMAX - old;
             pheromone.put(destination, neighbour, old + change);
         }
         change += (tot - 1);
