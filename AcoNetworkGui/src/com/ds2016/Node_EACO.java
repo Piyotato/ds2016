@@ -252,14 +252,8 @@ public class Node_EACO {
             if (P == null) {
                 return; // Previous Node is gone
             }
-            if (Double.isNaN(P)) {
-                System.out.println("Not caught!");
-            }
             double R = 1. / ant.totalTime;
             double change = (P * (1 - R) + R) - P;
-            if (Double.isNaN(change)) {
-                System.out.println(ID + ", " + R + ", " + P);
-            }
             updateHeuristic(prev, ant.destination, change);
             if (ant.source == ID) {
                 return; // Reached source
