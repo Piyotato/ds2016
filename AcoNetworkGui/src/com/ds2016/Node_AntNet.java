@@ -170,11 +170,13 @@ public class Node_AntNet {
         }
         change += (tot - 1);
         tot -= old;
-        for (Edge_ACO edge : adjMat.get(ID).values()) {
-            if (edge.destination == neighbour) continue;
-            Double val = pheromone.get(destination, edge.destination);
-            if (val != null) {
-                pheromone.put(destination, edge.destination, val * (1 - change / tot));
+        if (tot > EPS) {
+            for (Edge_ACO edge : adjMat.get(ID).values()) {
+                if (edge.destination == neighbour) continue;
+                Double val = pheromone.get(destination, edge.destination);
+                if (val != null) {
+                    pheromone.put(destination, edge.destination, val * (1 - change / tot));
+                }
             }
         }
         updateRouting(destination);
@@ -320,13 +322,13 @@ public class Node_AntNet {
             // Intelligent Initialization
             if (neighbour == destination) {
                 double amt = 1. / NN + 3. / 2. * (NN - 1) / (NN * NN);
-                pheromone.put(neighbour, destination, amt);
+                pheromone.put(destination, neighbour, amt);
             } else {
                 double amt = 1. / NN - 3. / 2. * 1. / (NN * NN);
-                pheromone.put(neighbour, destination, amt);
+                pheromone.put(destination, neighbour, amt);
             }
         } else {
-            pheromone.put(neighbour, destination, 1. / NN);
+            pheromone.put(destination, neighbour, 1. / NN);
         }
     }
 
