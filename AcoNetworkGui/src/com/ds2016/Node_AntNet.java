@@ -72,7 +72,7 @@ public class Node_AntNet {
             ++numNeighbours;
             for (int a = 0; a < nodes.size(); ++a) {
                 if (a == ID) continue;
-                addHeuristic(ID, a);
+                updateHeuristic(ID, a, 1. / numNeighbours);
             }
         }
     }
@@ -86,7 +86,7 @@ public class Node_AntNet {
         ++numNeighbours;
         for (int a = 0; a < nodes.size(); ++a) {
             if (a == ID) continue;
-            addHeuristic(node, a);
+            updateHeuristic(node, a, 1. / numNeighbours);
         }
     }
 
@@ -106,7 +106,7 @@ public class Node_AntNet {
             ++numNeighbours;
             for (int a = 0; a < nodes.size(); ++a) {
                 if (a == ID) continue;
-                addHeuristic(node, a);
+                updateHeuristic(node, a, 1. / numNeighbours);
             }
         }
     }

@@ -324,7 +324,7 @@ public class Node_EACO {
         if (nxt != null) {
             slowQ.putIfAbsent(nxt, new ArrayDeque<>());
             slowQ.get(nxt).push(packet);
-        } else System.out.println("Packet dropped...");
+        }
         return 0;
     }
 
