@@ -150,34 +150,59 @@ public class Node_AntNet {
      * @param neighbour   ID of neighbour
      * @param destination ID of destination
      * @param change      Pheromone change
-     * @throws IllegalArgumentException if pheromone lies out of range [0, 1]
+     * @throws IllegalStateException if pheromone does not add up to 1.
      */
     private void updateHeuristic(int neighbour, int destination, double change) throws IllegalArgumentException {
-        Double old = pheromone.get(destination, neighbour);
-        double tot = 0;
+        // First we fix any rounding errors
+        double tot = .0;
         for (Edge_ACO edge : adjMat.get(ID).values()) {
             Double val = pheromone.get(destination, edge.destination);
             if (val != null) {
                 tot += val;
             }
         }
-        if (old == null) old = .0;
-        if (Math.abs(old + change) < EPS) {
-            pheromone.put(destination, neighbour, null);
-        } else {
-            if ((old + change) < -EPS || (old + change - 1) > EPS) throw new IllegalArgumentException();
-            if (old + change > TMAX) change = TMAX - old;
-            pheromone.put(destination, neighbour, old + change);
+        double new_tot = .0;
+        for (Edge_ACO edge : adjMat.get(ID).values()) {
+            Double val = pheromone.get(destination, edge.destination);
+            if (val != null) {
+                double new_val = val + (1. - tot) * (val / tot);
+                new_tot += new_val;
+                pheromone.put(destination, edge.destination, new_val);
+            }
         }
-        change += (tot - 1);
-        tot -= old;
-        if (tot > EPS) {
-            for (Edge_ACO edge : adjMat.get(ID).values()) {
-                if (edge.destination == neighbour) continue;
-                Double val = pheromone.get(destination, edge.destination);
-                if (val != null) {
-                    pheromone.put(destination, edge.destination, val * (1 - change / tot));
-                }
+        if (1. - new_tot > EPS) throw new IllegalStateException();
+        // Main update code
+        double TMIN = 0.05 / (numNeighbours - 1);
+        Double cur = pheromone.get(destination, neighbour);
+        if (cur == null) cur = 0.;
+        double maxChange = (TMAX - cur) / (1. - cur);
+        change = Math.min(change, maxChange);
+        cur = cur * (1 - change) + change;
+        pheromone.put(destination, neighbour, cur);
+        // Decrease the rest
+        double owed = .0;
+        double excess = .0;
+        for (Edge_ACO edge : adjMat.get(ID).values()) {
+            if (edge.destination == neighbour) continue;
+            Double val = pheromone.get(destination, edge.destination);
+            if (val != null) {
+                double new_val = val * (1 - change);
+                if (TMIN - new_val > EPS) {
+                    owed += TMIN - new_val;
+                    new_val = TMIN;
+                } else excess += new_val - TMIN;
+                if (TMIN - new_val > EPS) throw new IllegalStateException();
+                pheromone.put(destination, edge.destination, new_val);
+            }
+        }
+        // Pay off the debt
+        for (Edge_ACO edge : adjMat.get(ID).values()) {
+            if (edge.destination == neighbour) continue;
+            Double val = pheromone.get(destination, edge.destination);
+            if (val != null && val - TMIN > EPS) {
+                double new_val = val - owed * ((val - TMIN) / excess);
+                if (TMIN - new_val > EPS) throw new IllegalStateException();
+                pheromone.put(destination, edge.destination, new_val);
             }
         }
         updateRouting(destination);
@@ -198,8 +223,7 @@ public class Node_AntNet {
                 return; // Previous Node is gone
             }
             double R = 1. / ant.totalTime;
-            double change = (P * (1 - R) + R) - P;
-            updateHeuristic(prev, ant.destination, change);
+            updateHeuristic(prev, ant.destination, R);
             if (ant.source == ID) {
                 return; // Reached source
             }
@@ -341,7 +365,17 @@ public class Node_AntNet {
      * @param destination Destination ID
      */
     private void removeHeuristic(int neighbour, int destination) {
-        updateHeuristic(neighbour, destination, -pheromone.get(destination, neighbour));
+        Double amount = pheromone.get(destination, neighbour);
+        pheromone.put(destination, neighbour, null);
+        /* Decrease proportionally */
+        for (Edge_ACO edge : adjMat.get(ID).values()) {
+            Double val = pheromone.get(destination, edge.destination);
+            if (val != null) {
+                Double new_val = val + amount * (val / (1 - amount));
+                pheromone.put(destination, edge.destination, new_val);
+            }
+        }
+        updateRouting(destination);
     }
 
     /**
