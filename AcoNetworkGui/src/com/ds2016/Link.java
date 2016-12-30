@@ -163,7 +163,6 @@ public class Link implements GuiEventListener {
                 break;
         }
         sAlgorithm.build(mGui.mNodeList, mGui.mEdgeList, source, destination);
-        if (Main.DEBUG) System.out.println("buildNewAlgorithm: algorithm = " + algorithm);
     }
 
     @Override

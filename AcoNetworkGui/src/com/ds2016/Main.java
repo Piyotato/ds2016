@@ -8,14 +8,14 @@ import com.ds2016.networks.NsfNetwork;
  */
 public class Main {
     // Debug tunables
-    public static final boolean DEBUG = false;
-
+    public static final boolean DEBUG_THROUGHPUT = false;
+    public static final boolean DEBUG_LATENCIES = false;
     // Algorithm tunables
     public static final int NUM_TICKS_PER_CHART_UPDATE = 1000;
     public static final int TTL_MS = 15000;
     // Debug table tunables
-    public static final int NUM_ARRAY_ROWS = 60;
-    public static final int NUM_ARRAY_COLS = 60;
+    public static final int NUM_ARRAY_ROWS = 14;
+    public static final int NUM_ARRAY_COLS = 10;
     // GUI network tunables
     public static final String STYLE_SHEET =
             "edge.highLoad { fill-color: #F44336; }" +

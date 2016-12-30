@@ -45,14 +45,11 @@ class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
             temp += edgeLoad;
         }
         int loadTotal = temp;
-        if (Main.DEBUG) System.out.println("compute: loadTotal = " + loadTotal);
         int edgeCount = edgeLoadList.size();
-        if (Main.DEBUG) System.out.println("compute: edgeCount = " + edgeCount);
         mEdgeLoadMean = loadTotal / edgeCount;
 
         for (int i = 0; i < edgeCount; i++) {
             Edge edge = graph.getEdge(i);
-            if (Main.DEBUG) System.out.println("compute: edgeId = " + edge.getId());
             setEdgeColor(edge, edgeLoadList.get(i));
         }
 
@@ -62,24 +59,18 @@ class GraphAlgo extends SinkAdapter implements DynamicAlgorithm {
             temp += nodeLoad;
         }
         loadTotal = temp;
-        if (Main.DEBUG) System.out.println("compute: loadTotal = " + loadTotal);
         final int nodeCount = nodeLoadlist.size();
-        if (Main.DEBUG) System.out.println("compute: nodeCount = " + nodeCount);
         mNodeLoadMean = loadTotal / nodeCount;
 
         for (int i = 0; i < nodeCount; i++) {
             Node node = graph.getNode(i);
             if ("destination".equals(node.getAttribute("ui.class")) ||
                     "source".equals(node.getAttribute("ui.class"))) continue;
-            if (Main.DEBUG) System.out.println("compute: nodeId = " + node.getId());
             setNodeColor(node, nodeLoadlist.get(i));
         }
     }
 
     private void setEdgeColor(final Edge edge, final int curLoad) {
-        //int avgLoad = calcLoadAvg(curLoad);
-        if (Main.DEBUG) System.out.println("setEdgeColor: curLoad = " + curLoad);
-
         String loadLv;
         if (curLoad >= Main.HIGH_LOAD_FACTOR * mEdgeLoadMean) {
             loadLv = "highLoad";

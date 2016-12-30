@@ -29,6 +29,10 @@ class DataChart {
 
     private java.util.List<TableModel> mModelList = new ArrayList<>();
 
+    private long mConsistentCount;
+    private long mTickCount;
+    private boolean mLoggedMax;
+
     void display() {
         JFrame frame = new JFrame(FRAME_TITLE);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -109,15 +113,33 @@ class DataChart {
 
     void updateCharts() {
         updatePheromoneTables();
-        
+
         mAccumulatedThroughput += Link.sThroughput;
 
         if (++mElapsedTicks < Main.NUM_TICKS_PER_CHART_UPDATE) {
             return;
         }
 
-        if (Main.DEBUG) System.out.println(++mUpdateCnt + " " + mAccumulatedThroughput);
         mThroughputSeries.add(mThroughputSeries.getItemCount(), mAccumulatedThroughput);
+
+        if (Main.DEBUG_THROUGHPUT) {
+            mTickCount += 1;
+            if (mAccumulatedThroughput >= 950) {
+                mConsistentCount += 1;
+                if (mConsistentCount == 5) {
+                    System.out.println("95% at " + (mTickCount - 5));
+                }
+            } else {
+                if (mConsistentCount >= 5) {
+                    System.out.println("95% RESET!");
+                    mConsistentCount = 0;
+                }
+            }
+            if (!mLoggedMax && mAccumulatedThroughput >= 1000) {
+                System.out.println("100% at " + mTickCount);
+                mLoggedMax = true;
+            }
+        }
 
         mAccumulatedThroughput = 0;
         mElapsedTicks = 0;
@@ -134,6 +156,10 @@ class DataChart {
             model.resetData();
         }
         updatePheromoneTables();
+
+        mTickCount = 0;
+        mConsistentCount = 0;
+        mLoggedMax = false;
     }
 
     void addNode() {

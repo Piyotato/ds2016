@@ -23,7 +23,9 @@ public class Node_EACO {
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat;
     private final HashMap2D<Integer, Integer, Double> routing = new HashMap2D<>();
     boolean isOffline;
+    long avgTripTime;
     private UFDS DSU;
+    private long mNumTripTimes;
 
     /**
      * Initialize a node
@@ -318,6 +320,10 @@ public class Node_EACO {
      */
     int processPacket(Packet packet) {
         if (packet.destination == ID) {
+            if (Main.DEBUG_LATENCIES) {
+                avgTripTime = (avgTripTime * mNumTripTimes
+                        + packet.timestamp - packet.getCreationTime()) / ++mNumTripTimes;
+            }
             return 1;
         }
         Integer nxt = nextHop(packet);

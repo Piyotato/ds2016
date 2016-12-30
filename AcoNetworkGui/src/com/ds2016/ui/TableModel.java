@@ -44,7 +44,6 @@ public class TableModel extends DefaultTableModel {
 
     @Override
     public void setValueAt(Object value, int row, int col) {
-        if (Main.DEBUG) System.out.println("setValueAt(): row=" + row + " col=" + col + " value=" + value);
         mData[row][col] = String.valueOf(value);
         fireTableCellUpdated(row, col);
     }

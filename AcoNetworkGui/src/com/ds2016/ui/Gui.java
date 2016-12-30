@@ -238,7 +238,6 @@ public class Gui implements GraphEventListener, NetworkEventListener {
     private void addNode() {
         // Add GUI node
         int nodeCount = mGraph.getNodeCount();
-        if (Main.DEBUG) System.out.println("addNode: nodeCount = " + nodeCount);
         Node node = mGraph.addNode(String.valueOf(nodeCount));
         node.addAttribute("ui.label", nodeCount);
 
@@ -284,14 +283,12 @@ public class Gui implements GraphEventListener, NetworkEventListener {
     private void addEdge(int node1, int node2, int cost, int bandwidth) throws IllegalArgumentException {
         // We can't add edges between non-existent nodes
         int nodeCount = mGraph.getNodeCount();
-        if (Main.DEBUG) System.out.println("addEdge: nodeCount = " + nodeCount);
         if (node1 >= nodeCount || node2 >= nodeCount) {
             throw new IllegalArgumentException();
         }
 
         // Add forward edge
         int edgeCount = mGraph.getEdgeCount() / 2;
-        if (Main.DEBUG) System.out.println("addEdge: edgeCount = " + nodeCount);
 
         Edge forward = mGraph.addEdge(String.valueOf(edgeCount + "f"), node1, node2, true);
         forward.addAttribute("ui.label", String.valueOf(edgeCount));
@@ -317,7 +314,6 @@ public class Gui implements GraphEventListener, NetworkEventListener {
         String backwardId = ID + "b";
         Edge forward = mGraph.getEdge(forwardId);
         Edge backward = mGraph.getEdge(backwardId);
-        if (Main.DEBUG) System.out.println("toggleEdge: forwardId = " + forwardId + " backwardId = " + backwardId);
 
         // Toggle forward edge visibility
         if (forward.hasAttribute("ui.hide")) {

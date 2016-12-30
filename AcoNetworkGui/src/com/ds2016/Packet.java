@@ -31,4 +31,8 @@ class Packet {
     boolean isValid(int time) {
         return (time - creation) <= TTL;
     }
+
+    int getCreationTime() {
+        return creation;
+    }
 }

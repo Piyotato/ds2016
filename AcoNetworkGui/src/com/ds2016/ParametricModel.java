@@ -36,7 +36,7 @@ public class ParametricModel {
     /**
      * Get reinforcement
      *
-     * @param T Time taken for trip
+     * @param T  Time taken for trip
      * @param _N Number of neighbour nodes
      * @return Reinforcement Value
      */

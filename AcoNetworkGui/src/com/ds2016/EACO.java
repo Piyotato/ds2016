@@ -252,6 +252,11 @@ public class EACO implements AlgorithmBase {
             if (node.isOffline) continue;
             processNode(node);
         }
+        if (Main.DEBUG_LATENCIES) {
+            if (currentTime % 1000 == 0) {
+                System.out.println("avgTripTime: " + nodes.get(destination).avgTripTime);
+            }
+        }
         return success;
     }
 
