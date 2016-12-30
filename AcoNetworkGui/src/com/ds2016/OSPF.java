@@ -212,7 +212,7 @@ public class OSPF implements AlgorithmBase {
             processNode(node);
         }
         if (Main.DEBUG_LATENCIES) {
-            if (currentTime % 1000 == 0) {
+            if (currentTime % Main.NUM_TICKS_PER_CHART_UPDATE == 0) {
                 System.out.println("avgTripTime: " + nodes.get(destination).avgTripTime);
             }
         }
