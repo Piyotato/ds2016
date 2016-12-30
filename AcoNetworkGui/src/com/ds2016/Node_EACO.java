@@ -23,9 +23,9 @@ public class Node_EACO {
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat;
     private final HashMap2D<Integer, Integer, Double> routing = new HashMap2D<>();
     boolean isOffline;
-    long avgTripTime;
+    double avgTripTime;
+    int mNumTripTimes;
     private UFDS DSU;
-    private long mNumTripTimes;
 
     /**
      * Initialize a node

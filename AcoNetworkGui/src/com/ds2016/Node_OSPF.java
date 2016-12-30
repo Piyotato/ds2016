@@ -16,8 +16,8 @@ public class Node_OSPF {
     public Dijkstra SSSP;
     boolean isOffline;
 
-    long avgTripTime;
-    private long mNumTripTimes;
+    double avgTripTime;
+    int mNumTripTimes;
 
     /**
      * Initialize a node

@@ -21,9 +21,9 @@ public class Node_AntNet {
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat;
     private final HashMap2D<Integer, Integer, Double> routing = new HashMap2D<>();
     boolean isOffline;
-    long avgTripTime;
+    double avgTripTime;
+    int mNumTripTimes;
     private int numNeighbours;
-    private long mNumTripTimes;
 
     /**
      * Initialize a node
