@@ -123,17 +123,17 @@ class DataChart {
         mThroughputSeries.add(mThroughputSeries.getItemCount(), mAccumulatedThroughput);
 
         if (Main.DEBUG_THROUGHPUT) {
-            mTickCount += 1;
+            ++mTickCount;
             if (mAccumulatedThroughput >= 950) {
-                mConsistentCount += 1;
+                ++mConsistentCount;
                 if (mConsistentCount == 5) {
                     System.out.println("95% at " + (mTickCount - 5));
                 }
             } else {
                 if (mConsistentCount >= 5) {
                     System.out.println("95% RESET!");
-                    mConsistentCount = 0;
                 }
+                mConsistentCount = 0;
             }
             if (!mLoggedMax && mAccumulatedThroughput >= 1000) {
                 System.out.println("100% at " + mTickCount);
