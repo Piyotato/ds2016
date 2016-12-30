@@ -21,8 +21,7 @@ public class Node_AntNet {
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat;
     private final HashMap2D<Integer, Integer, Double> routing = new HashMap2D<>();
     boolean isOffline;
-    double avgTripTime;
-    int mNumTripTimes;
+    int tripTime;
     private int numNeighbours;
 
     /**
@@ -268,8 +267,7 @@ public class Node_AntNet {
     int processPacket(Packet packet) {
         if (packet.destination == ID) {
             if (Main.DEBUG_LATENCIES) {
-                avgTripTime = (avgTripTime * mNumTripTimes
-                        + packet.timestamp - packet.getCreationTime()) / ++mNumTripTimes;
+                tripTime += (packet.timestamp - packet.getCreationTime());
             }
             return 1;
         }

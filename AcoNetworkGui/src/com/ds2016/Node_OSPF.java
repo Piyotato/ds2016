@@ -16,8 +16,7 @@ public class Node_OSPF {
     public Dijkstra SSSP;
     boolean isOffline;
 
-    double avgTripTime;
-    int mNumTripTimes;
+    int tripTime;
 
     /**
      * Initialize a node
@@ -58,8 +57,7 @@ public class Node_OSPF {
     int process(Packet packet) {
         if (packet.destination == ID) {
             if (Main.DEBUG_LATENCIES) {
-                avgTripTime = (avgTripTime * mNumTripTimes
-                        + packet.timestamp - packet.getCreationTime()) / ++mNumTripTimes;
+                tripTime += (packet.timestamp - packet.getCreationTime());
             }
             return 1;
         }
