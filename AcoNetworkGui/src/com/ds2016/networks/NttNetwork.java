@@ -31,6 +31,8 @@ public class NttNetwork extends Network {
 
         mListener.onEdgeAdded(8, 9, 22, 4);
 
+        mListener.onEdgeAdded(9, 17, 17, 4);
+
         mListener.onEdgeAdded(10, 12, 20, 4);
 
         mListener.onEdgeAdded(11, 14, 17, 4);
@@ -79,6 +81,8 @@ public class NttNetwork extends Network {
         mListener.onEdgeAdded(30, 33, 12, 4);
 
         mListener.onEdgeAdded(31, 32, 10, 4);
+
+        mListener.onEdgeAdded(32, 36, 17, 4);
 
         mListener.onEdgeAdded(33, 34, 11, 4);
         mListener.onEdgeAdded(33, 36, 16, 4);
