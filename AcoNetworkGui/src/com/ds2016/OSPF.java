@@ -43,6 +43,11 @@ public class OSPF implements AlgorithmBase {
         didInit = true;
     }
 
+    @Override
+    public int getCurrentTime() {
+        return currentTime;
+    }
+
     /**
      * Retrieve the current load of the network's nodes
      *

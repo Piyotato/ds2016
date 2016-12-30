@@ -24,4 +24,6 @@ public interface AlgorithmBase {
     void build(ArrayList<Node_GUI> nodes, ArrayList<SimpleEdge> edgeList, int source, int destination);
 
     void init(int source, int destination);
+
+    int getCurrentTime();
 }

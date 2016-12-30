@@ -22,7 +22,6 @@ public class Link implements GuiEventListener {
     private ParameterStorage mParams;
     private Thread mThread;
     private Runnable mRunnable;
-    private int mNumTicks;
     private boolean mStarted;
 
     Link() {
@@ -30,7 +29,6 @@ public class Link implements GuiEventListener {
         mParams = new ParameterStorage(0, 6,
                 0.4, 0.3, 1, 60000, ALGO_EACO);
         sAlgorithm = new EACO(0.4, 1, Main.TTL_MS, 0.3);
-        mNumTicks = 0;
     }
 
     void init() {
@@ -43,10 +41,8 @@ public class Link implements GuiEventListener {
                     try {
                         tick();
                         mGui.tick();
-                        mNumTicks++;
-                        if (mParams.getNumTicks() > 0 &&
-                                mNumTicks >= mParams.getNumTicks()) {
-                            mNumTicks = 0;
+                        if (sAlgorithm.getCurrentTime() >= mParams.getNumTicks()
+                                && mParams.getNumTicks() > 0) {
                             stop();
                         }
                     } finally {
@@ -137,7 +133,6 @@ public class Link implements GuiEventListener {
     }
 
     private void update(final ParameterStorage params) {
-        mNumTicks = 0;
         mParams.setSource(params.getSource());
         mParams.setDestination(params.getDestination());
         mParams.setAlpha(params.getAlpha());
