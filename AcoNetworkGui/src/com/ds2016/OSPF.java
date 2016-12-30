@@ -213,9 +213,10 @@ public class OSPF implements AlgorithmBase {
         }
         if (Main.DEBUG_LATENCIES) {
             if (currentTime % Main.NUM_TICKS_PER_CHART_UPDATE == 0) {
-                double avgTripTime = (double) nodes.get(destination).tripTime / Main.NUM_TICKS_PER_CHART_UPDATE;
+                double avgTripTime = (double) nodes.get(destination).tripTime / nodes.get(destination).numPackets;
                 System.out.println("avgTripTime: " + avgTripTime);
                 nodes.get(destination).tripTime = 0;
+                nodes.get(destination).numPackets = 0;
             }
         }
         return success;
