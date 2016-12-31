@@ -27,8 +27,8 @@ public class Link implements GuiEventListener {
     Link() {
         mGui = new Gui(this);
         mParams = new ParameterStorage(0, 6,
-                0.4, 0.3, 1, 60000, ALGO_EACO);
-        sAlgorithm = new EACO(0.4, 1, Main.TTL_MS, 0.3);
+                0.4, 0.1, 1, 60000, ALGO_EACO);
+        sAlgorithm = new EACO(mParams.getAlpha(), mParams.getTraffic(), Main.TTL_MS, mParams.getInterval());
     }
 
     void init() {

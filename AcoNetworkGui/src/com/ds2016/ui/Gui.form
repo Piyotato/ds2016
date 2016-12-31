@@ -57,7 +57,7 @@
                   </grid>
                 </constraints>
                 <properties>
-                  <text value="0.3"/>
+                  <text value="0.1"/>
                 </properties>
               </component>
             </children>
