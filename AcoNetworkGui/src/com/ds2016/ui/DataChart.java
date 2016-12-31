@@ -124,7 +124,7 @@ class DataChart {
 
         if (Main.DEBUG_THROUGHPUT) {
             ++mTickCount;
-            if (mAccumulatedThroughput >= 950) {
+            if (mAccumulatedThroughput >= Main.DEBUG_PACKETS_PER_TICK * 950) {
                 ++mConsistentCount;
                 if (mConsistentCount == 5) {
                     System.out.println("95% at " + (mTickCount - 5));
@@ -135,7 +135,7 @@ class DataChart {
                 }
                 mConsistentCount = 0;
             }
-            if (!mLoggedMax && mAccumulatedThroughput >= 1000) {
+            if (!mLoggedMax && mAccumulatedThroughput >= Main.DEBUG_PACKETS_PER_TICK * 1000) {
                 System.out.println("100% at " + mTickCount);
                 mLoggedMax = true;
             }
