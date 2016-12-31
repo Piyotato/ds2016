@@ -22,6 +22,7 @@ public class Node_EACO {
     private final ArrayList<Integer> numViableNeighbours = new ArrayList<>();
     private final HashMap2D<Integer, Integer, Edge_ACO> adjMat;
     private final HashMap2D<Integer, Integer, Double> routing = new HashMap2D<>();
+    private final ParametricModel PM = new ParametricModel();
     boolean isOffline;
     int tripTime, numPackets;
     private UFDS DSU;
@@ -276,7 +277,7 @@ public class Node_EACO {
             if (P == null) {
                 return; // Previous Node is gone
             }
-            double R = 1. / ant.totalTime;
+            double R = PM.getReinforcement(ant.totalTime / 1000, adjMat.get(ID).values().size());
             updateHeuristic(prev, ant.destination, R);
             if (ant.source == ID) {
                 return; // Reached source
