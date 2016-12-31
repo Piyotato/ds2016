@@ -100,11 +100,11 @@ class DataChart {
                 for (ArrayList<Integer> value : node.SSSP.P) {
                     int col = 1;
                     for (Integer valueEntry : value) {
-                        model.setValueAt(valueEntry, 0, col);
+                        model.setValueAt(col, 0, col);
                         model.setValueAt(String.valueOf(valueEntry), row, col);
                         col++;
                     }
-                    model.setValueAt(value, row, 0);
+                    model.setValueAt(row - 1, row, 0);
                     row++;
                 }
             }

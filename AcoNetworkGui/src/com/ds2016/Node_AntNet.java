@@ -156,23 +156,24 @@ public class Node_AntNet {
      */
     private void updateHeuristic(int neighbour, int destination, double change) throws IllegalArgumentException {
         // First we fix any rounding errors
+        int cnt = 0;
         double tot = .0;
         for (Edge_ACO edge : adjMat.get(ID).values()) {
             Double val = pheromone.get(destination, edge.destination);
             if (val != null) {
                 tot += val;
+                ++cnt;
             }
         }
-        double new_tot = .0;
-        for (Edge_ACO edge : adjMat.get(ID).values()) {
-            Double val = pheromone.get(destination, edge.destination);
-            if (val != null) {
-                double new_val = val + (1. - tot) * (val / tot);
-                new_tot += new_val;
-                pheromone.put(destination, edge.destination, new_val);
+        if (cnt > 0) {
+            for (Edge_ACO edge : adjMat.get(ID).values()) {
+                Double val = pheromone.get(destination, edge.destination);
+                if (val != null) {
+                    double new_val = val + (1. - tot) * (val / tot);
+                    pheromone.put(destination, edge.destination, new_val);
+                }
             }
         }
-        if (1. - new_tot > EPS) throw new IllegalStateException();
         // Main update code
         double TMIN = 0.05 / (numNeighbours - 1);
         Double cur = pheromone.get(destination, neighbour);

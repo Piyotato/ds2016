@@ -50,7 +50,7 @@ public class TableModel extends DefaultTableModel {
 
     void resetData() {
         for (int col = 0; col < Main.NUM_ARRAY_COLS; col++) {
-            mData[0][col] = "FILLERTEXT";
+            mData[0][col] = "FILLER";
         }
         for (int row = 1; row < Main.NUM_ARRAY_ROWS; row++) {
             for (int col = 0; col < Main.NUM_ARRAY_COLS; col++) {
