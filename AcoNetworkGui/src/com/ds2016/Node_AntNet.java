@@ -233,7 +233,7 @@ public class Node_AntNet {
                 return; // Next node is gone
             }
             fastQ.putIfAbsent(nxt, new ArrayDeque<>());
-            fastQ.get(nxt).push(ant);
+            fastQ.get(nxt).add(ant);
         } else { // Forward ant
             ant.addNode(ID);
             if (ant.destination == ID) {
@@ -244,7 +244,7 @@ public class Node_AntNet {
                 }
                 fastQ.putIfAbsent(nxt, new ArrayDeque<>());
                 ant.timings.add(getDepletionTime(nxt));
-                fastQ.get(nxt).push(ant);
+                fastQ.get(nxt).add(ant);
             } else {
                 nxt = nextHop(ant);
                 if (nxt == null) {
@@ -253,7 +253,7 @@ public class Node_AntNet {
                 fastQ.putIfAbsent(nxt, new ArrayDeque<>());
                 ant.timings.add(getDepletionTime(nxt));
                 ant.timings.add((double) adjMat.get(ID, nxt).cost);
-                fastQ.get(nxt).push(ant);
+                fastQ.get(nxt).add(ant);
             }
         }
     }
@@ -275,7 +275,7 @@ public class Node_AntNet {
         Integer nxt = nextHop(packet);
         if (nxt != null) {
             slowQ.putIfAbsent(nxt, new ArrayDeque<>());
-            slowQ.get(nxt).push(packet);
+            slowQ.get(nxt).add(packet);
         }
         return 0;
     }
