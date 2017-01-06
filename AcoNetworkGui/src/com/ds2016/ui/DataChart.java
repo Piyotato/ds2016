@@ -22,16 +22,14 @@ class DataChart {
 
     private JTabbedPane mTabbedPane;
     private XYSeries mThroughputSeries;
-    private int mUpdateCnt;
     private int mNumNodes;
-    private long mAccumulatedThroughput;
-    private long mElapsedTicks;
 
     private java.util.List<TableModel> mModelList = new ArrayList<>();
 
     private long mConsistentCount;
     private long mTickCount;
     private boolean mLoggedMax;
+    private ArrayList<Long> mThroughputs = new ArrayList<>();
 
     void display() {
         JFrame frame = new JFrame(FRAME_TITLE);
@@ -114,52 +112,50 @@ class DataChart {
     void updateCharts() {
         updatePheromoneTables();
 
-        mAccumulatedThroughput += Link.sThroughput;
-
-        if (++mElapsedTicks < Main.NUM_TICKS_PER_CHART_UPDATE) {
-            return;
-        }
-
-        mThroughputSeries.add(mThroughputSeries.getItemCount(), mAccumulatedThroughput);
+        mThroughputSeries.add(mThroughputSeries.getItemCount(), Link.sThroughput);
 
         if (Main.DEBUG_THROUGHPUT) {
-            ++mTickCount;
-            if (mAccumulatedThroughput >= Main.DEBUG_PACKETS_PER_TICK * 950) {
+            mThroughputs.add(Link.sThroughput);
+
+            long throughput = 0;
+            for (int i = 1; i <= 1000; i++) {
+                if (i > mThroughputs.size()) {
+                    break;
+                }
+                throughput += mThroughputs.get(mThroughputs.size() - i);
+            }
+
+            if (!mLoggedMax) {
+                if (throughput >= Main.DEBUG_PACKETS_PER_TICK * Main.DEBUG_NUM_TICKS_PER_UPDATE) {
+                    System.out.println("100% at " + mThroughputs.size() + " ticks");
+                    mLoggedMax = true;
+                }
+            }
+
+            if (throughput >= 0.95 * Main.DEBUG_PACKETS_PER_TICK * Main.DEBUG_NUM_TICKS_PER_UPDATE) {
                 ++mConsistentCount;
-                if (mConsistentCount == 5) {
-                    System.out.println("95% at " + (mTickCount - 5));
+                if (mConsistentCount == 5 * Main.DEBUG_NUM_TICKS_PER_UPDATE) {
+                    System.out.println("95% at "
+                            + (mThroughputs.size() - 5 * Main.DEBUG_NUM_TICKS_PER_UPDATE) + " ticks");
                 }
             } else {
-                if (mConsistentCount >= 5) {
-                    System.out.println("95% RESET!");
-                }
                 mConsistentCount = 0;
             }
-            if (!mLoggedMax && mAccumulatedThroughput >= Main.DEBUG_PACKETS_PER_TICK * 1000) {
-                System.out.println("100% at " + mTickCount);
-                mLoggedMax = true;
-            }
         }
-
-        mAccumulatedThroughput = 0;
-        mElapsedTicks = 0;
     }
 
     void resetCharts() {
+        mThroughputs.clear();
+        mTickCount = 0;
+        mConsistentCount = 0;
+        mLoggedMax = false;
         mThroughputSeries.clear();
         mThroughputSeries.add(0, 0);
-        mUpdateCnt = 0;
-        mAccumulatedThroughput = 0;
-        mElapsedTicks = 0;
         for (int node = 0; node < mNumNodes; node++) {
             final TableModel model = mModelList.get(node);
             model.resetData();
         }
         updatePheromoneTables();
-
-        mTickCount = 0;
-        mConsistentCount = 0;
-        mLoggedMax = false;
     }
 
     void addNode() {

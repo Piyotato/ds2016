@@ -11,8 +11,8 @@ public class Main {
     public static final boolean DEBUG_THROUGHPUT = false;
     public static final boolean DEBUG_LATENCIES = false;
     public static final int DEBUG_PACKETS_PER_TICK = 1;
+    public static final int DEBUG_NUM_TICKS_PER_UPDATE = 1000;
     // Algorithm tunables
-    public static final int NUM_TICKS_PER_CHART_UPDATE = 1000;
     public static final int TTL_MS = 15000;
     // Debug table tunables
     public static final int NUM_ARRAY_ROWS = 14;
