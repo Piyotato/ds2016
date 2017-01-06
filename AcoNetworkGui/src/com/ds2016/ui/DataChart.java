@@ -10,6 +10,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,10 +27,11 @@ class DataChart {
 
     private java.util.List<TableModel> mModelList = new ArrayList<>();
 
-    private long mConsistentCount;
-    private long mTickCount;
+    private int mConsistentCount;
     private boolean mLoggedMax;
-    private ArrayList<Long> mThroughputs = new ArrayList<>();
+    private int mNumTicks;
+    private int mCurThroughput;
+    private ArrayDeque<Integer> mThroughputs = new ArrayDeque<>();
 
     void display() {
         JFrame frame = new JFrame(FRAME_TITLE);
@@ -112,31 +114,31 @@ class DataChart {
     void updateCharts() {
         updatePheromoneTables();
 
-        mThroughputSeries.add(mThroughputSeries.getItemCount(), Link.sThroughput);
+        mThroughputs.addLast(Link.sThroughput);
+        mCurThroughput += Link.sThroughput;
+        if (mThroughputs.size() > 1000) {
+            mCurThroughput -= mThroughputs.getFirst();
+            mThroughputs.pollFirst();
+        }
+        ++mNumTicks;
+
+        if (mNumTicks % Main.DEBUG_NUM_TICKS_PER_UPDATE == 0) {
+            mThroughputSeries.add(mThroughputSeries.getItemCount(), mCurThroughput);
+        }
 
         if (Main.DEBUG_THROUGHPUT) {
-            mThroughputs.add(Link.sThroughput);
-
-            long throughput = 0;
-            for (int i = 1; i <= 1000; i++) {
-                if (i > mThroughputs.size()) {
-                    break;
-                }
-                throughput += mThroughputs.get(mThroughputs.size() - i);
-            }
-
             if (!mLoggedMax) {
-                if (throughput >= Main.DEBUG_PACKETS_PER_TICK * Main.DEBUG_NUM_TICKS_PER_UPDATE) {
-                    System.out.println("100% at " + mThroughputs.size() + " ticks");
+                if (mCurThroughput >= Main.DEBUG_PACKETS_PER_TICK * Main.DEBUG_NUM_TICKS_PER_UPDATE) {
+                    System.out.println("100% at " + mNumTicks + " ticks");
                     mLoggedMax = true;
                 }
             }
 
-            if (throughput >= 0.95 * Main.DEBUG_PACKETS_PER_TICK * Main.DEBUG_NUM_TICKS_PER_UPDATE) {
+            if (mCurThroughput >= 0.95 * Main.DEBUG_PACKETS_PER_TICK * Main.DEBUG_NUM_TICKS_PER_UPDATE) {
                 ++mConsistentCount;
                 if (mConsistentCount == 5 * Main.DEBUG_NUM_TICKS_PER_UPDATE) {
                     System.out.println("95% at "
-                            + (mThroughputs.size() - 5 * Main.DEBUG_NUM_TICKS_PER_UPDATE) + " ticks");
+                            + (mNumTicks - 5 * Main.DEBUG_NUM_TICKS_PER_UPDATE) + " ticks");
                 }
             } else {
                 mConsistentCount = 0;
@@ -146,7 +148,8 @@ class DataChart {
 
     void resetCharts() {
         mThroughputs.clear();
-        mTickCount = 0;
+        mNumTicks = 0;
+        mCurThroughput = 0;
         mConsistentCount = 0;
         mLoggedMax = false;
         mThroughputSeries.clear();
