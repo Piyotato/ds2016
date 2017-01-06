@@ -138,7 +138,7 @@ class DataChart {
                 ++mConsistentCount;
                 if (mConsistentCount == 5 * Main.DEBUG_NUM_TICKS_PER_UPDATE) {
                     System.out.println("95% at "
-                            + (mNumTicks - 5 * Main.DEBUG_NUM_TICKS_PER_UPDATE) + " ticks");
+                            + (mNumTicks - 5 * Main.DEBUG_NUM_TICKS_PER_UPDATE + 1) + " ticks");
                 }
             } else {
                 mConsistentCount = 0;
