@@ -212,6 +212,7 @@ public class Gui implements GraphEventListener, NetworkEventListener {
                 Integer.parseInt(mNumTicksField.getText()));
         colouriseNodes(mSourceNode, mDestinationNode);
         mListener.onUpdate(params);
+        mDataChart.onUpdate(params);
         mDataChart.resetCharts();
     }
 

@@ -10,7 +10,6 @@ public class Main {
     // Debug tunables
     public static final boolean DEBUG_THROUGHPUT = false;
     public static final boolean DEBUG_LATENCIES = false;
-    public static final int DEBUG_PACKETS_PER_TICK = 1;
     public static final int DEBUG_NUM_TICKS_PER_UPDATE = 1000;
     // Algorithm tunables
     public static final int TTL_MS = 15000;

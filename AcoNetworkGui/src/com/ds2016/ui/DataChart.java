@@ -1,6 +1,7 @@
 package com.ds2016.ui;
 
 import com.ds2016.*;
+import com.ds2016.listeners.GuiEventListener;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-class DataChart {
+class DataChart implements GuiEventListener {
     private static final String FRAME_TITLE = "Data charts";
     private static final String THROUGHPUT_TITLE = "Throughput";
     private static final String CHART_X = "Elapsed time";
@@ -32,6 +33,7 @@ class DataChart {
     private int mNumTicks;
     private int mCurThroughput;
     private ArrayDeque<Integer> mThroughputs = new ArrayDeque<>();
+    private int mPacketsPerTick;
 
     void display() {
         JFrame frame = new JFrame(FRAME_TITLE);
@@ -128,13 +130,13 @@ class DataChart {
 
         if (Main.DEBUG_THROUGHPUT) {
             if (!mLoggedMax) {
-                if (mCurThroughput >= Main.DEBUG_PACKETS_PER_TICK * Main.DEBUG_NUM_TICKS_PER_UPDATE) {
+                if (mCurThroughput >= mPacketsPerTick * Main.DEBUG_NUM_TICKS_PER_UPDATE) {
                     System.out.println("100% at " + mNumTicks + " ticks");
                     mLoggedMax = true;
                 }
             }
 
-            if (mCurThroughput >= 0.95 * Main.DEBUG_PACKETS_PER_TICK * Main.DEBUG_NUM_TICKS_PER_UPDATE) {
+            if (mCurThroughput >= 0.95 * mPacketsPerTick * Main.DEBUG_NUM_TICKS_PER_UPDATE) {
                 ++mConsistentCount;
                 if (mConsistentCount == 5 * Main.DEBUG_NUM_TICKS_PER_UPDATE) {
                     System.out.println("95% at "
@@ -175,5 +177,50 @@ class DataChart {
 
     void toggleNode(final boolean isOffline) {
         mNumNodes += isOffline ? -1 : 1;
+    }
+
+    @Override
+    public void onStart() {
+        // Do nothing
+    }
+
+    @Override
+    public void onStop() {
+        // Do nothing
+    }
+
+    @Override
+    public void onTick() {
+        // Do nothing
+    }
+
+    @Override
+    public void onUpdate(ParameterStorage params) {
+        mPacketsPerTick = params.getTraffic();
+    }
+
+    @Override
+    public void onAlgorithmChanged(int algorithmId) {
+        // Do nothing
+    }
+
+    @Override
+    public void onNodeAdded() {
+        // Do nothing
+    }
+
+    @Override
+    public void onNodeToggled(int nodeId) {
+        // Do nothing
+    }
+
+    @Override
+    public void onEdgeAdded(int source, int destination, int cost, int bandwidth) {
+        // Do nothing
+    }
+
+    @Override
+    public void onEdgeToggled(int edgeId) {
+        // Do nothing
     }
 }
