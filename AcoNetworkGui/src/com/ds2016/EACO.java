@@ -102,7 +102,6 @@ public class EACO implements AlgorithmBase {
         if (node.isOffline) {
             node.clearFastQ();
             node.clearSlowQ();
-            node.slowQ.clear();
             for (Edge_ACO edge : edgeList) {
                 if (edge.source != ID && edge.destination != ID) continue;
                 edge.clearPacketQ();
